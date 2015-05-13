@@ -313,7 +313,7 @@ SiStripDigitizerAlgorithm::digitize(
   }//if zeroSuppression
 
   if(!zeroSuppression){
-    //if(noise){
+    //if(noise)
       // the constant pedestal offset is needed because
       //   negative adc counts are not allowed in case
       //   Pedestal and CMN subtraction is performed.
