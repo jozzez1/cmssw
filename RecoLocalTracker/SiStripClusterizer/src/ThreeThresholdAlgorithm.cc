@@ -67,15 +67,15 @@ inline
 void ThreeThresholdAlgorithm::
 addToCandidate(uint16_t strip, uint8_t adc) { 
   float Noise = noise( strip );
-  if(  adc < static_cast<uint8_t>( Noise * ChannelThreshold) || bad(strip) )
+  if(  adc < static_cast<uint8_t>( Noise * ChannelThreshold / 2) || bad(strip) )
     return;
 
-  if(candidateLacksSeed) candidateLacksSeed  =  adc < static_cast<uint8_t>( Noise * SeedThreshold);
+  if(candidateLacksSeed) candidateLacksSeed  =  adc < static_cast<uint8_t>( Noise * SeedThreshold / 2);
   if(ADCs.empty()) lastStrip = strip - 1; // begin candidate
   while( ++lastStrip < strip ) ADCs.push_back(0); // pad holes
 
   ADCs.push_back( adc );
-  noiseSquared += Noise*Noise;
+  noiseSquared += Noise*Noise/4;
 }
 
 template <class T>
@@ -108,9 +108,9 @@ applyGains() {
     if(adc > 255) throw InvalidChargeException( SiStripDigi(strip,adc) );
 #endif
     // if(adc > 253) continue; //saturated, do not scale
-    auto charge = int( float(adc)/gain(strip++) + 0.5f ); //adding 0.5 turns truncation into rounding
+    auto charge = int( float(2 * adc)/gain(strip++) + 0.5f ); //adding 0.5 turns truncation into rounding
     if(adc < 254) adc = ( charge > 1022 ? 255 : 
-			  ( charge >  253 ? 254 : charge ));
+			  ( charge >  506 ? 254 : ((int) charge) >> 1 ));
   }
 }
 

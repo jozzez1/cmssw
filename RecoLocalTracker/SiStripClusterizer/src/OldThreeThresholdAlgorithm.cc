@@ -63,7 +63,7 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
     if(edm::isDebugEnabled())
       ss << "\nSeed Channel:\n\t\t detID "<< detID << " digis " << ihigh->strip() 
 	 << " adc " << ihigh->adc() << " is " 
-	 << " channelNoise " << noiseHandle_->getNoise(ihigh->strip(),detNoiseRange) 
+	 << " channelNoise " << noiseHandle_->getNoise(ihigh->strip(),detNoiseRange) / 2
 	 <<  " IsBadChannel from SiStripQuality " << qualityHandle_->IsStripBad(detQualityRange,ihigh->strip());
 #endif
     
@@ -79,11 +79,11 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 #ifdef DEBUG_SiStripClusterizer_
       if(edm::isDebugEnabled())
 	ss << "\nStrips on the right:\n\t\t detID " << detID << " digis " << itest->strip()  
-	   << " adc " << itest->adc() << " " << " channelNoise " << channelNoise 
+	   << " adc " << itest->adc() << " " << " channelNoise " << channelNoise / 2
 	   <<  " IsBadChannel from SiStripQuality " << IsBadChannel;
 #endif 
       
-      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma() * channelNoise)) { 
+      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma() * channelNoise / 2)) { 
 	iend = itest;
       }
       ++itest;
@@ -108,12 +108,12 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 #ifdef DEBUG_SiStripClusterizer_
       if(edm::isDebugEnabled())
 	ss << "\nStrips on the left:\n\t\t detID " << detID << " digis " << itest->strip()
-	   << " adc " << itest->adc() << " " << " channelNoise " << channelNoise 
+	   << " adc " << itest->adc() << " " << " channelNoise " << channelNoise / 2
 	   <<  " IsBadChannel from SiStripQuality " << IsBadChannel;
 #endif      
       
       
-      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma() * channelNoise)) { 
+      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma() * channelNoise / 2)) { 
         ibeg = itest;
       }
       --itest;
@@ -155,7 +155,7 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 #ifdef DEBUG_SiStripClusterizer_
       if(edm::isDebugEnabled())
 	ss << "\nLooking at cluster digis:\n\t\t detID " << detID << " digis " << itest->strip()  
-	   << " adc " << itest->adc() << " channelNoise " << channelNoise 
+	   << " adc " << itest->adc() << " channelNoise " << channelNoise / 2
 	   <<  " IsBadChannel from SiStripQuality " << IsBadChannel;
 #endif
       
@@ -170,7 +170,7 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 #endif
 	}
       }
-      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma()*channelNoise)) {
+      if (!IsBadChannel && itest->adc() >= static_cast<int>( channelThresholdInNoiseSigma()*channelNoise / 2)) {
 
 	float gainFactor  = gainHandle_->getStripGain(itest->strip(), detGainRange);
 
@@ -180,7 +180,7 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
         // Also, Gain is applied only if the strip is not saturating.
 	// Same convention as in SimTracker/SiStripDigitizer/src/SiTrivialDigitalConverter.cc
 
-        float stripCharge=(static_cast<float>(itest->adc()));
+        float stripCharge= 2 * (static_cast<float>(itest->adc()));
 
 	// //dummy DEBUGG
 	// float stripCharge;
@@ -193,14 +193,14 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 
 	//correct for gain only non-truncated channel charge. Throw exception if channel charge exceeding 255 ADC counts is found
  
-	if(stripCharge<254){
+	if(stripCharge<510){
 	  stripCharge /= gainFactor;  
 	      
-	  if(stripCharge>511.5){stripCharge=255;}
-	  else if(stripCharge>253.5){stripCharge=254;}
+	  if(stripCharge>1022.5){stripCharge=510;}
+	  else if(stripCharge>507.5){stripCharge=508;}
 	}  
-	else if(stripCharge>255){
-	  throw cms::Exception("LogicError") << "Cluster charge (" << stripCharge << ") out of range. This clustering algorithm should only work with input charges lower than or equal to 255 ADC counts";
+	else if(stripCharge>510){
+	  throw cms::Exception("LogicError") << "Cluster charge (" << stripCharge << ") out of range. This clustering algorithm should only work with input charges lower than or equal to 510 raw-charge counts";
 
 	}
 
@@ -214,10 +214,9 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 
 	// End of Change done by Loic Quertenmont
 
-
-
+	stripCharge /= 2;
         charge += stripCharge;
-        sigmaNoise2 += channelNoise*channelNoise/(gainFactor*gainFactor);
+        sigmaNoise2 += channelNoise*channelNoise/(gainFactor*gainFactor)/4;
       
 	cluster_digis_.push_back(SiStripDigi(itest->strip(), static_cast<uint8_t>(stripCharge+0.5)));
       } else {
@@ -226,7 +225,7 @@ void OldThreeThresholdAlgorithm::clusterizeDetUnit_(const InputDetSet& input,
 #ifdef DEBUG_SiStripClusterizer_
 	if(edm::isDebugEnabled())
 	  ss << "\n\t\tBad or under threshold digis: detID " << detID  << " digis " << itest->strip()  
-	     << " adc " << itest->adc() << " channelNoise " << channelNoise 
+	     << " adc " << itest->adc() << " channelNoise " << channelNoise / 2 
 	     <<  " IsBadChannel from SiStripQuality " << IsBadChannel;
 #endif
       }
