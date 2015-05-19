@@ -84,7 +84,7 @@ int SiTrivialDigitalConverter::truncate(float in_adc) const {
     if (adc > 510 ) return 510;
   }
   else {
-    if (adc > 1022) return 255;
+    if (adc > 511) return 255;
     if (adc > 253) return 254;
   }
   
