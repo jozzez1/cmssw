@@ -73,7 +73,7 @@ bool shapeSelection(const SiStripCluster & clus)
 	Float_t C_M=0.0;	Float_t C_D=0.0;	Float_t C_Mn=10000;	Float_t C_Dn=10000;	Float_t C_Mnn=10000;	Float_t C_Dnn=10000;
 	Int_t CDPos;
 	Float_t coeff1=1.7;	Float_t coeff2=2.0;
-	Float_t coeffn=0.10;	Float_t coeffnn=0.02; Float_t noise=4.0;
+	Float_t coeffn=0.10;	Float_t coeffnn=0.02; Float_t noise=4.0 / 2; // to compensate for the bitshift we divide by 2
 
 	if(NofMax==1){
 
@@ -189,7 +189,7 @@ int getCharge(const SiStripCluster* cluster, int& nSatStrip, const GeomDetUnit& 
        if(calibratedCharge>=254)nSatStrip++;
      }
    }
-   return charge;
+   return 2*charge; // true charge is bitshifted, so it's twice as big
 }
 
 
