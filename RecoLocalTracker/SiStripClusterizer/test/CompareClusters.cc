@@ -90,8 +90,8 @@ printDigis(uint32_t id) {
       s << "( " 
 	<< digi->strip() << ", "
 	<< digi->adc()   << ", "
-	<< noiseHandle->getNoise(digi->strip(),noiseRange) << ", "
-	<< gainHandle->getStripGain(digi->strip(),gainRange) << ", "
+	<< noiseHandle->getNoise(digi->strip(),noiseRange) / 2 << ", "
+	<< gainHandle->getStripGain(digi->strip(),gainRange) / 2 << ", "
 	<< ( qualityHandle->IsStripBad(qualityRange, digi->strip())  ? "bad" : "good") << ")\n";
     }
   }
