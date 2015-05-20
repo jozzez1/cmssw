@@ -34,7 +34,7 @@ class ClusterVariables {
   /*
     Returns the total charge of all the strips in the Cluster 
   */
-  uint16_t charge() const    {return   std::accumulate( stripCharges().begin(), stripCharges().end(), uint16_t(0));}
+  uint16_t charge() const    {return 2 * std::accumulate( stripCharges().begin(), stripCharges().end(), uint16_t(0));} // real charge is twice this number
   
 
  private:
