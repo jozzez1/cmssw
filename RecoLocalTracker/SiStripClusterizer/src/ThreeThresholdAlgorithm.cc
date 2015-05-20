@@ -108,7 +108,7 @@ applyGains() {
     if(adc > 255) throw InvalidChargeException( SiStripDigi(strip,adc) );
 #endif
     // if(adc > 253) continue; //saturated, do not scale
-    auto charge = int( float(2 * adc)/gain(strip++) + 0.5f ); //adding 0.5 turns truncation into rounding
+    auto charge = int(2 * float(adc)/gain(strip++) + 0.5f ); //adding 0.5 turns truncation into rounding
     if(adc < 254) adc = ( charge > 1022 ? 255 : 
 			  ( charge >  506 ? 254 : ((int) charge) >> 1 ));
   }
