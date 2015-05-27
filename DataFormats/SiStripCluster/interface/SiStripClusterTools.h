@@ -29,7 +29,7 @@ namespace siStripClusterTools {
 
   template<typename Clus>
   float chargePerCM(DetId detid, Clus const & cl) {
-    return 2 * cl.charge()*sensorThicknessInverse(detid);
+    return cl.charge()*sensorThicknessInverse(detid);
   }
 
 
