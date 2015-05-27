@@ -140,7 +140,7 @@ applyGain(const uint16_t& strip,const uint16_t& adc ) {
   if(adc > 253) return adc; //saturated, do not scale
   uint16_t charge = static_cast<uint16_t>(2*adc*gain(strip) + 0.5 ); //NB: here we revert the gain applied at the clusterizer level. for this reason the adc counts are multiplied by gain and not divided
   return ( charge > 1022 ? 255 : 
-	  ( charge >  506 ? 254 : (charge >> 1) ));
+	  ( charge >  507 ? 254 : (charge >> 1) ));
 }
 
 
