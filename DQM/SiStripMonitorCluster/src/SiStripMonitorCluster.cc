@@ -634,7 +634,7 @@ void SiStripMonitorCluster::analyze(const edm::Event& iEvent, const edm::EventSe
 	  if(ampls[iamp]>0){ // nonzero amplitude
 	    cluster_signal += ampls[iamp];
 	    if(!qualityHandle->IsStripBad(qualityRange, clusterIter->firstStrip()+iamp)){
-	      noise = noiseHandle->getNoise(clusterIter->firstStrip()+iamp,detNoiseRange)/gainHandle->getStripGain(clusterIter->firstStrip()+iamp, detGainRange);
+	      noise = 0.5 * noiseHandle->getNoise(clusterIter->firstStrip()+iamp,detNoiseRange)/gainHandle->getStripGain(clusterIter->firstStrip()+iamp, detGainRange); // true charge is halved and so is noise
 	    }
 	    noise2 += noise*noise;
 	    nrnonzeroamplitudes++;
