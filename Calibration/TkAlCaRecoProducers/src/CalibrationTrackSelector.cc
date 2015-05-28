@@ -264,13 +264,13 @@ bool CalibrationTrackSelector::isOkCharge(const TrackingRecHit* therechit) const
     const std::vector<uint16_t> amplitudesmono( monocluster.amplitudes().begin(),
 						monocluster.amplitudes().end());
     for(size_t ia=0; ia<amplitudesmono.size();++ia)
-      { charge1+=amplitudesmono[ia];} 
+      { charge1+=2*amplitudesmono[ia];} 
     
     const SiStripCluster & stereocluster = matchedhit->stereoCluster();
     const std::vector<uint16_t> amplitudesstereo( stereocluster.amplitudes().begin(),
 						  stereocluster.amplitudes().end());
     for(size_t ia=0; ia<amplitudesstereo.size();++ia)
-      {charge2+=amplitudesstereo[ia];}
+      {charge2+=2*amplitudesstereo[ia];}
     // std::cout << "charge1 = " << charge1 << "\n";
     // std::cout << "charge2 = " << charge2 << "\n";
     if (charge1 < minHitChargeStrip_ || charge2 < minHitChargeStrip_) return false;
@@ -281,7 +281,7 @@ bool CalibrationTrackSelector::isOkCharge(const TrackingRecHit* therechit) const
     const std::vector<uint16_t> amplitudes( cluster->amplitudes().begin(),
 					    cluster->amplitudes().end());
     for(size_t ia=0; ia<amplitudes.size();++ia)
-      {charge1+=amplitudes[ia];}
+      {charge1+=2*amplitudes[ia];}
     // std::cout << "charge1 = " << charge1 << "\n";
     if (charge1 < minHitChargeStrip_) return false;
   }
@@ -292,7 +292,7 @@ bool CalibrationTrackSelector::isOkCharge(const TrackingRecHit* therechit) const
     const std::vector<uint16_t> amplitudes( origcluster->amplitudes().begin(),
 					    origcluster->amplitudes().end());
     for(size_t ia=0; ia<amplitudes.size();++ia)
-      {charge1+=amplitudes[ia];}
+      {charge1+=2*amplitudes[ia];}
     // std::cout << "charge1 = " << charge1 << "\n";
     if (charge1 < minHitChargeStrip_) return false;
   } 
