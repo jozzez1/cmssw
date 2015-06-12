@@ -31,7 +31,7 @@ bool MTCCHLTrigger::filter(edm::Event & e, edm::EventSetup const& c) {
 	for(std::vector<SiStripDigi>::const_iterator vit=(it->data).begin(); vit!=(it->data).end(); vit++) digiadc += vit->adc();
       }
     }
-    return (digiadc>ChargeThreshold) ? true : false;
+    return (digiadc>ChargeThreshold/2) ? true : false;
   } else {
     unsigned int amplclus=0;
     for (edm::DetSetVector<SiStripCluster>::const_iterator it=h->begin();it!=h->end();it++) {
@@ -42,7 +42,7 @@ bool MTCCHLTrigger::filter(edm::Event & e, edm::EventSetup const& c) {
         }
       }
     }
-    bool decision= (amplclus>ChargeThreshold) ? true : false;
+    bool decision= (amplclus>ChargeThreshold/2) ? true : false;
     std::auto_ptr< unsigned int > output( new unsigned int(amplclus) );
     std::auto_ptr< int > output_dec( new int(decision) );
     e.put(output);

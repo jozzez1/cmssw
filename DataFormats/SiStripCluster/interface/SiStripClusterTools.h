@@ -24,7 +24,7 @@ namespace siStripClusterTools {
 
   template<typename Iter>
   float chargePerCM(DetId detid, Iter a, Iter b) {
-    return float(std::accumulate(a,b,int(0)))*sensorThicknessInverse(detid);
+    return 2*float(std::accumulate(a,b,int(0)))*sensorThicknessInverse(detid);
   }
 
   template<typename Clus>
@@ -35,12 +35,12 @@ namespace siStripClusterTools {
 
   template<typename Clus>
   float	chargePerCM(DetId detid, Clus const & cl, LocalTrajectoryParameters const & tp) {
-    return chargePerCM(detid,cl)*tp.absdz();
+    return 2*chargePerCM(detid,cl)*tp.absdz();
   }
 
   template<typename Clus>
   float chargePerCM(DetId detid, Clus const & cl, const LocalVector & ldir) {
-    return chargePerCM(detid,cl)*std::abs(ldir.z())/ldir.mag();
+    return 2*chargePerCM(detid,cl)*std::abs(ldir.z())/ldir.mag();
   }
 
 

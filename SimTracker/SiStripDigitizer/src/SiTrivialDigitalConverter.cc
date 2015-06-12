@@ -67,17 +67,22 @@ SiTrivialDigitalConverter::convertRaw(const std::vector<float>& analogSignal, ed
 
 int SiTrivialDigitalConverter::truncate(float in_adc) const {
   //Rounding the ADC number instead of truncating it
-  int adc = int(in_adc+0.5);
+  //we shift bits to the right so as to ignore the most significant
+  //and least significant bit
+  int adc = int(in_adc+0.5) >> 1;
   /*
-    254 ADC: 254  <= raw charge < 1023
-    255 ADC: raw charge >= 1023
+   * we lose some resolution, but can measure up to 510 in charge deposit
+   * charge values {0,2,4,...,508,510} are represented as {0,1,2,...,254,255}
+   *
+   * 254 ADC:  510 <= raw charge < 1023   -- BSZS truncated mode
+   * 255 ADC: 1023 <= raw charge < inf.   -- saturated mode (hardware limit)
   */
   if(PreMixing_) {
-    if (adc > 2047 ) return 1023;
-    if (adc > 1022 ) return 1022;
+    if (adc > 1022 ) return 511;
+    if (adc > 510 ) return 510;
   }
   else {
-    if (adc > 1022 ) return 255;
+    if (adc > 511 ) return 255;
     if (adc > 253) return 254;
   }
   //Protection

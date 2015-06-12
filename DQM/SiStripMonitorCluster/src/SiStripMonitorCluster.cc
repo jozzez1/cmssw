@@ -633,7 +633,7 @@ void SiStripMonitorCluster::analyze(const edm::Event& iEvent, const edm::EventSe
 	float noise  = 0.0;
 	for(uint iamp=0; iamp<ampls.size(); iamp++){
 	  if(ampls[iamp]>0){ // nonzero amplitude
-	    cluster_signal += ampls[iamp];
+	    cluster_signal += 2*ampls[iamp];
 	    if(!qualityHandle->IsStripBad(qualityRange, clusterIter->firstStrip()+iamp)){
 	      noise = noiseHandle->getNoise(clusterIter->firstStrip()+iamp,detNoiseRange)/gainHandle->getStripGain(clusterIter->firstStrip()+iamp, detGainRange);
 	    }

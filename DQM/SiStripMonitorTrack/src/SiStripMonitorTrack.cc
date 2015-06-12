@@ -1002,7 +1002,7 @@ bool SiStripMonitorTrack::clusterInfos(SiStripClusterInfo* cluster, const uint32
     }
     else if(flag==OffTrack){
       tkhisto_NumOffTrack->add(adet,1.);
-      if(cluster->charge() > 250){
+      if(cluster->charge() > 500){
 	LogDebug("SiStripMonitorTrack") << "Module firing " << detid << " in Event " << eventNb << std::endl;
       }
     }

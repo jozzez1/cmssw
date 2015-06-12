@@ -70,10 +70,10 @@ bool shapeSelection(const SiStripCluster & clus)
    bool shapecdtn=false;
 
 //	Float_t C_M;	Float_t C_D;	Float_t C_Mn;	Float_t C_Dn;	Float_t C_Mnn;	Float_t C_Dnn;
-	Float_t C_M=0.0;	Float_t C_D=0.0;	Float_t C_Mn=10000;	Float_t C_Dn=10000;	Float_t C_Mnn=10000;	Float_t C_Dnn=10000;
+	Float_t C_M=0.0/2;	Float_t C_D=0.0/2;	Float_t C_Mn=10000/2;	Float_t C_Dn=10000/2;	Float_t C_Mnn=10000/2;	Float_t C_Dnn=10000/2;
 	Int_t CDPos;
 	Float_t coeff1=1.7;	Float_t coeff2=2.0;
-	Float_t coeffn=0.10;	Float_t coeffnn=0.02; Float_t noise=4.0;
+	Float_t coeffn=0.10;	Float_t coeffnn=0.02; Float_t noise=4.0 / 2;
 
 	if(NofMax==1){
 
@@ -179,7 +179,7 @@ int getCharge(const SiStripCluster* cluster, int& nSatStrip, const GeomDetUnit& 
        auto & gains     = calibGains[detUnit.index()-m_off];
        calibratedCharge = (int)(calibratedCharge / gains[(cluster->firstStrip()+i)/128] );
        if ( calibratedCharge>=255 ) {
-	 if ( calibratedCharge>=1025 )
+	 if ( calibratedCharge>=510 )
 	   calibratedCharge=255;
 	 else
 	   calibratedCharge=254;
@@ -189,7 +189,7 @@ int getCharge(const SiStripCluster* cluster, int& nSatStrip, const GeomDetUnit& 
        if(calibratedCharge>=254)nSatStrip++;
      }
    }
-   return charge;
+   return 2*charge;
 }
 
 
