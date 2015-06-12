@@ -505,7 +505,7 @@ void SiStripGainFromCalibTree::algoAnalyzeTheTree()
                   if(useCalibration && !FirstSetOfConstants){ StripCharge=(int)(StripCharge*(APV->PreviousGain/APV->CalibGain));
                   }else if(useCalibration){                   StripCharge=(int)(StripCharge/APV->CalibGain);
                   }else if(!FirstSetOfConstants){             StripCharge=(int)(StripCharge*APV->PreviousGain);}
-                  if(StripCharge>1024){
+                  if(StripCharge>509){
                      StripCharge = 255;
                      Saturation = true;
                   }else if(StripCharge>254){
@@ -518,6 +518,7 @@ void SiStripGainFromCalibTree::algoAnalyzeTheTree()
             }else{
                Charge = (*charge)[i];
             }
+	    Charge *= 2;
 
             //printf("ChargeDifference = %i Vs %i with Gain = %f\n",(*charge)[i],Charge,APV->CalibGain);
 
@@ -884,7 +885,7 @@ SiStripGainFromCalibTree::algoAnalyze(const edm::Event& iEvent, const edm::Event
             }
 
             for(unsigned int a=0;a<Ampls.size();a++){               
-               charge+=Ampls[a];
+               charge+=2*Ampls[a];
                if(Ampls[a] >=254)Saturation =true;
             }
 
@@ -924,14 +925,14 @@ SiStripGainFromCalibTree::algoAnalyze(const edm::Event& iEvent, const edm::Event
                   if(useCalibration && !FirstSetOfConstants){ StripCharge=(int)(StripCharge*(APV->PreviousGain/APV->CalibGain));
                   }else if(useCalibration){                   StripCharge=(int)(StripCharge/APV->CalibGain);
                   }else if(!FirstSetOfConstants){             StripCharge=(int)(StripCharge*APV->PreviousGain);}
-                  if(StripCharge>1024){
+                  if(StripCharge>509){
                      StripCharge = 255;
                      Saturation = true;
                   }else if(StripCharge>254){
                      StripCharge = 254;
                      Saturation = true;
                   }
-                  Charge += StripCharge;
+                  Charge += 2*StripCharge;
                }
                if(Saturation && !AllowSaturation)continue;
             }else{

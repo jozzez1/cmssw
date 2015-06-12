@@ -1141,7 +1141,7 @@ SiStripGainFromData::ComputeChargeOverPath(const SiStripCluster*   Cluster ,Traj
    if(Overlaping)return -1;
 */
 
-   for(unsigned int a=0;a<Ampls.size();a++){Charge+=Ampls[a];if(Ampls[a]>=254)Saturation++;if(Ampls[a]>=20)NHighStrip++;}
+   for(unsigned int a=0;a<Ampls.size();a++){Charge+=2*Ampls[a];if(Ampls[a]>=254)Saturation++;if(Ampls[a]>=20/2)NHighStrip++;}
    double path                    = (10.0*APV->Thickness)/fabs(cosine);
    double ClusterChargeOverPath   = (double)Charge / path ;
 
