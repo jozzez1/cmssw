@@ -261,7 +261,7 @@ void DeDxDiscriminatorLearner::algoAnalyzeTheTree(const edm::EventSetup& iSetup)
                  int StripCharge =  (*amplitude)[FirstAmplitude-(*nstrips)[c]+s];
                  if(StripCharge<254){
                     StripCharge=(int)(StripCharge/gain);
-                    if(StripCharge>=1024){
+                    if(StripCharge>=510){
                        StripCharge = 255;
                     }else if(StripCharge>=254){
                        StripCharge = 254;
@@ -272,6 +272,7 @@ void DeDxDiscriminatorLearner::algoAnalyzeTheTree(const edm::EventSetup& iSetup)
             }else{
                Charge = (*charge)[c];
             }
+	    Charge *= 2;
 
 //          printf("ChargeDifference = %i Vs %i with Gain = %f\n",(*charge)[c],Charge,Gains[(*rawid)[c]]);
             double ClusterChargeOverPath   =  ( (double) Charge )/(*path)[c] ;       

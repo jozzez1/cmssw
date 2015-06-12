@@ -108,7 +108,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             }
 
             for(unsigned int a=0;a<Ampls.size();a++){               
-               Charge+=Ampls[a];
+               Charge+=2*Ampls[a];
                if(Ampls[a] >=254)Saturation =true;
                amplitude->push_back( Ampls[a] );
             }

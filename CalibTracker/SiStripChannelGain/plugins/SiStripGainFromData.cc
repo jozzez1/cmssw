@@ -1263,7 +1263,7 @@ void SiStripGainFromData::getPeakOfLandau(TH1* InputHisto, double* FitResults, d
     chi2overndf = MyLandau->GetChisquare() / MyLandau->GetNDF();
 
     // if still wrong, give up
-    if(adcs<2. || chi2overndf>MaxChi2OverNDF){
+    if(adcs<1. || chi2overndf>MaxChi2OverNDF){
        adcs  = -0.5; adcs_err  = 0.;
        width = -0.5; width_err = 0;
        chi2overndf = -0.5;

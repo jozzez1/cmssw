@@ -192,7 +192,7 @@ void SiStripGainCosmicCalculator::algoAnalyze(const edm::Event & iEvent, const e
         if( histopointer ){
           short cCharge = 0;
           for(unsigned int iampl = 0; iampl<ampls.size(); iampl++){
-          cCharge += ampls[iampl];
+          cCharge += 2*ampls[iampl];
           }
           double cluster_charge_over_path = ((double)cCharge) * fabs(cos(local_angle)) / ( 10. * module_thickness);
           histopointer->Fill(cluster_charge_over_path);
@@ -310,7 +310,7 @@ SiStripApvGain * SiStripGainCosmicCalculator::getNewObject() {
       EntriesApvPairs->Fill(histo_title, MyHisto->GetEntries());
       NrOfEntries->Fill(MyHisto->GetEntries());
       if(local_nrofadcs > 0){ // if nr of adcs is negative, the fitting routine could not extract meaningfull numbers
-       MeanCharge += local_nrofadcs;
+       MeanCharge += 2*local_nrofadcs;
        NrOfApvPairs += 1.; // count nr of apv pairs since do not know whether nr of bins of histogram is the same
       }
     }
@@ -330,7 +330,7 @@ TH1F *CorrectionOfEachAPVPairControlView = new TH1F("CorrectionOfEachAPVPairCont
   APVPairTextOutput<<"# Nr. of APVPairs = "<<NrOfApvPairs<<std::endl;
   for(int ibin=1; ibin <= ChargeOfEachAPVPair->GetNbinsX(); ibin++){
      TString local_bin_label = ChargeOfEachAPVPair->GetXaxis()->GetBinLabel(ibin);
-     double local_charge_over_path = ChargeOfEachAPVPair->GetBinContent(ibin);
+     double local_charge_over_path = 2* ChargeOfEachAPVPair->GetBinContent(ibin);
      if(local_bin_label.Contains("ChargeAPVPair_") && local_charge_over_path > 0.0000001){ // calculate correction only for meaningful numbers
        uint32_t extracted_detid; std::istringstream read_label((local_bin_label(14,9)).Data()); read_label >> extracted_detid; 
        unsigned short extracted_apvpairid; std::istringstream read_apvpair((local_bin_label(24,1)).Data()); read_apvpair >> extracted_apvpairid; 
