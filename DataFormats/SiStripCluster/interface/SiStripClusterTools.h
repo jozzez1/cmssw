@@ -35,12 +35,12 @@ namespace siStripClusterTools {
 
   template<typename Clus>
   float	chargePerCM(DetId detid, Clus const & cl, LocalTrajectoryParameters const & tp) {
-    return 2*chargePerCM(detid,cl)*tp.absdz();
+    return chargePerCM(detid,cl)*tp.absdz();
   }
 
   template<typename Clus>
   float chargePerCM(DetId detid, Clus const & cl, const LocalVector & ldir) {
-    return 2*chargePerCM(detid,cl)*std::abs(ldir.z())/ldir.mag();
+    return chargePerCM(detid,cl)*std::abs(ldir.z())/ldir.mag();
   }
 
 
