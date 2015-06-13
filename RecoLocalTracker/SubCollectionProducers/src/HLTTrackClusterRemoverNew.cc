@@ -421,7 +421,7 @@ HLTTrackClusterRemoverNew::produce(Event& iEvent, const EventSetup& iSetup)
 	
 	for (auto i = item.offset; i<item.offset+int(item.size); ++i) {
 	  int clusCharge=0;
-	  for ( auto cAmp : clusters[i].amplitudes() ) clusCharge+=cAmp;
+	  for ( auto cAmp : clusters[i].amplitudes() ) clusCharge+=2*cAmp;
 	  
 	  //	if (clusCharge < pblocks_[subdet-1].minGoodStripCharge_) std::cout << " clusCharge: " << clusCharge << std::endl;
 	  if(clusCharge < pblocks_[subdet-1].minGoodStripCharge_) collectedRegStrips_[i] = true; // (|= does not work!)
