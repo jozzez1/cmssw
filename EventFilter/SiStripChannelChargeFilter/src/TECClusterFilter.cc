@@ -57,8 +57,8 @@ namespace cms
 		unsigned int amplclus=0;
 		// int amplclus=0;
 		for(auto ia=vit->amplitudes().begin(); ia!=vit->amplitudes().end(); ia++) 
-		  { if ((*ia)>0) amplclus+=(*ia); } // why should this be negative?
-		if(amplclus>ChargeThresholdTEC/2) nr_clusters_above_threshold++;
+		  { if ((*ia)>0) amplclus+=2*(*ia); } // why should this be negative?
+		if(amplclus>ChargeThresholdTEC) nr_clusters_above_threshold++;
 	      }
 	  }
       }

@@ -29,8 +29,8 @@ chargeLR() const {
     begin( stripCharges().begin() ),
     end( stripCharges().end() ), 
     max; max = max_element(begin,end);
-  return std::make_pair( accumulate(begin, max, uint16_t(0) ),
-			 accumulate(max+1, end, uint16_t(0) ) );
+  return std::make_pair( 2*accumulate(begin, max, uint16_t(0) ),
+			 2*accumulate(max+1, end, uint16_t(0) ) );
 }
 
 

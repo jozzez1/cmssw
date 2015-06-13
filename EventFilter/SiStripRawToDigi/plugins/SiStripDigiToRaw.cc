@@ -139,7 +139,7 @@ namespace sistrip {
 	    }
 
 	    // Add digi to buffer
-	    chanData[strip] = (*idigi).adc();
+	    chanData[strip] = (*idigi).adc() << 1; // digi information is shifted by one bit to the right
 
 	  }
 	  // if ((*idigi).strip() >= (ipair+1)*256) break;

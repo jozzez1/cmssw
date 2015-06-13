@@ -62,7 +62,7 @@ bool ClusterMTCCFilter::filter(edm::Event & e, edm::EventSetup const& c) {
       // calculate sum of amplitudes
       unsigned int amplclus=0;
       for(auto ia=vit->amplitudes().begin(); ia!=vit->amplitudes().end(); ia++) {
-        if ((*ia)>0) amplclus+=(*ia); // why should this be negative?
+        if ((*ia)>0) amplclus+=2*(*ia); // why should this be negative?
       }
       sum_of_cluster_charges += amplclus;
       DetId thedetId = DetId(it->detId());
@@ -73,9 +73,9 @@ bool ClusterMTCCFilter::filter(edm::Event & e, edm::EventSetup const& c) {
       }
       // apply different thresholds for TIB/TOB/TEC
       if( ! exclude_this_detid ){ // only consider if not in exclusion list
-        if ( ( thedetId.subdetId()==StripSubdetector::TIB && amplclus>ChargeThresholdTIB/2 )
-          || ( thedetId.subdetId()==StripSubdetector::TOB && amplclus>ChargeThresholdTOB/2 )
-          || ( thedetId.subdetId()==StripSubdetector::TEC && amplclus>ChargeThresholdTEC/2 )
+        if ( ( thedetId.subdetId()==StripSubdetector::TIB && amplclus>ChargeThresholdTIB )
+          || ( thedetId.subdetId()==StripSubdetector::TOB && amplclus>ChargeThresholdTOB )
+          || ( thedetId.subdetId()==StripSubdetector::TEC && amplclus>ChargeThresholdTEC )
           ){
           // calculate generalized_layer:  31 = TIB1, 32 = TIB2, 33 = TIB3, 50 = TOB, 60 = TEC
           if(thedetId.subdetId()==StripSubdetector::TIB){
