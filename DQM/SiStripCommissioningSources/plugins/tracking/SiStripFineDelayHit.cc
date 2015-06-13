@@ -435,15 +435,17 @@ SiStripFineDelayHit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   	 // build the rawdigi corresponding to the leading strip and save it
   	 // here, only the leading strip is retained. All other rawdigis in the module are set to 0.
   	 const auto & amplitudes = candidateCluster.first->amplitudes();
-  	 uint8_t leadingCharge = 0;
+  	 uint16_t leadingCharge = 0;
   	 uint8_t leadingStrip = candidateCluster.first->firstStrip();
   	 uint8_t leadingPosition = 0;
   	 for(auto amplit = amplitudes.begin();amplit<amplitudes.end();amplit++,leadingStrip++) {
-  	   if(leadingCharge<*amplit) {
-  	     leadingCharge = *amplit;
+  	   if(leadingCharge< static_cast <uint16_t> (*amplit)) {
+  	     leadingCharge = static_cast <uint16_t> (*amplit);
   	     leadingPosition = leadingStrip;
   	   }
   	 }
+	 // actual charge on clusters is twice a large
+	 leadingCharge *= 2;
 
          // look for an existing detset
 	 std::vector< edm::DetSet<SiStripRawDigi> >::iterator newdsit = output.begin();
@@ -461,13 +463,13 @@ SiStripFineDelayHit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                              << " giving a final value of " << int(leadingCharge*fabs(it->second.second)) 
 			     << " for fed key = " << connectionMap_[it->first] << " (detid=" << it->first << ")" ;
   	 // apply corrections to the leading charge, but only if it has not saturated.
-  	 if(leadingCharge<255) {
+  	 if(leadingCharge<510) {
   	   // correct the leading charge for the crossing angle
-    	   leadingCharge = uint8_t(leadingCharge*fabs(it->second.second));
+    	   leadingCharge = static_cast <uint16_t> (leadingCharge*fabs(it->second.second));
            // correct for module thickness for TEC and TOB
 	   if((((it->first>>25)&0x7f)==0xd) ||
 	      ((((it->first>>25)&0x7f)==0xe) && (((it->first>>5)&0x7)>4)))
-             leadingCharge = uint8_t((leadingCharge*0.64));
+             leadingCharge = static_cast <uint16_t> ((leadingCharge*0.64));
   	 }
   	 //code the time of flight in the digi
   	 unsigned int tof = abs(int(round(it->second.first*10)));
@@ -521,30 +523,32 @@ SiStripFineDelayHit::produceNoTracking(edm::Event& iEvent, const edm::EventSetup
          // build the rawdigi corresponding to the leading strip and save it
          // here, only the leading strip is retained. All other rawdigis in the module are set to 0.
 	 auto const & amplitudes = iter->amplitudes();
-	 uint8_t leadingCharge = 0;
+	 uint16_t leadingCharge = 0;
 	 uint8_t leadingStrip = iter->firstStrip();
 	 uint8_t leadingPosition = 0;
 	 for(auto amplit = amplitudes.begin();amplit<amplitudes.end();amplit++,leadingStrip++) {
-	   if(leadingCharge<*amplit) {
-	     leadingCharge = *amplit;
+	   if(leadingCharge< static_cast <uint16_t> (*amplit)) {
+	     leadingCharge = static_cast <uint16_t> (*amplit);
 	     leadingPosition = leadingStrip;
 	   }
 	 }
+	 // raw charge is twice as large as the amplitudes on clusters
+	 leadingCharge *= 2;
          // apply some sanity cuts. This is needed since we don't use tracking to clean clusters
          // 1.5< noise <8
-         // charge<250
+         // charge<500
          // 50 > s/n > 10
          edm::ESHandle<SiStripNoises> noiseHandle_;
          iSetup.get<SiStripNoisesRcd>().get(noiseHandle_);
          SiStripNoises::Range detNoiseRange = noiseHandle_->getRange(DSViter->id());  
          float noise=noiseHandle_->getNoise(leadingPosition, detNoiseRange);   
          if( noise<1.5 ) continue;
-         if( leadingCharge>=250 || noise>=8 || leadingCharge/noise>50 || leadingCharge/noise<10 ) continue;
+         if( leadingCharge>=500 || noise>=8 || leadingCharge/noise>50 || leadingCharge/noise<10 ) continue;
 	 // apply some correction to the leading charge, but only if it has not saturated.
-	 if(leadingCharge<255) {
+	 if(leadingCharge<510) {
 	   // correct for modulethickness for TEC and TOB
 	   if((((((DSViter->id())>>25)&0x7f)==0xd)||((((DSViter->id())>>25)&0x7f)==0xe))&&((((DSViter->id())>>5)&0x7)>4)) 
-	      leadingCharge = uint8_t((leadingCharge*0.64));
+	      leadingCharge = static_cast <uint16_t> ((leadingCharge*0.64));
 	 }
 	 //code the time of flight == 0 in the digi
 	 SiStripRawDigi newSiStrip(leadingCharge);
