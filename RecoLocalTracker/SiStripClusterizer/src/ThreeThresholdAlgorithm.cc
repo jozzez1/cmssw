@@ -67,7 +67,7 @@ inline
 void ThreeThresholdAlgorithm::
 addToCandidate(uint16_t strip, uint8_t adc) { 
   float Noise = noise( strip );
-  if(  adc < static_cast<uint8_t>( Noise * ChannelThreshold / 4) || bad(strip) )
+  if(  adc < static_cast<uint8_t>( Noise * ChannelThreshold / 2) || bad(strip) )
     return;
 
   if(candidateLacksSeed) candidateLacksSeed  =  adc < static_cast<uint8_t>( Noise * SeedThreshold / 2);
