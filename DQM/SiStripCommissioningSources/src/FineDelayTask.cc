@@ -95,16 +95,16 @@ void FineDelayTask::fill( const SiStripEventSummary& summary,
       // apply the TOF correction
       float tof = (digis.data[strip].adc()>>8)/10.;
       correctedDelay = delay - (latencyShift*25.) - tof;
-      if((digis.data[strip].adc()>>8)==255) continue; // skip hit if TOF is in overflow
+      if((digis.data[strip].adc()>>8)==510) continue; // skip hit if TOF is in overflow
       // compute the bin
       float nbins = NBINS;
       float lowbin = LOWBIN;
       float highbin = HIGHBIN;
       int bin = int((correctedDelay-lowbin)/((highbin-lowbin)/nbins));
-      LogDebug("Commissioning") << "[FineDelayTask::fill]; using a hit with value " << ( digis.data[strip].adc()&0xff )
+      LogDebug("Commissioning") << "[FineDelayTask::fill]; using a hit with value " << ( digis.data[strip].adc()&510 )
                                 << " at corrected delay of " << correctedDelay
 				<< " in bin " << bin << "  (tof is " << tof << "( since adc = " << digis.data[strip].adc() << "))";
-      updateHistoSet( timing_,bin,digis.data[strip].adc()&0xff);
+      updateHistoSet( timing_,bin,digis.data[strip].adc()&510);
       if(mode_) mode_->Fill(latencyCode);
     }
   }

@@ -146,12 +146,12 @@ void LatencyTask::fill( const SiStripEventSummary& summary,
       correctedDelay = delay*(-25.); // no TOF correction is applied. 
       // compute the bin
       int bin = int((correctedDelay-LOWBIN)/((HIGHBIN-LOWBIN)/NBINS));
-      LogDebug("Commissioning") << "[LatencyTask::fill]; using a hit with value " << ( digis.data[strip].adc()&0xff )
+      LogDebug("Commissioning") << "[LatencyTask::fill]; using a hit with value " << ( digis.data[strip].adc()&510 )
                                 << " at corrected delay of " << correctedDelay
 				<< " in bin " << bin ;
-      updateHistoSet( timing_,bin,digis.data[strip].adc()&0xff);
+      updateHistoSet( timing_,bin,digis.data[strip].adc()&510);
       LogDebug("Commissioning") << "HistoSet timing Updated " << strip << " " << digis.data.size();
-      updateHistoSet( timingPartition_,bin,digis.data[strip].adc()&0xff);
+      updateHistoSet( timingPartition_,bin,digis.data[strip].adc()&510);
       LogDebug("Commissioning") << "HistoSet timingPartition Updated " << strip << " " << digis.data.size();
     }
   }

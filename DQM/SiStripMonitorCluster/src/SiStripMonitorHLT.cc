@@ -83,7 +83,7 @@ void SiStripMonitorHLT::analyze(const edm::Event& iEvent, const edm::EventSetup&
         // calculate sum of amplitudes
         unsigned int amplclus=0;
         for(auto ia=icluster->amplitudes().begin(); ia!=icluster->amplitudes().end(); ia++) {
-          if ((*ia)>0) amplclus+=(*ia); // why should this be negative?
+          if ((*ia)>0) amplclus+=2*(*ia); // why should this be negative? // we have to multiply by 2
         }
         if(generalized_layer==31 || generalized_layer==32 || generalized_layer==33){ // you can also ask the detid here whether is TIB
           ChargeOfEachClusterTIB_all->Fill(amplclus,1.);
