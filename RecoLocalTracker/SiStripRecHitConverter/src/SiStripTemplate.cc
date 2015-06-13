@@ -1563,6 +1563,9 @@ int SiStripTemplate::qbin(int id, float cotalpha, float cotbeta, float qclus)
 	   qmin *= qcorrect;
 	   qmin2 = (1.f - yratio)*theStripTemp_[index].enty[ilow].qmin2 + yratio*theStripTemp_[index].enty[ihigh].qmin2;
 	   qmin2 *= qcorrect;
+
+	   // fix for the bitshifted ZS mode
+	   qmin /= 2; qmin2 /= 2;
 	   
 	
 #ifndef SI_PIXEL_TEMPLATE_STANDALONE
