@@ -92,7 +92,7 @@ namespace {
         }
 
         bool operator()(uint8_t max, uint8_t min) const {
-            return max-min > cut_;
+            return max-min > cut_/2;
         } 
         bool operator()(const uint8_t *left, const uint8_t *right, const uint8_t *begin, const uint8_t *end) const {
             int yleft  = (left  <  begin ? 0 : *left);
@@ -105,7 +105,7 @@ namespace {
                 noise += std::pow(noiseObj_->getNoise(firstStrip_ + int(x-begin), noises_), 2);
                 maxval = std::max(maxval, int(*x) - baseline);
             }
-            if (sum > sumCut_ && sum*sum > noise*subclusterCutSN2_) return true;
+            if (2*sum > sumCut_ && 4*sum*sum > noise*subclusterCutSN2_) return true;
             return false; 
         }
 
@@ -250,7 +250,7 @@ bool StripSubClusterShapeFilterBase::testLastHit
       INC_COUNTER(test_)
       unsigned int hitStripsTrim = ampls.size();
       int sum = std::accumulate(ampls.begin(), ampls.end(), 0);
-      uint8_t trimCut = std::min<uint8_t>(trimMaxADC_, std::floor(trimMaxFracTotal_ * sum));
+      uint8_t trimCut = std::min<uint8_t>(trimMaxADC_/2, std::floor(trimMaxFracTotal_ * sum));
       auto begin = ampls.begin();
       auto last = ampls.end()-1;
       while (hitStripsTrim > 1 && (*begin < std::max<uint8_t>(trimCut, trimMaxFracNeigh_*(*(begin+1)))) ) { hitStripsTrim--; ++begin; }

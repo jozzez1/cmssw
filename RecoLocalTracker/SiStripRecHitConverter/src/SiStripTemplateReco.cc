@@ -273,8 +273,8 @@ int SiStripTemplateReco::StripTempReco1D(int id, float cotalpha, float cotbeta, 
 // Return the charge bin via the parameter list unless the charge is too small (then flag it)
 	
 	qbin = binq;
-	if(qtotal < 0.95f*templ.qmin()) {qbin = 5;} else {
-		if(qtotal < 0.95f*templ.qmin(1)) {qbin = 4;}
+	if(2*qtotal < 0.95f*templ.qmin()) {qbin = 5;} else {
+		if(2*qtotal < 0.95f*templ.qmin(1)) {qbin = 4;}
 	}
 	if (theVerboseLevel > 9) {
        LOGDEBUG("SiStripTemplateReco") <<

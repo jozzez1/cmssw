@@ -242,8 +242,8 @@ int SiStripTemplateSplit::StripTempSplit(int id, float cotalpha, float cotbeta, 
 	// Return the charge bin via the parameter list unless the charge is too small (then flag it)
 	
 	q2bin = binq;
-	if(qtotal < 1.9f*templ.qmin()) {q2bin = 5;} else {
-		if(qtotal < 1.9f*templ.qmin(1)) {q2bin = 4;}
+	if(2*qtotal < 1.9f*templ.qmin()) {q2bin = 5;} else {
+		if(2*qtotal < 1.9f*templ.qmin(1)) {q2bin = 4;}
 	}
 	if (theVerboseLevel > 9) {
 		LOGDEBUG("SiStripTemplateReco") <<
