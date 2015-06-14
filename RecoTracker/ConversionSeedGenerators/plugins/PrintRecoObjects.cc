@@ -10,7 +10,7 @@ print(std::stringstream& ss, const SiStripCluster& clus){
   float charge=0;
   size_t idx=0;
   for (auto  adc : clus.amplitudes()){
-    charge+=adc;
+    charge+=2*adc;
     ss << "\n\t\t strip " << ++idx << " adc " << (size_t) adc;
   }
   ss << "\n\t\t charge " << charge
