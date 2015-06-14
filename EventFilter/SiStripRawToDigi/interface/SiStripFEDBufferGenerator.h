@@ -236,9 +236,9 @@ namespace sistrip {
   
   inline uint8_t FEDStripData::ChannelData::get8BitSample(const uint16_t sampleNumber) const
   {
-    if (dataIs8Bit_) return (0xFF & getSample(sampleNumber));
+    if (dataIs8Bit_) return (0xFF & (getSample(sampleNumber)) >> 1);
     else {
-      const uint16_t sample = getSample(sampleNumber);
+      const uint16_t sample = getSample(sampleNumber) >> 1;
       if (sample < 0xFE) return sample;
       else if (sample == 0x3FF) return 0xFF;
       else return 0xFE;
@@ -248,10 +248,10 @@ namespace sistrip {
   inline uint16_t FEDStripData::ChannelData::get10BitSample(const uint16_t sampleNumber) const
   {
     if (dataIs8Bit_) {
-      return (0xFF & getSample(sampleNumber));
+      return (0xFF & (getSample(sampleNumber)) >> 1);
     }
     else {
-      const uint16_t sample = getSample(sampleNumber);
+      const uint16_t sample = getSample(sampleNumber) >> 1;
       if (sample < 0x3FF) return sample;
       else return 0x3FF;
     }
