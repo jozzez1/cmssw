@@ -85,7 +85,7 @@ class AboveSeed {
     return ( 
 	    !quality_->IsStripBad(qualityRange_,digi.strip()) 
 	        && 
-	    digi.adc() >= seed * noise_->getNoise(digi.strip(), noiseRange_)/2 // digi is half the actual size
+	    digi.adc() >= seed * noise_->getNoise(digi.strip(), noiseRange_)
 	    );
   }
  private:

@@ -102,7 +102,7 @@ calculate_noise(const std::vector<float>& noise) const {
   int numberStripsOverThreshold = 0;
   for(int i=0;i<width();i++) {
     if(stripCharges()[i]!=0) {
-      noiseSumInQuadrature += noise.at(i) * noise.at(i);
+      noiseSumInQuadrature += 4 * noise.at(i) * noise.at(i); // real noise in StripNoises is divided by 2
       numberStripsOverThreshold++;
     }
   }
