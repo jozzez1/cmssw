@@ -67,17 +67,25 @@ SiTrivialDigitalConverter::convertRaw(const std::vector<float>& analogSignal, ed
 
 int SiTrivialDigitalConverter::truncate(float in_adc) const {
   //Rounding the ADC number instead of truncating it
-  int adc = int(in_adc+0.5);
+  // in the BSZS paradigm we drop the 1st and the last bit
+  // meaning we store charges
+  // {0, 2, 4, ..., 510}
+  // however, containers have only 8-bits, therefore we represent them with
+  // {0, 1, 2, ..., 255}
+  // to do so we bitshifting the raw charge to right -- removing least significant bit,
+  // 1st bit is now set to zero, and former most significant bit will be removed
+  // via truncation
+  int adc = int(in_adc+0.5) >> 1;
   /*
-    254 ADC: 254  <= raw charge < 1023
+    254 ADC: 510  <= raw charge < 1023
     255 ADC: raw charge >= 1023
   */
   if(PreMixing_) {
-    if (adc > 2047 ) return 1023;
-    if (adc > 1022 ) return 1022;
+    if (adc > 1023 ) return 510;
+    if (adc > 508 ) return 508;
   }
   else {
-    if (adc > 1022 ) return 255;
+    if (adc > 509 ) return 255;
     if (adc > 253) return 254;
   }
   //Protection

@@ -37,7 +37,7 @@ class SiStripClusterInfo {
   std::vector<bool>           stripQualitiesBad() const;
 
   uint16_t charge() const    {return   std::accumulate( stripCharges().begin(), stripCharges().end(), uint16_t(0));}
-  uint8_t  maxCharge() const {return * std::max_element(stripCharges().begin(), stripCharges().end());}
+  uint16_t maxCharge() const {return * std::max_element(stripCharges().begin(), stripCharges().end());}
   uint16_t maxIndex() const  {return   std::max_element(stripCharges().begin(), stripCharges().end()) - stripCharges().begin();}
   std::pair<uint16_t,uint16_t> chargeLR() const;
   

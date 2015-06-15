@@ -25,10 +25,10 @@ SiStripClusterInfo::SiStripClusterInfo(const SiStripCluster& cluster,
 
 std::pair<uint16_t,uint16_t > SiStripClusterInfo::
 chargeLR() const { 
-  std::vector<uint8_t>::const_iterator 
+    auto
     begin( stripCharges().begin() ),
-    end( stripCharges().end() ), 
-    max; max = max_element(begin,end);
+    end( stripCharges().end() ); 
+    auto max = max_element(begin,end);
   return std::make_pair( accumulate(begin, max, uint16_t(0) ),
 			 accumulate(max+1, end, uint16_t(0) ) );
 }

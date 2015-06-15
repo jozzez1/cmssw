@@ -46,13 +46,13 @@ namespace {
                 size_(size), half_((size+1)/2) {}
 
             template<typename Test>
-            bool apply(const uint8_t *x, const uint8_t *begin, const uint8_t *end, const Test & test, bool verbose=false, int firststrip=0) {
-                const uint8_t * ileft  = (x != begin)      ? std::min_element(x-1,x+half_)                     : begin - 1;
-                const uint8_t * iright = ((x+size_) < end) ? std::min_element(x+half_,std::min(x+size_+1,end)) : end;
-                uint8_t left   = (ileft  <  begin ? 0 : *ileft );
-                uint8_t right =  (iright >= end   ? 0 : *iright);
-                uint8_t center = *std::max_element(x, std::min(x+size_,end));
-                uint8_t maxmin = std::max(left,right);
+            bool apply(const uint16_t *x, const uint16_t *begin, const uint16_t *end, const Test & test, bool verbose=false, int firststrip=0) {
+                const uint16_t * ileft  = (x != begin)      ? std::min_element(x-1,x+half_)                     : begin - 1;
+                const uint16_t * iright = ((x+size_) < end) ? std::min_element(x+half_,std::min(x+size_+1,end)) : end;
+                uint16_t left   = (ileft  <  begin ? 0 : *ileft );
+                uint16_t right =  (iright >= end   ? 0 : *iright);
+                uint16_t center = *std::max_element(x, std::min(x+size_,end));
+                uint16_t maxmin = std::max(left,right);
                 if (maxmin < center) {
                     bool ret = test(center, maxmin);
                     if (ret) {
@@ -66,9 +66,9 @@ namespace {
 
             template<typename V, typename Test>
             bool apply(const V & ampls, const Test & test, bool verbose=false, int firststrip=0) {
-                const uint8_t *begin = &*ampls.begin();
-                const uint8_t *end = &*ampls.end();
-                for (const uint8_t *x = begin; x < end - (half_-1); ++x) {
+                const uint16_t *begin = &*ampls.begin();
+                const uint16_t *end = &*ampls.end();
+                for (const uint16_t *x = begin; x < end - (half_-1); ++x) {
                     if (apply(x,begin,end,test,verbose,firststrip)) {
                         return true;
                     }
@@ -91,15 +91,15 @@ namespace {
             cut_ = std::min<float>(seedCutMIPs*mip, seedCutSN*noiseObj_->getNoise(firstStrip+1, noises_));
         }
 
-        bool operator()(uint8_t max, uint8_t min) const {
+        bool operator()(uint16_t max, uint16_t min) const {
             return max-min > cut_;
         } 
-        bool operator()(const uint8_t *left, const uint8_t *right, const uint8_t *begin, const uint8_t *end) const {
+        bool operator()(const uint16_t *left, const uint16_t *right, const uint16_t *begin, const uint16_t *end) const {
             int yleft  = (left  <  begin ? 0 : *left);
             int yright = (right >= end   ? 0 : *right);
             float sum = 0.0; 
             int maxval = 0; float noise = 0;
-            for (const uint8_t *x = left+1; x < right; ++x) {
+            for (const uint16_t *x = left+1; x < right; ++x) {
                 int baseline = (yleft * int(right-x) + yright * int(x-left)) / int(right-left);
                 sum += int(*x) - baseline;
                 noise += std::pow(noiseObj_->getNoise(firstStrip_ + int(x-begin), noises_), 2);
