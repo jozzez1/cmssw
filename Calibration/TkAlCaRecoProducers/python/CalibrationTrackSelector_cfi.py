@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 CalibrationTrackSelector = cms.EDFilter("CalibrationTrackSelectorModule",
-    minHitChargeStrip = cms.double(20.0),
+    minHitChargeStrip = cms.double(10.0),
     rphirecHits = cms.InputTag("siStripMatchedRecHits","rphiRecHit"),
     applyMultiplicityFilter = cms.bool(False),
     matchedrecHits = cms.InputTag("siStripMatchedRecHits","matchedRecHit"),
