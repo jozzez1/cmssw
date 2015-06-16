@@ -172,7 +172,8 @@ void TrackMaker::SetVars(HWW& hww, const edm::Event& iEvent, const edm::EventSet
           int cluster_size   = (int)cluster->amplitudes().size();
           int cluster_charge = 0;
           double   cluster_weight_size = 0.0;
-          int max_strip_i = std::max_element(cluster->amplitudes().begin(),cluster->amplitudes().end())-cluster->amplitudes().begin();
+	  auto tmp = cluster->amplitudes();
+          int max_strip_i = std::max_element(tmp.begin(),tmp.end())-cluster->amplitudes().begin();
           for(int istrip = 0; istrip < cluster_size; istrip++){
             cluster_charge += (int)cluster->amplitudes()[istrip];
             cluster_weight_size += (istrip-max_strip_i)*(istrip-max_strip_i)*(cluster->amplitudes()[istrip]);

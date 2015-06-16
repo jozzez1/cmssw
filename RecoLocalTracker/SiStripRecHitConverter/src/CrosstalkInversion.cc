@@ -8,8 +8,8 @@ std::vector<stats_t<float> > InverseCrosstalkMatrix::
 unfold(const SiStripCluster& clus, const float x) {
   auto const & q = clus.amplitudes();
   const stats_t<float> suppressed(-5,100);
-  const stats_t<float> saturated(254,400);
-  #define STATS(value) ( (value<254) ? stats_t<float>(value) : saturated )
+  const stats_t<float> saturated(510,400);
+  #define STATS(value) ( (value>=509) ? saturated : stats_t<float>(value) )
 
   const unsigned N=q.size();
   std::vector<stats_t<float> > Q(N+2,stats_t<float>(0));
