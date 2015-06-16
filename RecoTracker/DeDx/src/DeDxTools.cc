@@ -18,23 +18,23 @@ bool shapeSelection(const SiStripCluster & clus)
 	 Int_t MaxPos=0;
 	// Début avec max
       	 if(ampls.size()!=1 && ((ampls[0]>ampls[1])
-	    || (ampls.size()>2 && ampls[0]==ampls[1] && ampls[1]>ampls[2] && ampls[0]!=254 && ampls[0]!=255) 
-	    || (ampls.size()==2 && ampls[0]==ampls[1] && ampls[0]!=254 && ampls[0]!=255)) ){
+	    || (ampls.size()>2 && ampls[0]==ampls[1] && ampls[1]>ampls[2] && ampls[0]!=508 && ampls[0]!=510) 
+	    || (ampls.size()==2 && ampls[0]==ampls[1] && ampls[0]!=508 && ampls[0]!=510)) ){
  	  NofMax=NofMax+1;  MaxOnStart=true;  }
 
 	// Maximum entouré
          if(ampls.size()>2){
           for (unsigned int i =1; i < ampls.size()-1U; i++) {
                 if( (ampls[i]>ampls[i-1] && ampls[i]>ampls[i+1]) 
-		    || (ampls.size()>3 && i>0 && i<ampls.size()-2U && ampls[i]==ampls[i+1] && ampls[i]>ampls[i-1] && ampls[i]>ampls[i+2] && ampls[i]!=254 && ampls[i]!=255) ){ 
+		    || (ampls.size()>3 && i>0 && i<ampls.size()-2U && ampls[i]==ampls[i+1] && ampls[i]>ampls[i-1] && ampls[i]>ampls[i+2] && ampls[i]!=508 && ampls[i]!=510) ){ 
 		 NofMax=NofMax+1; MaxInMiddle=true;  MaxPos=i; 
 		}
-		if(ampls[i]==255 && ampls[i]==ampls[i-1]) {
+		if(ampls[i]==510 && ampls[i]==ampls[i-1]) {
 			recur255=recur255+1;
 			MaxPos=i-(recur255/2);
 		 	if(ampls[i]>ampls[i+1]){NofMax=NofMax+1;MaxInMiddle=true;}
 		}
-		if(ampls[i]==254 && ampls[i]==ampls[i-1]) {
+		if(ampls[i]==508 && ampls[i]==ampls[i-1]) {
 			recur254=recur254+1;
 			MaxPos=i-(recur254/2);
 		 	if(ampls[i]>ampls[i+1]){NofMax=NofMax+1;MaxInMiddle=true;}
@@ -45,7 +45,7 @@ bool shapeSelection(const SiStripCluster & clus)
          if(ampls.size()>1){
           if(ampls[ampls.size()-1]>ampls[ampls.size()-2]
 	     || (ampls.size()>2 && ampls[ampls.size()-1]==ampls[ampls.size()-2] && ampls[ampls.size()-2]>ampls[ampls.size()-3] ) 
-	     ||  ampls[ampls.size()-1]==255){
+	     ||  ampls[ampls.size()-1]==510){
 	   NofMax=NofMax+1;  MaxOnEnd=true;   }
          }
 	// Si une seule strip touchée
@@ -80,9 +80,9 @@ bool shapeSelection(const SiStripCluster & clus)
 		if(MaxOnStart==true){
 			C_M=(Float_t)ampls[0]; C_D=(Float_t)ampls[1];
 				if(ampls.size()<3) shapecdtn=true ;
-				else if(ampls.size()==3){C_Dn=(Float_t)ampls[2] ; if(C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==255) shapecdtn=true;}
+				else if(ampls.size()==3){C_Dn=(Float_t)ampls[2] ; if(C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==510) shapecdtn=true;}
 				else if(ampls.size()>3){ C_Dn=(Float_t)ampls[2];  C_Dnn=(Float_t)ampls[3] ;
-							if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==255)
+							if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==510)
 							   && C_Dnn<=coeff1*coeffn*C_Dn+coeff2*coeffnn*C_D+2*noise){
 							 shapecdtn=true;}
 				}
@@ -91,9 +91,9 @@ bool shapeSelection(const SiStripCluster & clus)
 		if(MaxOnEnd==true){
 			C_M=(Float_t)ampls[ampls.size()-1]; C_D=(Float_t)ampls[ampls.size()-2];
 				if(ampls.size()<3) shapecdtn=true ;
-				else if(ampls.size()==3){C_Dn=(Float_t)ampls[0] ; if(C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==255) shapecdtn=true;}
+				else if(ampls.size()==3){C_Dn=(Float_t)ampls[0] ; if(C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==510) shapecdtn=true;}
 				else if(ampls.size()>3){C_Dn=(Float_t)ampls[ampls.size()-3] ; C_Dnn=(Float_t)ampls[ampls.size()-4] ; 
-							if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==255)
+							if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==510)
 					 		   && C_Dnn<=coeff1*coeffn*C_Dn+coeff2*coeffnn*C_D+2*noise){ 
  							 shapecdtn=true;}
 				}
@@ -105,7 +105,7 @@ bool shapeSelection(const SiStripCluster & clus)
                         int RightOfMaxPos=MaxPos+1;if(RightOfMaxPos>=(int)ampls.size())RightOfMaxPos=ampls.size()-1;
                         //int after = RightOfMaxPos; int before = LeftOfMaxPos; if (after>=(int)ampls.size() ||  before<0)  std::cout<<"invalid read MaxPos:"<<MaxPos <<"size:"<<ampls.size() <<std::endl; 
 			if(ampls[LeftOfMaxPos]<ampls[RightOfMaxPos]){ C_D=(Float_t)ampls[RightOfMaxPos]; C_Mn=(Float_t)ampls[LeftOfMaxPos];CDPos=RightOfMaxPos;} else{ C_D=(Float_t)ampls[LeftOfMaxPos]; C_Mn=(Float_t)ampls[RightOfMaxPos];CDPos=LeftOfMaxPos;}
-			if(C_Mn<coeff1*coeffn*C_M+coeff2*coeffnn*C_D+2*noise || C_M==255){ 
+			if(C_Mn<coeff1*coeffn*C_M+coeff2*coeffnn*C_D+2*noise || C_M==510){ 
 				if(ampls.size()==3) shapecdtn=true ;
 				else if(ampls.size()>3){
 					if(CDPos>MaxPos){
@@ -141,7 +141,7 @@ bool shapeSelection(const SiStripCluster & clus)
 							C_Mnn=(Float_t)ampls[MaxPos+2];
 						}else C_Mnn=0;							
 					}
-					if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==255)
+					if((C_Dn<=coeff1*coeffn*C_D+coeff2*coeffnn*C_M+2*noise || C_D==510)
 					   && C_Mnn<=coeff1*coeffn*C_Mn+coeff2*coeffnn*C_M+2*noise
 					   && C_Dnn<=coeff1*coeffn*C_Dn+coeff2*coeffnn*C_D+2*noise) {
 						shapecdtn=true;
@@ -169,7 +169,7 @@ int getCharge(const SiStripCluster* cluster, int& nSatStrip, const GeomDetUnit& 
      for(unsigned int i=0;i<Ampls.size();i++){
        int calibratedCharge = Ampls[i];
        charge+=calibratedCharge;
-       if(calibratedCharge>=254)nSatStrip++;
+       if(calibratedCharge>=508)nSatStrip++;
      }
    }
    else{
@@ -178,15 +178,15 @@ int getCharge(const SiStripCluster* cluster, int& nSatStrip, const GeomDetUnit& 
        
        auto & gains     = calibGains[detUnit.index()-m_off];
        calibratedCharge = (int)(calibratedCharge / gains[(cluster->firstStrip()+i)/128] );
-       if ( calibratedCharge>=255 ) {
+       if ( calibratedCharge>=510 ) {
 	 if ( calibratedCharge>=1025 )
-	   calibratedCharge=255;
+	   calibratedCharge=510;
 	 else
-	   calibratedCharge=254;
+	   calibratedCharge=508;
        }
        
        charge+=calibratedCharge;
-       if(calibratedCharge>=254)nSatStrip++;
+       if(calibratedCharge>=508)nSatStrip++;
      }
    }
    return charge;
