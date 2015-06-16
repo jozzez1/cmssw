@@ -239,8 +239,9 @@ namespace sistrip {
     if (dataIs8Bit_) return (0xFF & getSample(sampleNumber));
     else {
       const uint16_t sample = getSample(sampleNumber);
+      sample >> 1; // the BSZS mode
       if (sample < 0xFE) return sample;
-      else if (sample == 0x3FF) return 0xFF;
+      else if (sample == 0x1FE) return 0xFF;
       else return 0xFE;
     }
   }
