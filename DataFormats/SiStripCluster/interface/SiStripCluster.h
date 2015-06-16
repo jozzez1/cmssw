@@ -68,7 +68,7 @@ public:
   /** total charge
    *
    */
-   int  charge() const { return std::accumulate(amplitudes().begin(), amplitudes().end(), int(0)); }
+   int  charge() const { auto amps = amplitudes(); return std::accumulate(amps.begin(), amps.end(), int(0)); }
 
   /** Test (set) the merged status of the cluster
    *

@@ -135,7 +135,7 @@ setDetId(const uint32_t id) {
 inline
 uint16_t SiStripClusterToDigiProducer::
 applyGain(const uint16_t& strip,const uint16_t& adc ) {
-  bitShiftedAdc = adc >> 1; // digis store information stored in bitshifted format
+  auto bitShiftedAdc = adc >> 1; // digis store information stored in bitshifted format
   if(bitShiftedAdc > 255) throw cms::Exception("Invalid Charge") << " digi at strip " << strip << " has bitShiftedAdc out of range " << bitShiftedAdc;
   if(bitShiftedAdc > 253) return bitShiftedAdc; //saturated, do not scale
   uint16_t charge = static_cast<uint16_t>( bitShiftedAdc*gain(strip) + 0.5 ); //NB: here we revert the gain applied at the clusterizer level. for this reason the bitShiftedAdc counts are multiplied by gain and not divided
