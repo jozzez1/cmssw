@@ -1,7 +1,6 @@
 #include "SimTracker/SiStripDigitizer/interface/SiTrivialDigitalConverter.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include <iostream>
 
 SiTrivialDigitalConverter::SiTrivialDigitalConverter(float in, bool PreMix) :
   electronperADC(in), PreMixing_(PreMix) {
@@ -68,18 +67,16 @@ SiTrivialDigitalConverter::convertRaw(const std::vector<float>& analogSignal, ed
 
 int SiTrivialDigitalConverter::truncate(float in_adc) const {
   //Rounding the ADC number instead of truncating it
-  int adc = int(in_adc+0.5);
+  int adc = int(in_adc+0.5) >> 1;
   /*
     254 ADC: 254  <= raw charge < 1023
     255 ADC: raw charge >= 1023
   */
   if(PreMixing_) {
-    if (adc > 2047 ) return 1023;
-    if (adc > 1022 ) return 1022;
+    if (adc > 1023 ) return 510;
+    if (adc > 508 ) return 508;
   }
   else {
-    if (adc > 255) std::cout << "Greater than 255!" << std::endl;
-    adc = adc >> 1;
     if (adc > 510 ) return 255;
     if (adc > 253) return 254;
   }
