@@ -106,7 +106,7 @@ calculate_noise(const std::vector<float>& noise) const {
       numberStripsOverThreshold++;
     }
   }
-  return std::sqrt( noiseSumInQuadrature / numberStripsOverThreshold );
+  return std::sqrt( noiseSumInQuadrature / numberStripsOverThreshold )/2;
 } 
 
 
