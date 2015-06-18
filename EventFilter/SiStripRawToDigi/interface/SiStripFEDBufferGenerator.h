@@ -236,7 +236,7 @@ namespace sistrip {
   
   inline uint8_t FEDStripData::ChannelData::get8BitSample(const uint16_t sampleNumber) const
   {
-    if (dataIs8Bit_) return (0xFF & getSample(sampleNumber));
+    if (dataIs8Bit_) return (0xFF & getSample(sampleNumber) >> 1);
     else {
       const uint16_t sample = getSample(sampleNumber) >> 1; // bit-shift for the BSZS mode
       if (sample < 0xFE) return sample;
