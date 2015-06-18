@@ -65,7 +65,7 @@ class SiStripNoises
   RegistryIterator getRegistryVectorEnd()   const{return indexes.end();}
 
   static inline float getNoiseFast(const uint16_t& strip, const Range& range) {
-    return  0.1f*float(decode(strip,range));
+    return  0.05f*float(decode(strip,range));
   }
 
 #ifdef EDM_ML_DEBUG
