@@ -5,7 +5,7 @@ SiStripClusterChargeCutNone = cms.PSet(
 )
   
 SiStripClusterChargeCutLoose = cms.PSet(
-    value     = cms.double(860.0) 
+    value     = cms.double(810.0) 
 )
 
 SiStripClusterChargeCutTight = cms.PSet(
