@@ -4,6 +4,7 @@
 #include <cstring>
 #include "EventFilter/SiStripRawToDigi/interface/SiStripFEDBufferComponents.h"
 #include "FWCore/Utilities/interface/CRC16.h"
+#include <iostream>
 
 namespace sistrip {
 
@@ -345,62 +346,74 @@ namespace sistrip {
   
   FEDReadoutMode fedReadoutModeFromString(const std::string& readoutModeString)
   {
+      std::cerr << "ATTENTION:: I also like to live dangerously ..." << std::endl;
     if ( (readoutModeString == "READOUT_MODE_SCOPE") ||
          (readoutModeString == "SCOPE") ||
          (readoutModeString == "SCOPE_MODE") ||
          (readoutModeString == "Scope mode") ) {
+    std::cerr << "ATTENTION! Scope mode selected." << std::endl;
       return READOUT_MODE_SCOPE;
     }
     if ( (readoutModeString == "READOUT_MODE_VIRGIN_RAW") ||
          (readoutModeString == "VIRGIN_RAW") ||
          (readoutModeString == "Virgin raw") ) {
+    std::cerr << "ATTENTION! Virgin raw selected." << std::endl;
       return READOUT_MODE_VIRGIN_RAW;
     }
     if ( (readoutModeString == "READOUT_MODE_PROC_RAW") ||
          (readoutModeString == "PROC_RAW") ||
          (readoutModeString == "PROCESSED_RAW") ||
          (readoutModeString == "Processed raw") ) {
+    std::cerr << "ATTENTION! Processed raw selected." << std::endl;
       return READOUT_MODE_PROC_RAW;
     }
     if ( (readoutModeString == "READOUT_MODE_ZERO_SUPPRESSED") ||
          (readoutModeString == "ZERO_SUPPRESSED") ||
          (readoutModeString == "Zero suppressed") ) {
+    std::cerr << "ATTENTION! Zero Standard selected." << std::endl;
       return READOUT_MODE_ZERO_SUPPRESSED;
     }
     if ( (readoutModeString == "READOUT_MODE_ZERO_SUPPRESSED_LITE") ||
          (readoutModeString == "ZERO_SUPPRESSED_LITE") ||
          (readoutModeString == "Zero suppressed lite") ) {
+    std::cerr << "ATTENTION! Zero Lite selected." << std::endl;
       return READOUT_MODE_ZERO_SUPPRESSED_LITE10;
     }
     if ( (readoutModeString == "READOUT_MODE_ZERO_SUPPRESSED_CMOVERRIDE") ||
          (readoutModeString == "ZERO_SUPPRESSED_CMOVERRIDE") ||
          (readoutModeString == "ZERO_SUPPRESSED_CMO") ||
          (readoutModeString == "Zero suppressed CM Override") ) {
+    std::cerr << "ATTENTION! Zero CMO selected." << std::endl;
       return READOUT_MODE_ZERO_SUPPRESSED;
     }
     if ( (readoutModeString == "READOUT_MODE_ZERO_SUPPRESSED_LITE_CMOVERRIDE") ||
          (readoutModeString == "ZERO_SUPPRESSED_LITE_CMO") ||
          (readoutModeString == "ZERO_SUPPRESSED_LITE_CMOVERRIDE") ||
          (readoutModeString == "Zero suppressed lite CM Override") ) {
+    std::cerr << "ATTENTION! Zero Lite CMO selected." << std::endl;
       return READOUT_MODE_ZERO_SUPPRESSED_LITE10;
     }
     if ( (readoutModeString == "READOUT_MODE_ZERO_SUPPRESSED_LITE8_TOPBOT" ) ||
 	 (readoutModeString == "ZERO_SUPPRESSED_LITE8_TOPBOT") ||
 	 (readoutModeString == "ZERO_SUPPRESSED_TOPBOT") ||
 	 (readoutModeString == "Zero suppressed TopBot") ) {
+    std::cerr << "ATTENTION! Zero TB selected." << std::endl;
       return READOUT_MODE_ZERO_SUPPRESSED_LITE8_TOPBOT;
     }
     if ( (readoutModeString == "READOUT_MODE_PREMIX_RAW") ||
          (readoutModeString == "PREMIX_RAW") ||
          (readoutModeString == "PreMix Raw") ) {
+    std::cerr << "ATTENTION! Premix Raw selected." << std::endl;
       return READOUT_MODE_PREMIX_RAW;
     }
     if ( (readoutModeString == "READOUT_MODE_SPY") ||
          (readoutModeString == "SPY") ||
          (readoutModeString == "Spy channel") ) {
+    std::cerr << "ATTENTION! Spy channel selected." << std::endl;
       return READOUT_MODE_SPY;
     }
     //if it was none of the above then return invalid
+    std::cerr << "ATTENTION! I cannot understand???" << std::endl;
     return READOUT_MODE_INVALID;
   }
   
