@@ -4,7 +4,8 @@ import urllib
 import string
 import os
 import sys
-import LaunchOnCondor
+import SUSYBSMAnalysis.HSCP.LaunchOnCondor as LaunchOnCondor 
+import glob
 
 Jobs = [
 #["RunA_*_190645_190999","RunA_190645_190999"],
@@ -42,12 +43,12 @@ Jobs = [
 #["RunD_*_207501_207800","RunD_207501_207800"],
 #["RunD_*_207801_208100","RunD_207801_208100"],
 #["RunD_*_208101_208357","RunD_208101_208357"],
-["RunD_*_208358_208686","RunD_208358_208686"]
+["RunD_*_208358_208686","dEdx_Skim_Run251252"]
 ]
 
 FarmDirectory = "MERGE"
 for j in Jobs:
-	LaunchOnCondor.ListToFile(LaunchOnCondor.GetListOfFiles('"dcache:','/pnfs/cms/WAX/11/store/user/farrell3/HSCPEDMUpdateData2012_30Nov2012/'+j[0]+'/HSCP_*.root','",'), FarmDirectory + "InputFile.txt")
+	LaunchOnCondor.ListToFile(LaunchOnCondor.GetListOfFiles('"file:','/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/dEdxSkim_*.root','",'), FarmDirectory + "InputFile.txt")
 	#LaunchOnCondor.SendCMSJobs(FarmDirectory, j[1], "Merge_cfg.py", FarmDirectory + "InputFile.txt", 1, ['XXX_SAVEPATH_XXX','file:/storage/data/cms/users/quertenmont/HSCP/CMSSW_4_2_8/12_08_16/'])
-	LaunchOnCondor.SendCMSJobs(FarmDirectory, j[1], "Merge_cfg.py", FarmDirectory + "InputFile.txt", 1, ['XXX_SAVEPATH_XXX','/uscmst1b_scratch/lpc1/3DayLifetime/farrell/2012Data_04Sep2012'])
+	LaunchOnCondor.SendCMSJobs(FarmDirectory, j[1], "Merge_cfg.py", FarmDirectory + "InputFile.txt", 1, ['XXX_SAVEPATH_XXX','file:/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/MakeEDMtuples/Sample_Data'])
 os.system("rm " +  FarmDirectory + "InputFile.txt")
