@@ -64,16 +64,16 @@ void Analysis_Step3_MakePlots()
 
 
    InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 84;
-   MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
-   MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
-   CutFlow(InputPattern, CutIndex);
-   CutFlow(InputPattern, CutIndexTight);
+//   MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
+//   MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
+//   CutFlow(InputPattern, CutIndex);
+//   CutFlow(InputPattern, CutIndexTight);
    CutFlowPlot(InputPattern, "Data13TeV", CutIndex);
    CutFlowPlot(InputPattern, "Data13TeV", CutIndexTight);
-   SelectionPlot(InputPattern, CutIndex, CutIndexTight);
-   PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
+//   SelectionPlot(InputPattern, CutIndex, CutIndexTight);
+//   PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
-
+/*
    InputPattern = "Results/Type2/";   CutIndex = 16; CutIndexTight = 905; CutIndex_Flip=16;
    MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
@@ -85,7 +85,7 @@ void Analysis_Step3_MakePlots()
 
 
 
-  return;
+*/  return; // <--- TO HERE
   //FIXME:  Bellow this line, all the code in THIS FUNCTION is what was used for run1 paper.
   //Note that the code for 7 and 8TeV data analysis is kept --> would be useful to perform comparison between run1 and run2
 
@@ -1375,69 +1375,86 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
     TFile* InputFile = new TFile((InputPattern + "Histos.root").c_str());
     if (!InputFile) std::cerr << "File could not be opened!" << std::endl;
 
-    stPlots st;
-    stPlots_InitFromFile (InputFile, st, SampleName);
-
-    vector <double> Num, Eff;
-    Num.push_back (st.Total->GetBinContent (1));          Eff.push_back (1.0);
-    Num.push_back (st.TNOH ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
-    Num.push_back (st.TNOM ->GetBinContent (1));          Eff.push_back (Num[ 2]/ Num[ 1]);
-    Num.push_back (st.nDof ->GetBinContent (1));          Eff.push_back (Num[ 3]/ Num[ 4]);
-    Num.push_back (st.Qual ->GetBinContent (1));          Eff.push_back (Num[ 4]/ Num[ 5]);
-    Num.push_back (st.Chi2 ->GetBinContent (1));          Eff.push_back (Num[ 5]/ Num[ 6]);
-    Num.push_back (st.MPt  ->GetBinContent (1));          Eff.push_back (Num[ 6]/ Num[ 7]);
-    Num.push_back (st.MI   ->GetBinContent (1));          Eff.push_back (Num[ 7]/ Num[ 8]);
-    Num.push_back (st.MTOF ->GetBinContent (1));          Eff.push_back (Num[ 8]/ Num[ 9]);
-    Num.push_back (st.Dxy  ->GetBinContent (1));          Eff.push_back (Num[ 9]/ Num[10]);
-    Num.push_back (st.TIsol->GetBinContent (1));          Eff.push_back (Num[10]/ Num[11]);
-    Num.push_back (st.EIsol->GetBinContent (1));          Eff.push_back (Num[11]/ Num[12]);
-    Num.push_back (st.Pterr->GetBinContent (1));          Eff.push_back (Num[12]/ Num[13]);
-    Num.push_back (st.Dz   ->GetBinContent (1));          Eff.push_back (Num[13]/ Num[14]);
-    Num.push_back (st.Basic->GetBinContent (1));          Eff.push_back (Num[14]/ Num[ 0]);
-    Num.push_back (st.Pt   ->GetBinContent (CutIndex+1)); Eff.push_back (Num[15]/ Num[14]);
-    Num.push_back (st.I    ->GetBinContent (CutIndex+1)); Eff.push_back (Num[16]/ Num[15]);
-    Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
-    Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
-
-    TH1F h1 ("testName1", "testTitle1", 19, 0, 19);
-    TH1F h2 ("testName2", "testTitle2", 19, 0, 19);
-    for (int i = 1; i <= 19; i++){
-        h1.SetBinContent (i, Num[i-1]);
-        h2.SetBinContent (i, Eff[i-1]);
-    }
+    vector < pair <const char*, Color_t> > SampleNames;
+    SampleNames.push_back(make_pair("Data13TeV",              kBlack));
+    SampleNames.push_back(make_pair("MCTr_13TeV",             kBlue ));
+    SampleNames.push_back(make_pair("Gluino_13TeV_M1000_f10", kRed  ));
+    pair < TH1F*, TH1F* > * histos = new pair < TH1F*, TH1F* >[SampleNames.size()];
 
     TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
     c1->SetLogy(true);
-    h1.SetLineColor (kOrange-8);
-    h2.SetLineColor (kViolet-2);
-    DrawPreliminary(13.0, 5.59);
-    
-    h1.GetXaxis()->SetBit      (TAxis::kLabelsHori);
-    h1.GetXaxis()->SetBinLabel ( 1, "Tot"  );
-    h1.GetXaxis()->SetBinLabel ( 2, "TNOH" );
-    h1.GetXaxis()->SetBinLabel ( 3, "TNOM" );
-    h1.GetXaxis()->SetBinLabel ( 4, "nDof" );
-    h1.GetXaxis()->SetBinLabel ( 5, "Qual" );
-    h1.GetXaxis()->SetBinLabel ( 6, "Chi2" );
-    h1.GetXaxis()->SetBinLabel ( 7, "MPt"  );
-    h1.GetXaxis()->SetBinLabel ( 8, "MI"   );
-    h1.GetXaxis()->SetBinLabel ( 9, "MTOF" );
-    h1.GetXaxis()->SetBinLabel (10, "Dxy"  );
-    h1.GetXaxis()->SetBinLabel (11, "TIsol");
-    h1.GetXaxis()->SetBinLabel (12, "EIsol");
-    h1.GetXaxis()->SetBinLabel (13, "Pterr");
-    h1.GetXaxis()->SetBinLabel (14, "Dz"   );
-    h1.GetXaxis()->SetBinLabel (15, "Pre"  );
-    h1.GetXaxis()->SetBinLabel (16, "Pt"   );
-    h1.GetXaxis()->SetBinLabel (17, "I"    );
-    h1.GetXaxis()->SetBinLabel (18, "TOF"  );
-    h1.GetXaxis()->SetBinLabel (19, "Sel"  );
+    TH1F h ("Name", "Title", 19, 0, 19);
+    h.SetStats(0);
+    h.SetFillStyle (3004);
+    h.GetYaxis()->SetTitle ("number of tracks");
+    h.GetYaxis()->SetRangeUser(1e2,1e8);
+    h.GetXaxis()->SetLabelOffset (99); // disable label
+    h.Draw("hist text45");
+    for (unsigned int sample_i = 0; sample_i < SampleNames.size(); sample_i++){
+        stPlots st;
+        stPlots_InitFromFile (InputFile, st, SampleNames[sample_i].first);
 
-    h1.Draw("A");
-    h2.Draw("same Y+");
-    char SaveName [128]; sprintf (SaveName, "CutFlowPlot_%s_%u", SampleName.c_str(), CutIndex);
+        histos[sample_i].first  = new TH1F (SampleNames[sample_i].first,
+                SampleNames[sample_i].first, 19, 0, 19);
+        histos[sample_i].second = new TH1F (SampleNames[sample_i].first,
+                SampleNames[sample_i].first, 19, 0, 19);
+//        histospush_back (make_pair (h1, h2));
+
+        vector <double> Num, Eff;
+        Num.push_back (st.Total->GetBinContent (1));          Eff.push_back (1.0);
+        Num.push_back (st.TNOH ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
+        Num.push_back (st.TNOM ->GetBinContent (1));          Eff.push_back (Num[ 2]/ Num[ 1]);
+        Num.push_back (st.nDof ->GetBinContent (1));          Eff.push_back (Num[ 3]/ Num[ 4]);
+        Num.push_back (st.Qual ->GetBinContent (1));          Eff.push_back (Num[ 4]/ Num[ 5]);
+        Num.push_back (st.Chi2 ->GetBinContent (1));          Eff.push_back (Num[ 5]/ Num[ 6]);
+        Num.push_back (st.MPt  ->GetBinContent (1));          Eff.push_back (Num[ 6]/ Num[ 7]);
+        Num.push_back (st.MI   ->GetBinContent (1));          Eff.push_back (Num[ 7]/ Num[ 8]);
+        Num.push_back (st.MTOF ->GetBinContent (1));          Eff.push_back (Num[ 8]/ Num[ 9]);
+        Num.push_back (st.Dxy  ->GetBinContent (1));          Eff.push_back (Num[ 9]/ Num[10]);
+        Num.push_back (st.TIsol->GetBinContent (1));          Eff.push_back (Num[10]/ Num[11]);
+        Num.push_back (st.EIsol->GetBinContent (1));          Eff.push_back (Num[11]/ Num[12]);
+        Num.push_back (st.Pterr->GetBinContent (1));          Eff.push_back (Num[12]/ Num[13]);
+        Num.push_back (st.Dz   ->GetBinContent (1));          Eff.push_back (Num[13]/ Num[14]);
+        Num.push_back (st.Basic->GetBinContent (1));          Eff.push_back (Num[14]/ Num[ 0]);
+        Num.push_back (st.Pt   ->GetBinContent (CutIndex+1)); Eff.push_back (Num[15]/ Num[14]);
+        Num.push_back (st.I    ->GetBinContent (CutIndex+1)); Eff.push_back (Num[16]/ Num[15]);
+        Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
+        Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
+
+        for (int cut_i = 1; cut_i <= 19; cut_i++){
+            histos[sample_i].first ->SetBinContent (cut_i, Num[cut_i-1]);
+            histos[sample_i].second->SetBinContent (cut_i, Eff[cut_i-1]);
+        }
+        histos[sample_i].first ->SetFillStyle (3004+sample_i);
+        histos[sample_i].first ->SetLineColor (SampleNames[sample_i].second);
+        histos[sample_i].first ->SetFillColor (SampleNames[sample_i].second);
+        histos[sample_i].second->SetLineColor (SampleNames[sample_i].second);
+//        h1.SetFillColor (name.second);
+        histos[sample_i].first->Draw("same");
+    }
+
+    const char * AxisLabels [19] = {"Total", "TNOH", "TNOM", "nDof", "Qual", "Chi2",
+	    "Min Pt", "Min Ias", "Min TOF", "Dxy", "TIsol", "EIsol", "Pterr", "Dz", "PreSel",
+	    "Pt", "Ias", "TOF", "Selection"};
+
+    TText T;
+    T.SetTextAngle(45);
+    T.SetTextAlign(33);
+    T.SetTextSize (0.03);
+    double Y = histos[0].first->GetYaxis()->GetBinLowEdge(1);
+    for (int cut_i = 0; cut_i < 19; cut_i++)
+        T.DrawText (histos[0].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
+
+    SQRTS=13; string LegendTitle = LegendFromType(InputPattern);
+    DrawPreliminary(LegendTitle, SQRTS, IntegratedLuminosityFromE(SQRTS));
+    char SaveName [128]; sprintf (SaveName, "CutFlowPlot_%s_%u", SampleNames[0].first, CutIndex);
     SaveCanvas(c1, InputPattern, SaveName);
-    delete c1;
+    c1->~TCanvas();
+
+    for (unsigned int sample_i = 0; sample_i < SampleNames.size(); sample_i++){
+        histos[sample_i].first ->~TH1F();
+        histos[sample_i].second->~TH1F();
+    }
 }
 
 // make all plots of the preselection and selection variables as well as some plots showing 2D planes
