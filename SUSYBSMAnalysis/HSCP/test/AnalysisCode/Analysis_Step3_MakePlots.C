@@ -20,7 +20,7 @@ using namespace std;
 void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuffix="Mass", bool showMC=true, string Data="Data13TeV");
 void PredictionAndControlPlot(string InputPattern, string Data, unsigned int CutIndex, unsigned int CutIndex_Flip);
 void CutFlow(string InputPattern, unsigned int CutIndex=0);
-void CutFlowPlot(string InputPattern, string SampleName="Data13TeV", unsigned int CutIndex=4);
+void CutFlowPlot(string InputPattern, unsigned int CutIndex=4);
 void SelectionPlot (string InputPattern, unsigned int CutIndex, unsigned int CutIndexTight);
 
 void Make2DPlot_Core(string ResultPattern, unsigned int CutIndex);
@@ -64,16 +64,16 @@ void Analysis_Step3_MakePlots()
 
 
    InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 84;
-//   MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
-//   MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
-//   CutFlow(InputPattern, CutIndex);
-//   CutFlow(InputPattern, CutIndexTight);
-   CutFlowPlot(InputPattern, "Data13TeV", CutIndex);
-   CutFlowPlot(InputPattern, "Data13TeV", CutIndexTight);
-//   SelectionPlot(InputPattern, CutIndex, CutIndexTight);
-//   PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
+   MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
+   MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
+   CutFlow(InputPattern, CutIndex);
+   CutFlow(InputPattern, CutIndexTight);
+   CutFlowPlot(InputPattern, CutIndex);
+   CutFlowPlot(InputPattern, CutIndexTight);
+   SelectionPlot(InputPattern, CutIndex, CutIndexTight);
+   PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
-/*
+
    InputPattern = "Results/Type2/";   CutIndex = 16; CutIndexTight = 905; CutIndex_Flip=16;
    MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
@@ -85,7 +85,7 @@ void Analysis_Step3_MakePlots()
 
 
 
-*/  return; // <--- TO HERE
+  return;
   //FIXME:  Bellow this line, all the code in THIS FUNCTION is what was used for run1 paper.
   //Note that the code for 7 and 8TeV data analysis is kept --> would be useful to perform comparison between run1 and run2
 
@@ -1370,7 +1370,7 @@ void CutFlow(string InputPattern, unsigned int CutIndex){
 }
 
 
-void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
+void CutFlowPlot(string InputPattern, unsigned int CutIndex){
 
     TFile* InputFile = new TFile((InputPattern + "Histos.root").c_str());
     if (!InputFile) std::cerr << "File could not be opened!" << std::endl;
@@ -1387,9 +1387,13 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
     h.SetStats(0);
     h.SetFillStyle (3004);
     h.GetYaxis()->SetTitle ("number of tracks");
-    h.GetYaxis()->SetRangeUser(1e2,1e8);
+    h.GetYaxis()->SetRangeUser(1e2,9e7);
     h.GetXaxis()->SetLabelOffset (99); // disable label
     h.Draw("hist text45");
+    TLegend* leg = new TLegend(0.80,0.93,0.80 - 0.40,0.93 - 6*0.03);
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0);
     for (unsigned int sample_i = 0; sample_i < SampleNames.size(); sample_i++){
         stPlots st;
         stPlots_InitFromFile (InputFile, st, SampleNames[sample_i].first);
@@ -1398,8 +1402,13 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
                 SampleNames[sample_i].first, 19, 0, 19);
         histos[sample_i].second = new TH1F (SampleNames[sample_i].first,
                 SampleNames[sample_i].first, 19, 0, 19);
-//        histospush_back (make_pair (h1, h2));
 
+        switch (sample_i){
+            case 0: leg->AddEntry(histos[sample_i].first, "13 TeV Data","F"); break;
+            case 1: leg->AddEntry(histos[sample_i].first, "13 TeV (SM)MC","F"); break;
+            case 2: leg->AddEntry(histos[sample_i].first, "Gluino (M = 1000 GeV/#font[12]{c}^{2})","F"); break;
+            default: break;
+        }
         vector <double> Num, Eff;
         Num.push_back (st.Total->GetBinContent (1));          Eff.push_back (1.0);
         Num.push_back (st.TNOH ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
@@ -1429,7 +1438,6 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
         histos[sample_i].first ->SetLineColor (SampleNames[sample_i].second);
         histos[sample_i].first ->SetFillColor (SampleNames[sample_i].second);
         histos[sample_i].second->SetLineColor (SampleNames[sample_i].second);
-//        h1.SetFillColor (name.second);
         histos[sample_i].first->Draw("same");
     }
 
@@ -1445,6 +1453,7 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
     for (int cut_i = 0; cut_i < 19; cut_i++)
         T.DrawText (histos[0].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
 
+    leg->Draw();
     SQRTS=13; string LegendTitle = LegendFromType(InputPattern);
     DrawPreliminary(LegendTitle, SQRTS, IntegratedLuminosityFromE(SQRTS));
     char SaveName [128]; sprintf (SaveName, "CutFlowPlot_%s_%u", SampleNames[0].first, CutIndex);
@@ -1455,6 +1464,7 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
         histos[sample_i].first ->~TH1F();
         histos[sample_i].second->~TH1F();
     }
+    delete [] histos;
 }
 
 // make all plots of the preselection and selection variables as well as some plots showing 2D planes
