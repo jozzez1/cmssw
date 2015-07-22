@@ -1435,8 +1435,7 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
 
     h1.Draw("A");
     h2.Draw("same Y+");
-    char SaveName [128]; sprintf (SaveName, "%s/CutFlowPlot_%s_%u",
-            InputPattern.c_str(), SampleName.c_str(), CutIndex);
+    char SaveName [128]; sprintf (SaveName, "CutFlowPlot_%s_%u", SampleName.c_str(), CutIndex);
     SaveCanvas(c1, InputPattern, SaveName);
     delete c1;
 }
