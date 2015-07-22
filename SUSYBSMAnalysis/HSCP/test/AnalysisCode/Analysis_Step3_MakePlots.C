@@ -1399,8 +1399,8 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
     Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
     Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
 
-    TH1F h1 ("testName1", "testTitle1", 19, 19);
-    TH1F h2 ("testName2", "testTitle2", 19, 19);
+    TH1F h1 ("testName1", "testTitle1", 19, 0, 19);
+    TH1F h2 ("testName2", "testTitle2", 19, 0, 19);
     for (int i = 1; i <= 19; i++){
         h1.SetBinContent (i, Num[i-1]);
         h2.SetBinContent (i, Eff[i-1]);
