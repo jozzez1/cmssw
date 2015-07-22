@@ -68,8 +68,8 @@ void Analysis_Step3_MakePlots()
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
-   CutFlowPlot(string InputPattern, "Data13TeV", CutIndex)
-   CutFlowPlot(string InputPattern, "Data13TeV", CutIndexTight)
+   CutFlowPlot(InputPattern, "Data13TeV", CutIndex);
+   CutFlowPlot(InputPattern, "Data13TeV", CutIndexTight);
    SelectionPlot(InputPattern, CutIndex, CutIndexTight);
    PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
@@ -1379,28 +1379,28 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
     stPlots_InitFromFile (InputFile, st, SampleName);
 
     vector <double> Num, Eff;
-    Num.push_back (st.Total    ->GetBinContent (1));          Eff.push_back (1.0);
-    Num.push_back (st.TNOH     ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
-    Num.push_back (st.TNOM     ->GetBinContent (1));          Eff.push_back (Num[ 2]/ Num[ 1]);
-    Num.push_back (st.nDof     ->GetBinContent (1));          Eff.push_back (Num[ 3]/ Num[ 4]);
-    Num.push_back (st.Qual     ->GetBinContent (1));          Eff.push_back (Num[ 4]/ Num[ 5]);
-    Num.push_back (st.Chi2     ->GetBinContent (1));          Eff.push_back (Num[ 5]/ Num[ 6]);
-    Num.push_back (st.MPt      ->GetBinContent (1));          Eff.push_back (Num[ 6]/ Num[ 7]);
-    Num.push_back (st.MI       ->GetBinContent (1));          Eff.push_back (Num[ 7]/ Num[ 8]);
-    Num.push_back (st.MTOF     ->GetBinContent (1));          Eff.push_back (Num[ 8]/ Num[ 9]);
-    Num.push_back (st.Dxy      ->GetBinContent (1));          Eff.push_back (Num[ 9]/ Num[10]);
-    Num.push_back (st.TIsol    ->GetBinContent (1));          Eff.push_back (Num[10]/ Num[11]);
-    Num.push_back (st.EIsol    ->GetBinContent (1));          Eff.push_back (Num[11]/ Num[12]);
-    Num.push_back (st.Pterr    ->GetBinContent (1));          Eff.push_back (Num[12]/ Num[13]);
-    Num.push_back (st.Dz       ->GetBinContent (1));          Eff.push_back (Num[13]/ Num[14]);
-    Num.push_back (st.Basic    ->GetBinContent (1));          Eff.push_back (Num[14]/ Num[ 0]);
-    Num.push_back (st.Pt       ->GetBinContent (CutIndex+1)); Eff.push_back (Num[15]/ Num[14]);
-    Num.push_back (st.I        ->GetBinContent (CutIndex+1)); Eff.push_back (Num[16]/ Num[15]);
-    Num.push_back (st.TOF      ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
-    Num.push_back (st.Selection->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
+    Num.push_back (st.Total->GetBinContent (1));          Eff.push_back (1.0);
+    Num.push_back (st.TNOH ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
+    Num.push_back (st.TNOM ->GetBinContent (1));          Eff.push_back (Num[ 2]/ Num[ 1]);
+    Num.push_back (st.nDof ->GetBinContent (1));          Eff.push_back (Num[ 3]/ Num[ 4]);
+    Num.push_back (st.Qual ->GetBinContent (1));          Eff.push_back (Num[ 4]/ Num[ 5]);
+    Num.push_back (st.Chi2 ->GetBinContent (1));          Eff.push_back (Num[ 5]/ Num[ 6]);
+    Num.push_back (st.MPt  ->GetBinContent (1));          Eff.push_back (Num[ 6]/ Num[ 7]);
+    Num.push_back (st.MI   ->GetBinContent (1));          Eff.push_back (Num[ 7]/ Num[ 8]);
+    Num.push_back (st.MTOF ->GetBinContent (1));          Eff.push_back (Num[ 8]/ Num[ 9]);
+    Num.push_back (st.Dxy  ->GetBinContent (1));          Eff.push_back (Num[ 9]/ Num[10]);
+    Num.push_back (st.TIsol->GetBinContent (1));          Eff.push_back (Num[10]/ Num[11]);
+    Num.push_back (st.EIsol->GetBinContent (1));          Eff.push_back (Num[11]/ Num[12]);
+    Num.push_back (st.Pterr->GetBinContent (1));          Eff.push_back (Num[12]/ Num[13]);
+    Num.push_back (st.Dz   ->GetBinContent (1));          Eff.push_back (Num[13]/ Num[14]);
+    Num.push_back (st.Basic->GetBinContent (1));          Eff.push_back (Num[14]/ Num[ 0]);
+    Num.push_back (st.Pt   ->GetBinContent (CutIndex+1)); Eff.push_back (Num[15]/ Num[14]);
+    Num.push_back (st.I    ->GetBinContent (CutIndex+1)); Eff.push_back (Num[16]/ Num[15]);
+    Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
+    Num.push_back (st.TOF  ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
 
-    TH1F h1 (); h1.SetNameTitle ("testName1", "test title1");
-    TH1F h2 (); h2.SetNameTitle ("testName2", "test title2");
+    TH1F h1 ("testName1", "testTitle1", 19, 19);
+    TH1F h2 ("testName2", "testTitle2", 19, 19);
     for (int i = 1; i <= 19; i++){
         h1.SetBinContent (i, Num[i-1]);
         h2.SetBinContent (i, Eff[i-1]);
@@ -1435,7 +1435,7 @@ void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
 
     h1.Draw("A");
     h2.Draw("same Y+");
-    char SaveName [30]; sprintf (SaveName, "%s/CutFlowPlot_%s_%u",
+    char SaveName [128]; sprintf (SaveName, "%s/CutFlowPlot_%s_%u",
             InputPattern.c_str(), SampleName.c_str(), CutIndex);
     SaveCanvas(c1, InputPattern, SaveName);
     delete c1;
