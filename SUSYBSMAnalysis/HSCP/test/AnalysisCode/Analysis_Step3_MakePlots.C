@@ -20,6 +20,7 @@ using namespace std;
 void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuffix="Mass", bool showMC=true, string Data="Data13TeV");
 void PredictionAndControlPlot(string InputPattern, string Data, unsigned int CutIndex, unsigned int CutIndex_Flip);
 void CutFlow(string InputPattern, unsigned int CutIndex=0);
+void CutFlowPlot(string InputPattern, string SampleName="Data13TeV", unsigned int CutIndex=4);
 void SelectionPlot (string InputPattern, unsigned int CutIndex, unsigned int CutIndexTight);
 
 void Make2DPlot_Core(string ResultPattern, unsigned int CutIndex);
@@ -67,6 +68,8 @@ void Analysis_Step3_MakePlots()
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
+   CutFlowPlot(string InputPattern, "Data13TeV", CutIndex)
+   CutFlowPlot(string InputPattern, "Data13TeV", CutIndexTight)
    SelectionPlot(InputPattern, CutIndex, CutIndexTight);
    PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
@@ -1364,6 +1367,78 @@ void CutFlow(string InputPattern, unsigned int CutIndex){
 
     fclose(pFile);
     InputFile->Close();
+}
+
+
+void CutFlowPlot(string InputPattern, string SampleName, unsigned int CutIndex){
+
+    TFile* InputFile = new TFile((InputPattern + "Histos.root").c_str());
+    if (!InputFile) std::cerr << "File could not be opened!" << std::endl;
+
+    stPlots st;
+    stPlots_InitFromFile (InputFile, st, SampleName);
+
+    vector <double> Num, Eff;
+    Num.push_back (st.Total    ->GetBinContent (1));          Eff.push_back (1.0);
+    Num.push_back (st.TNOH     ->GetBinContent (1));          Eff.push_back (Num[ 1]/ Num[ 0]);
+    Num.push_back (st.TNOM     ->GetBinContent (1));          Eff.push_back (Num[ 2]/ Num[ 1]);
+    Num.push_back (st.nDof     ->GetBinContent (1));          Eff.push_back (Num[ 3]/ Num[ 4]);
+    Num.push_back (st.Qual     ->GetBinContent (1));          Eff.push_back (Num[ 4]/ Num[ 5]);
+    Num.push_back (st.Chi2     ->GetBinContent (1));          Eff.push_back (Num[ 5]/ Num[ 6]);
+    Num.push_back (st.MPt      ->GetBinContent (1));          Eff.push_back (Num[ 6]/ Num[ 7]);
+    Num.push_back (st.MI       ->GetBinContent (1));          Eff.push_back (Num[ 7]/ Num[ 8]);
+    Num.push_back (st.MTOF     ->GetBinContent (1));          Eff.push_back (Num[ 8]/ Num[ 9]);
+    Num.push_back (st.Dxy      ->GetBinContent (1));          Eff.push_back (Num[ 9]/ Num[10]);
+    Num.push_back (st.TIsol    ->GetBinContent (1));          Eff.push_back (Num[10]/ Num[11]);
+    Num.push_back (st.EIsol    ->GetBinContent (1));          Eff.push_back (Num[11]/ Num[12]);
+    Num.push_back (st.Pterr    ->GetBinContent (1));          Eff.push_back (Num[12]/ Num[13]);
+    Num.push_back (st.Dz       ->GetBinContent (1));          Eff.push_back (Num[13]/ Num[14]);
+    Num.push_back (st.Basic    ->GetBinContent (1));          Eff.push_back (Num[14]/ Num[ 0]);
+    Num.push_back (st.Pt       ->GetBinContent (CutIndex+1)); Eff.push_back (Num[15]/ Num[14]);
+    Num.push_back (st.I        ->GetBinContent (CutIndex+1)); Eff.push_back (Num[16]/ Num[15]);
+    Num.push_back (st.TOF      ->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[16]);
+    Num.push_back (st.Selection->GetBinContent (CutIndex+1)); Eff.push_back (Num[17]/ Num[14]);
+
+    TH1F h1 (); h1.SetNameTitle ("testName1", "test title1");
+    TH1F h2 (); h2.SetNameTitle ("testName2", "test title2");
+    for (int i = 1; i <= 19; i++){
+        h1.SetBinContent (i, Num[i-1]);
+        h2.SetBinContent (i, Eff[i-1]);
+    }
+
+    TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
+    c1->SetLogy(true);
+    h1.SetLineColor (kOrange-8);
+    h2.SetLineColor (kViolet-2);
+    DrawPreliminary(13.0, 5.59);
+    
+    h1.GetXaxis()->SetBit      (TAxis::kLabelsHori);
+    h1.GetXaxis()->SetBinLabel ( 1, "Tot"  );
+    h1.GetXaxis()->SetBinLabel ( 2, "TNOH" );
+    h1.GetXaxis()->SetBinLabel ( 3, "TNOM" );
+    h1.GetXaxis()->SetBinLabel ( 4, "nDof" );
+    h1.GetXaxis()->SetBinLabel ( 5, "Qual" );
+    h1.GetXaxis()->SetBinLabel ( 6, "Chi2" );
+    h1.GetXaxis()->SetBinLabel ( 7, "MPt"  );
+    h1.GetXaxis()->SetBinLabel ( 8, "MI"   );
+    h1.GetXaxis()->SetBinLabel ( 9, "MTOF" );
+    h1.GetXaxis()->SetBinLabel (10, "Dxy"  );
+    h1.GetXaxis()->SetBinLabel (11, "TIsol");
+    h1.GetXaxis()->SetBinLabel (12, "EIsol");
+    h1.GetXaxis()->SetBinLabel (13, "Pterr");
+    h1.GetXaxis()->SetBinLabel (14, "Dz"   );
+    h1.GetXaxis()->SetBinLabel (15, "Pre"  );
+    h1.GetXaxis()->SetBinLabel (16, "Pt"   );
+    h1.GetXaxis()->SetBinLabel (17, "I"    );
+    h1.GetXaxis()->SetBinLabel (18, "TOF"  );
+    h1.GetXaxis()->SetBinLabel (19, "Sel"  );
+
+    h1.Draw("A");
+    h2.Draw("same Y+");
+    char SaveName [30]; sprintf (SaveName, "%s/CutFlowPlot_%s_%u",
+            InputPattern.c_str(), SampleName.c_str(), CutIndex);
+    SaveCanvas(c1, InputPattern, SaveName);
+    delete c1;
 }
 
 // make all plots of the preselection and selection variables as well as some plots showing 2D planes
