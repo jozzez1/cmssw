@@ -1369,16 +1369,18 @@ void CutFlow(string InputPattern, unsigned int CutIndex){
     InputFile->Close();
 }
 
-
 void CutFlowPlot(string InputPattern, unsigned int CutIndex){
 
     TFile* InputFile = new TFile((InputPattern + "Histos.root").c_str());
     if (!InputFile) std::cerr << "File could not be opened!" << std::endl;
 
     vector < pair <const char*, Color_t> > SampleNames;
-    SampleNames.push_back(make_pair("Data13TeV",              kBlack));
-    SampleNames.push_back(make_pair("MCTr_13TeV",             kBlue ));
-    SampleNames.push_back(make_pair("Gluino_13TeV_M1000_f10", kRed  ));
+    SampleNames.push_back(make_pair("Data13TeV",              kBlack   ));
+    SampleNames.push_back(make_pair("MCTr_13TeV",             kBlue - 3));
+    SampleNames.push_back(make_pair("Gluino_13TeV_M1400_f10", kRed + 1 ));
+    SampleNames.push_back(make_pair(InputPattern.find("Type2")!=string::npos
+                ?"GMStau_13TeV_M494"
+                :"Stop_13TeV_M1000", kSpring-9));
     pair < TH1F*, TH1F* > * histos = new pair < TH1F*, TH1F* >[SampleNames.size()];
 
     TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
@@ -1386,11 +1388,12 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
     TH1F h ("Name", "Title", 19, 0, 19);
     h.SetStats(0);
     h.SetFillStyle (3004);
-    h.GetYaxis()->SetTitle ("number of tracks");
-    h.GetYaxis()->SetRangeUser(1e2,9e7);
+    h.GetYaxis()->SetTitle ("fraction of tracks (%)");
+    h.GetYaxis()->SetRangeUser(1e-3,6e+2);
     h.GetXaxis()->SetLabelOffset (99); // disable label
     h.Draw("hist text45");
-    TLegend* leg = new TLegend(0.80,0.93,0.80 - 0.40,0.93 - 6*0.03);
+    double Dx = 0.4, Dy = 6*0.03, x = 0.15, y = 0.13;
+    TLegend* leg = new TLegend(x+Dx, y+Dy, x, y);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
     leg->SetBorderSize(0);
@@ -1404,9 +1407,14 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
                 SampleNames[sample_i].first, 19, 0, 19);
 
         switch (sample_i){
-            case 0: leg->AddEntry(histos[sample_i].first, "13 TeV Data","F"); break;
-            case 1: leg->AddEntry(histos[sample_i].first, "13 TeV (SM)MC","F"); break;
-            case 2: leg->AddEntry(histos[sample_i].first, "Gluino (M = 1000 GeV/#font[12]{c}^{2})","F"); break;
+            case 0: leg->AddEntry(histos[sample_i].first, "13 TeV Data","L"); break;
+            case 1: leg->AddEntry(histos[sample_i].first, "13 TeV (SM)MC","L"); break;
+            case 2: leg->AddEntry(histos[sample_i].first, "Gluino (M = 1000 GeV/#font[12]{c}^{2})","L"); break;
+            case 3: leg->AddEntry(histos[sample_i].first,
+                            InputPattern.find("Type2")!=string::npos
+                                ?"Stau (M = 494 GeV/#font[12]{c}^{2})"
+                                :"Stop (M = 1000 GeV/#font[12]{c}^{2})","L");
+                    break;
             default: break;
         }
         vector <double> Num, Eff;
@@ -1434,9 +1442,12 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
             histos[sample_i].first ->SetBinContent (cut_i, Num[cut_i-1]);
             histos[sample_i].second->SetBinContent (cut_i, Eff[cut_i-1]);
         }
-        histos[sample_i].first ->SetFillStyle (3004+sample_i);
         histos[sample_i].first ->SetLineColor (SampleNames[sample_i].second);
+        histos[sample_i].first ->SetLineWidth (2.0);
+        // normalize to total number of tracks
+        histos[sample_i].first ->Scale(100.0/histos[sample_i].first->GetBinContent(1));
         histos[sample_i].first ->SetFillColor (SampleNames[sample_i].second);
+        histos[sample_i].first ->SetFillStyle (0);//3004+sample_i);
         histos[sample_i].second->SetLineColor (SampleNames[sample_i].second);
         histos[sample_i].first->Draw("same");
     }
@@ -1447,11 +1458,16 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
 
     TText T;
     T.SetTextAngle(45);
-    T.SetTextAlign(33);
+    T.SetTextAlign(11);
     T.SetTextSize (0.03);
-    double Y = histos[0].first->GetYaxis()->GetBinLowEdge(1);
+    double Y = histos[3].first->GetYaxis()->GetBinLowEdge(1);
     for (int cut_i = 0; cut_i < 19; cut_i++)
-        T.DrawText (histos[0].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
+        T.DrawText (histos[3].first->GetXaxis()->GetBinCenter(cut_i+1),
+                    histos[3].first->GetBinContent(cut_i+1)*1.2, AxisLabels[cut_i]);
+
+    T.SetTextAlign(33);
+    for (int cut_i = 0; cut_i < 19; cut_i++)
+        T.DrawText (histos[3].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
 
     leg->Draw();
     SQRTS=13; string LegendTitle = LegendFromType(InputPattern);
