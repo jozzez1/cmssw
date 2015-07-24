@@ -20,7 +20,7 @@ using namespace std;
 void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuffix="Mass", bool showMC=true, string Data="Data13TeV");
 void PredictionAndControlPlot(string InputPattern, string Data, unsigned int CutIndex, unsigned int CutIndex_Flip);
 void CutFlow(string InputPattern, unsigned int CutIndex=0);
-void CutFlowPlot(string InputPattern, unsigned int CutIndex=4);
+void CutFlowPlot(string InputPattern, unsigned int CutIndex=4, double ylow=9e-1, double yhigh=2e+2, bool setlog=false);
 void SelectionPlot (string InputPattern, unsigned int CutIndex, unsigned int CutIndexTight);
 
 void Make2DPlot_Core(string ResultPattern, unsigned int CutIndex);
@@ -63,18 +63,18 @@ void Analysis_Step3_MakePlots()
 
 
 
-   InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 84;
+   InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 67;
    MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
-   CutFlowPlot(InputPattern, CutIndex);
-   CutFlowPlot(InputPattern, CutIndexTight);
+   CutFlowPlot(InputPattern, CutIndex, true);
+   CutFlowPlot(InputPattern, CutIndexTight, 1e-3, 2e+2, true);
    SelectionPlot(InputPattern, CutIndex, CutIndexTight);
    PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
 
-   InputPattern = "Results/Type2/";   CutIndex = 16; CutIndexTight = 905; CutIndex_Flip=16;
+   InputPattern = "Results/Type2/";   CutIndex = 16; CutIndexTight = 695; CutIndex_Flip=16;
    MassPrediction(InputPattern, CutIndex,      "Mass", true, "13TeV_Loose");
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
    CutFlow(InputPattern, CutIndex);
@@ -1369,7 +1369,7 @@ void CutFlow(string InputPattern, unsigned int CutIndex){
     InputFile->Close();
 }
 
-void CutFlowPlot(string InputPattern, unsigned int CutIndex){
+void CutFlowPlot(string InputPattern, unsigned int CutIndex, double ylow, double yhigh, bool setLog){
 
     TFile* InputFile = new TFile((InputPattern + "Histos.root").c_str());
     if (!InputFile) std::cerr << "File could not be opened!" << std::endl;
@@ -1384,15 +1384,17 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
     pair < TH1F*, TH1F* > * histos = new pair < TH1F*, TH1F* >[SampleNames.size()];
 
     TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-    c1->SetLogy(true);
+    c1->SetLogy(setLog);
+    c1->SetGridx();
     TH1F h ("Name", "Title", 19, 0, 19);
     h.SetStats(0);
     h.SetFillStyle (3004);
     h.GetYaxis()->SetTitle ("fraction of tracks (%)");
-    h.GetYaxis()->SetRangeUser(1e-3,6e+2);
+    h.GetYaxis()->SetRangeUser(ylow,yhigh);
+    h.GetXaxis()->SetNdivisions(19);
     h.GetXaxis()->SetLabelOffset (99); // disable label
     h.Draw("hist text45");
-    double Dx = 0.4, Dy = 6*0.03, x = 0.15, y = 0.13;
+    double Dx = 0.4, Dy = 6*0.03, x = 0.15, y = 0.15;
     TLegend* leg = new TLegend(x+Dx, y+Dy, x, y);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
@@ -1458,14 +1460,9 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex){
 
     TText T;
     T.SetTextAngle(45);
-    T.SetTextAlign(11);
+    T.SetTextAlign(33);
     T.SetTextSize (0.03);
     double Y = histos[3].first->GetYaxis()->GetBinLowEdge(1);
-    for (int cut_i = 0; cut_i < 19; cut_i++)
-        T.DrawText (histos[3].first->GetXaxis()->GetBinCenter(cut_i+1),
-                    histos[3].first->GetBinContent(cut_i+1)*1.2, AxisLabels[cut_i]);
-
-    T.SetTextAlign(33);
     for (int cut_i = 0; cut_i < 19; cut_i++)
         T.DrawText (histos[3].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
 
