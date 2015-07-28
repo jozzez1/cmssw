@@ -161,11 +161,13 @@ void MakePlot()
 
 
    for(unsigned int i=0;i<ObjName.size();i++){
-      TH1D*       HdedxMIP        = (TH1D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_MIP"      ).c_str() );
-      TH1D*       HMass           = (TH1D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_Mass"     ).c_str() );
-      TH2D*       HdedxVsP        = (TH2D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP"  ).c_str() );
-      TH2D*       HdedxVsQP       = (TH2D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsQP" ).c_str() );
-      TProfile*   HdedxVsPProfile = (TProfile*)GetObjectFromPath(InputFile, (ObjName[i] + "_Profile"  ).c_str() );
+      TH1D*       HdedxMIP        = (TH1D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_MIP"       ).c_str() );
+      TH1D*       HMass           = (TH1D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_Mass"      ).c_str() );
+      TH2D*       HdedxVsP        = (TH2D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP"   ).c_str() );
+      TH2D*       HdedxVsQP       = (TH2D*)    GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsQP"  ).c_str() );
+      TProfile*   HdedxVsPProfile = (TProfile*)GetObjectFromPath(InputFile, (ObjName[i] + "_Profile"   ).c_str() );
+      TProfile*   IasVsEta_S      = (TProfile*)GetObjectFromPath(InputFile, (ObjName[i] + "_IasVsEta_S").c_str() );
+      TProfile*   IasVsEta_U      = (TProfile*)GetObjectFromPath(InputFile, (ObjName[i] + "_IasVsEta_U").c_str() );
 
 //      ExtractConstants(HdedxVsP);
 
@@ -240,6 +242,26 @@ void MakePlot()
       HdedxVsPProfile->GetYaxis()->SetTitle("dE/dx (MeV/cm)");
       HdedxVsPProfile->Draw("");
       SaveCanvas(c1, "pictures/", ObjName[i] + "_Profile");
+      delete c1;
+
+      c1 = new TCanvas("c1", "c1", 600,600);
+      TLegend* leg = new TLegend(0.50, 0.80, 0.80, 0.90);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(0);
+      leg->SetBorderSize(0);
+      leg->AddEntry (IasVsEta_U, "Unsplit", "P");
+      leg->AddEntry (IasVsEta_S, "Split per module", "P");
+      c1->SetLogy(true);
+      IasVsEta_U->SetStats(kFALSE);
+      IasVsEta_S->SetMarkerStyle(23);
+      IasVsEta_S->SetMarkerColor(kBlue);
+      IasVsEta_U->GetXaxis()->SetTitle("track momentum (GeV/c)");
+      IasVsEta_U->GetYaxis()->SetTitle("I_{as}");
+      IasVsEta_U->Draw("");
+      IasVsEta_S->Draw("same");
+      leg->Draw();
+      SaveCanvas(c1, "pictures/", ObjName[i] + "_IasVsEta");
+      delete leg;
       delete c1;
 
       c1 = new TCanvas("c1", "c1", 600,600);

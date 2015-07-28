@@ -89,6 +89,16 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    }else{         dEdxTemplates = loadDeDxTemplate(DIRNAME + "/../../../data/MC7TeV_Deco_SiStripDeDxMip_3D_Rcd.root");
    }
 
+   TH3F* dEdxNewTemplatesSplit   = NULL;
+   TH3F* dEdxNewTemplatesUnsplit = NULL;
+   if (isData){
+	   dEdxNewTemplatesSplit   = loadDeDxTemplate ("dEdxVsPath_Data.root", true);
+	   dEdxNewTemplatesUnsplit = loadDeDxTemplate ("dEdxVsPath_Data.root", false);
+   } else {
+	   dEdxNewTemplatesSplit   = loadDeDxTemplate ("dEdxVsPath_MC.root", true);
+	   dEdxNewTemplatesUnsplit = loadDeDxTemplate ("dEdxVsPath_MC.root", false);
+   }
+
    //system("mkdir -p pictures/");
    double P_Min               = 1;
    double P_Max               = 15;
@@ -127,6 +137,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
       TH2D* HIasVsP          = new TH2D(    (saveName + "_IasVsP").c_str(), "IasVsP", 3000, 0, 30,1500,0,1);
       TH2D* HIasVsPM         = new TH2D(    (saveName + "_IasVsPM").c_str(), "IasVsPM", 3000, 0, 30,1500,0,1);
       TH1D* HIasMIP          = new TH1D(    (saveName + "_IasMIP"    ).c_str(), "IasMIP"    ,  1000, 0, 1);
+      TProfile* IasVsEta_S   = new TProfile ((saveName+"_IasVsEta_S").c_str(), "IasVsEta_S", 100, -3, 3);
+      TProfile* IasVsEta_U   = new TProfile ((saveName+"_IasVsEta_U").c_str(), "IasVsEta_U", 100, -3, 3);
 
 
 
@@ -196,6 +208,12 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                HNOMSVsEtaProfile->Fill(track->eta(),dedxMObj->numberOfMeasurements() - dedxMObj->numberOfSaturatedMeasurements() );
              }
 
+	     if (track->p() > 5 && dEdxNewTemplatesSplit && dEdxNewTemplatesUnsplit){ // only for MIPs
+		     DeDxData* dedxSObj_New_S = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesSplit,   false, useClusterCleaning, false, false );
+		     DeDxData* dedxSObj_New_U = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesUnsplit, false, useClusterCleaning, false, false );
+		     IasVsEta_S->Fill(track->eta(), dedxSObj_New_S->dEdx());
+		     IasVsEta_U->Fill(track->eta(), dedxSObj_New_U->dEdx());
+	     }
 
              if(fabs(track->eta())>2.1)continue;
              if((int)dedxMObj->numberOfMeasurements()<10)continue;
