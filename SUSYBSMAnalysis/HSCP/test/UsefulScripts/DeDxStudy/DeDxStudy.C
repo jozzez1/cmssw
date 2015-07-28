@@ -215,24 +215,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
     	     if (track->p() > 5){
                  for(unsigned int R=0;R<Nstudies;R++){ results[R]->Charge_Vs_Path->Fill (SSdetId.moduleGeometry(), dedxHits->pathlength(h)*10, dedxHits->charge(h)/(dedxHits->pathlength(h)*10)); }
              }
-<<<<<<< HEAD
-             if(!dedxHits)continue;
-
-
-             for(unsigned int h=0;h<dedxHits->size();h++){
-                DetId detid(dedxHits->detId(h));
-                if(detid.subdetId()<3)continue; // skip pixels
-               
-                double scaleFactor = 1.0;
-                double Norm = (detid.subdetId()<3)?3.61e-06:3.61e-06*265;
-                double ChargeOverPathlength = scaleFactor*Norm*dedxHits->charge(h)/dedxHits->pathlength(h);
-
-		SiStripDetId SSdetId(detid);
-		if (track->p() > 5) Charge_Vs_Path->Fill (SSdetId.moduleGeometry(),
-				dedxHits->pathlength(h)*10,
-				dedxHits->charge(h)/(dedxHits->pathlength(h)*10));
-                HHit->Fill(ChargeOverPathlength);
-=======
              for(unsigned int R=0;R<Nstudies;R++){ results[R]->HHit->Fill(ChargeOverPathlength); }
           }
 
@@ -245,7 +227,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
              }else if(studies[R]=="trunc40_raw"){ dedxObj = computedEdx(dedxHits, dEdxSF, NULL,          false, useClusterCleaning, true,  false, NULL          );  
              }else if(studies[R]=="Ias"        ){ dedxObj = computedEdx(dedxHits, dEdxSF, dEdxTemplates, false, useClusterCleaning, false, false );                 
              }else{ printf("Unknown case: %s!  Exit here.\n", studies[R].c_str());  exit(0);
->>>>>>> Run2HSCP_v8
              }
 
              results[R]->HdedxVsPHSCP->Fill(track->pt(), dedxObj->dEdx());
@@ -258,16 +239,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                results[R]->HNOMSVsEtaProfile->Fill(track->eta(),dedxObj->numberOfMeasurements() - dedxObj->numberOfSaturatedMeasurements() );
              }
 
-<<<<<<< HEAD
-	     if (track->p() > 5 && dEdxNewTemplatesSplit && dEdxNewTemplatesUnsplit){ // only for MIPs
-		     DeDxData* dedxSObj_New_S = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesSplit,   false, useClusterCleaning, false, false );
-		     DeDxData* dedxSObj_New_U = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesUnsplit, false, useClusterCleaning, false, false );
-		     IasVsEta_S->Fill(track->eta(), dedxSObj_New_S->dEdx());
-		     IasVsEta_U->Fill(track->eta(), dedxSObj_New_U->dEdx());
-	     }
-
-=======
->>>>>>> Run2HSCP_v8
              if(fabs(track->eta())>2.1)continue;
              if((int)dedxObj->numberOfMeasurements()<10)continue;
              if(track->p()>5 && track->p()<40){
@@ -284,25 +255,9 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                 if(isnan((float)Mass) || Mass<0.94-0.3 || Mass>0.94+0.3)continue;
                 results[R]->HdedxVsPM ->Fill(track->p(), dedxObj->dEdx() );
              }
-<<<<<<< HEAD
-
-
-
-         }
-      }printf("\n");
-
-
-      HdedxMIP->Scale(1.0/HdedxMIP->Integral() );
-      HHit->Scale(1.0/HHit->Integral() );
-
-   }
-
-   Charge_Vs_Path->SaveAs(("ChargeVsPath"+OUTPUT).c_str());
-=======
           }
       }
    }printf("\n");
->>>>>>> Run2HSCP_v8
    OutputHisto->Write();
    OutputHisto->Close();  
 }
