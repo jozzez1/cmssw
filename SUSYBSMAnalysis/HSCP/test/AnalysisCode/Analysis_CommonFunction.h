@@ -471,12 +471,31 @@ class DuplicatesClass{
 #ifdef FWLITE
 
 
-TH3F* loadDeDxTemplate(string path);
-reco::DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor=1.0, TH3* templateHisto=NULL, bool usePixel=false, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false);
+TH3F* loadDeDxTemplate(string path, bool splitByModuleType=false);
+reco::DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor=1.0, TH3* templateHisto=NULL, bool usePixel=false, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false, std::unordered_map<unsigned int,double>* TrackerGains=NULL);
 bool clusterCleaning(const SiStripCluster*   cluster,  bool crosstalkInv=false );
 void printStripCluster(FILE* pFile, const SiStripCluster*   cluster, const DetId& DetId);
 
-TH3F* loadDeDxTemplate(string path){
+void LoadDeDxCalibration(std::unordered_map<unsigned int,double>& TrackerGains, string path){
+   TChain* t1 = new TChain("SiStripCalib/APVGain");
+   t1->Add(path.c_str());
+
+   unsigned int  tree_DetId;   t1->SetBranchAddress("DetId"             ,&tree_DetId      );
+   unsigned char tree_APVId;   t1->SetBranchAddress("APVId"             ,&tree_APVId      );
+   double        tree_Gain;    t1->SetBranchAddress("Gain"              ,&tree_Gain       );
+   double        tree_PrevGain;t1->SetBranchAddress("PrevGain"          ,&tree_PrevGain   );
+
+   TrackerGains.clear();
+   for (unsigned int ientry = 0; ientry < t1->GetEntries(); ientry++) {
+       t1->GetEntry(ientry);
+       TrackerGains[tree_DetId<<3 | tree_APVId] = tree_Gain / tree_PrevGain;
+   }
+   delete t1;
+}
+
+
+
+TH3F* loadDeDxTemplate(string path, bool splitByModuleType){
    TFile* InputFile = new TFile(path.c_str());
    TH3F* DeDxMap_ = (TH3F*)GetObjectFromPath(InputFile, "Charge_Vs_Path");
    if(!DeDxMap_){printf("dEdx templates in file %s can't be open\n", path.c_str()); exit(0);}
@@ -484,6 +503,10 @@ TH3F* loadDeDxTemplate(string path){
    TH3F* Prob_ChargePath  = (TH3F*)(DeDxMap_->Clone("Prob_ChargePath")); 
    Prob_ChargePath->Reset();
    Prob_ChargePath->SetDirectory(0); 
+
+   if(!splitByModuleType){
+      Prob_ChargePath->RebinX(Prob_ChargePath->GetNbinsX());
+   }
 
    for(int i=0;i<=Prob_ChargePath->GetXaxis()->GetNbins()+1;i++){
       for(int j=0;j<=Prob_ChargePath->GetYaxis()->GetNbins()+1;j++){
@@ -506,7 +529,8 @@ TH3F* loadDeDxTemplate(string path){
    return Prob_ChargePath;
 }
 
-DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor, TH3* templateHisto, bool usePixel, bool useClusterCleaning, bool reverseProb, bool useTruncated){
+#include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
+DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor, TH3* templateHisto, bool usePixel, bool useClusterCleaning, bool reverseProb, bool useTruncated, std::unordered_map<unsigned int,double>* TrackerGains){
      if(!dedxHits) return NULL;
      if(templateHisto)usePixel=false; //never use pixel for discriminator
 
@@ -528,9 +552,29 @@ DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor, TH3* temp
         //if(detid.subdetId()==5 && (absDistEdgeXNorm<0.005 || absDistEdgeYNorm<0.02 || absDistEdgeYNorm>0.97)) continue;
         //if(detid.subdetId()==6 && (absDistEdgeXNorm<0.005 || absDistEdgeYNorm<0.03 || absDistEdgeYNorm>0.8)) continue;
 
+        int ClusterCharge = dedxHits->charge(h);
+
+        if(detid.subdetId()>=3 && TrackerGains!=NULL){//for strip only
+           const SiStripCluster* cluster = dedxHits->stripCluster(h);
+           const vector<unsigned char>& amplitutes = cluster->amplitudes();
+           int firstStrip = cluster->firstStrip();
+           ClusterCharge = 0;
+           for(unsigned int s=0;s<amplitutes.size();s++){               
+              int StripCharge =  amplitutes[s];
+              if(StripCharge<254){
+                 StripCharge=(int)(StripCharge/(TrackerGains->at(detid.rawId()<<3 | (firstStrip+s)/128)));
+                 if(StripCharge>=1024){         StripCharge = 255;
+                 }else if(StripCharge>=254){    StripCharge = 254;
+                 }
+              }
+              ClusterCharge += StripCharge;
+            } 
+        }
+
         if(templateHisto){  //save discriminator probability
-           double ChargeOverPathlength = scaleFactor*dedxHits->charge(h)/(dedxHits->pathlength(h)*10.0);
-           int    BinX   = templateHisto->GetXaxis()->FindBin(50.0);//trajState.localMomentum().mag()); //our template does not depends on this variable currently
+           double ChargeOverPathlength = scaleFactor*ClusterCharge/(dedxHits->pathlength(h)*10.0);
+           SiStripDetId SSdetId(detid); //we sure it's strip since template force the use of usePixel=false
+           int    BinX   = templateHisto->GetXaxis()->FindBin(SSdetId.moduleGeometry());
            int    BinY   = templateHisto->GetYaxis()->FindBin(dedxHits->pathlength(h)*10.0); //*10 because of cm-->mm
            int    BinZ   = templateHisto->GetZaxis()->FindBin(ChargeOverPathlength);
            double Prob   = templateHisto->GetBinContent(BinX,BinY,BinZ);
@@ -539,7 +583,7 @@ DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double scaleFactor, TH3* temp
            vect.push_back(Prob); //save probability
         }else{              
            double Norm = (detid.subdetId()<3)?3.61e-06:3.61e-06*265;
-           double ChargeOverPathlength = scaleFactor*Norm*dedxHits->charge(h)/dedxHits->pathlength(h);
+           double ChargeOverPathlength = scaleFactor*Norm*ClusterCharge/dedxHits->pathlength(h);
            vect.push_back(ChargeOverPathlength); //save charge
 
 //           printf("%i - %f / %f = %f\n", h, scaleFactor*Norm*dedxHits->charge(h), dedxHits->pathlength(h), ChargeOverPathlength);
