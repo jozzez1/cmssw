@@ -68,8 +68,11 @@ void Analysis_Step3_MakePlots()
    MassPrediction(InputPattern, CutIndexTight, "Mass", true, "13TeV_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
+<<<<<<< HEAD
    CutFlowPlot(InputPattern, CutIndex, true);
    CutFlowPlot(InputPattern, CutIndexTight, 1e-3, 2e+2, true);
+=======
+>>>>>>> cmssw-fromLoic/Run2HSCP_v8
    SelectionPlot(InputPattern, CutIndex, CutIndexTight);
    PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, CutIndex_Flip);
 
@@ -599,7 +602,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
    t2->SetTopMargin(0);
    t2->SetBottomMargin(0.5);
 
-   TH1D* frameR = new TH1D("frameR", "frameR", 1,0, 1400);
+   TH1D* frameR = new TH1D("frameR", "frameR", 1,0, 2800);
    frameR->GetXaxis()->SetNdivisions(505);
    frameR->SetTitle("");
    frameR->SetStats(kFALSE);
@@ -657,7 +660,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
    }
 
 
-   TLine* LineAtOne = new TLine(0,1,1400,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
+   TLine* LineAtOne = new TLine(0,1,2800,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
 
    c1->cd();
    SaveCanvas(c1, InputPattern, string("Rescale_") + HistoSuffix + "_" + DataName);
