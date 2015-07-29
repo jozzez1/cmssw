@@ -249,19 +249,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                results[R]->HNOMSVsEtaProfile->Fill(track->eta(),dedxObj->numberOfMeasurements() - dedxObj->numberOfSaturatedMeasurements() );
              }
 
-	     if (track->p() > 5 && dEdxNewTemplatesSplit && dEdxNewTemplatesUnsplit){
-                bool useraw   = studies[R].find("raw")  !=std::string::npos ? true : false,
-		     truncate = studies[R].find("trunc")!=std::string::npos ? true : false;
-
-		DeDxData* dedxNewObjS = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesSplit,   false, useClusterCleaning, truncate, false, useraw ? &TrackerGains : NULL);
-		DeDxData* dedxNewObjU = computedEdx(dedxHits, dEdxSF, dEdxNewTemplatesUnsplit, false, useClusterCleaning, truncate, false, useraw ? &TrackerGains : NULL);
-
-                results[R]->IasVsEta_Split   ->Fill(track->eta(), dedxNewObjS->dEdx());
-                results[R]->IasVsEta_ProfileS->Fill(track->eta(), dedxNewObjS->dEdx());
-                results[R]->IasVsEta_Unsplit ->Fill(track->eta(), dedxNewObjU->dEdx());
-                results[R]->IasVsEta_ProfileU->Fill(track->eta(), dedxNewObjU->dEdx());
-	     }
-
              if(fabs(track->eta())>2.1)continue;
              if((int)dedxObj->numberOfMeasurements()<10)continue;
              if(track->p()>5 && track->p()<40){
