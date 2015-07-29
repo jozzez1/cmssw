@@ -20,8 +20,9 @@ def checkInputFile(url):
 
 samples = [
 #SampleName, generator config file, NJobs, NEvents/Job
-  ['MC_13TeV_DYToMuMu' , 'ZMM_13TeV_TuneCUETP8M1_cfi', 4000, 2500],
-  ['MC_13TeV_WToLNu' , 'WToLNu_13TeV_pythia8_cff', 4000, 2500],
+#  ['MC_13TeV_DYToMuMu' , 'ZMM_13TeV_TuneCUETP8M1_cfi', 4000, 2500],
+#  ['MC_13TeV_WToLNu' , 'WToLNu_13TeV_pythia8_cff', 4000, 2500],
+  ['MC_13TeV_MinBias' , 'MinBias_13TeV_pythia8_TuneCUETP8M1_cfi.py', 1000, 1000]
 ]
 
 
