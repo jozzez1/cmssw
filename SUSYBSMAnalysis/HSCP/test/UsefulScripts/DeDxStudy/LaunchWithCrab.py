@@ -17,7 +17,8 @@ if len(sys.argv)==1:
         print "  3  - Merge all output files and run the plot generating script"
 	sys.exit()
 
-STORE = "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/"
+STORE = "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/" # Data
+#STORE = "/nfs/scratch/fynu/jzobec/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs #MC
 
 if sys.argv[1]=='1':
 	print 'SKIMMING DEDX EDM'
@@ -36,9 +37,10 @@ elif sys.argv[1]=='2':
 	LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)	
         rootfiles = [f for f in listdir(STORE) if isfile(join(STORE,f)) ]
         index = -1
+	os.system("sh DeDxStudy.sh")
         for file in rootfiles :
 		index+=1
-		LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/DeDxStudy.sh", STORE+file, 'dEdxSkim_'+str(index)+'_ready.root'])
+		LaunchOnCondor.SendCluster_Push(["BASH", os.getcwd()+"/DeDxStudy.sh "+STORE+file+' dEdxSkim_'+str(index)+'_ready.root'])
 	LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='3':
