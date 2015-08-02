@@ -27,6 +27,14 @@ datasetList = [
    ["MCMinBias", "/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
 ]
 
+signalList = [
+   ["MCGluino_1000_f10", "Gluino_13TeV_M1000_f10"],
+   ["MCGluino_1400_f10", "Gluino_13TeV_M1200_f10"],
+   ["MCGluino_1800_f10", "Gluino_13TeV_M1200_f10"],
+   ["MCGMStau_494", "GMStau_13TeV_M494"],
+   ["MCStop_M1000", "Stop_13TeV_M1000"],
+]
+
 if sys.argv[1]=='1':
         os.system("sh " + os.getcwd() + "/DeDxStudy.sh ") #just compile
 
@@ -48,16 +56,27 @@ if sys.argv[1]=='1':
               LaunchOnCondor.SendCluster_Push  (["BASH", "sh " + os.getcwd() + "/DeDxStudy.sh " + InputListCSV + " out.root; mv out.root " + outdir+"dEdxHistos_%i.root" %  LaunchOnCondor.Jobs_Count ])
 	   LaunchOnCondor.SendCluster_Submit()
 
+	for SIGNAL in signalList :
+	   outdir =  os.getcwd() + "/Histos/"+SIGNAL[0]+"/"
+	   os.system('mkdir -p ' + outdir)
+
+	   JobName = "DEDXHISTO_"+SIGNAL[0]
+	   FarmDirectory = "FARM_DEDXHISTO_"+SIGNAL[0]
+	   LaunchOnCondor.Jobs_Queue = '8nh'
+	   LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
+	   LaunchOnCondor.SendCluster_Push  (["BASH", "sh " + os.getcwd() + "/DeDxStudy.sh " + SIGNAL[1] + " out.root; mv out.root " + outdir+"dEdxHistos_%i.root" %  LaunchOnCondor.Jobs_Count ])
+	   LaunchOnCondor.SendCluster_Submit()
+
 elif sys.argv[1]=='2':
-        for DATASET in datasetList :
+        for DATASET in datasetList :#+signalList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
-	   os.system('rm -f Histos_'+DATASET[0]+'.root')
+           os.system('rm -f Histos_'+DATASET[0]+'.root')
            os.system('hadd -f Histos_'+DATASET[0]+'.root ' + indir + '*.root')
-           os.system('./MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
+           os.system('sh MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
            os.system('mv pictures pictures_'+DATASET[0]+' && MakePlot_'+DATASET[0]+'.log pictures_'+DATASET[0])
 
 elif sys.argv[1]=='3':
-        for DATASET in datasetList :
+        for DATASET in datasetList+signalList :
            os.system('./MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
            os.system('mv pictures pictures_'+DATASET[0]+' && MakePlot_'+DATASET[0]+'.log pictures_'+DATASET[0])
 

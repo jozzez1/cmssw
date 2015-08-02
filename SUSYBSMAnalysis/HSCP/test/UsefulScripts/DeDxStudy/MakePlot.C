@@ -140,10 +140,10 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    TFile* InputFile = new TFile(INPUT.c_str());
    std::vector<string> ObjName;
    ObjName.push_back("harm2_SO");
-   ObjName.push_back("harm2_SP");
-   ObjName.push_back("harm2_PO_raw");
+//   ObjName.push_back("harm2_SP");
+//   ObjName.push_back("harm2_PO_raw");
    ObjName.push_back("harm2_SO_raw");
-   ObjName.push_back("harm2_SP_raw");
+//   ObjName.push_back("harm2_SP_raw");
    ObjName.push_back("Ias_SO_inc");
    ObjName.push_back("Ias_SO");
 //   ObjName.push_back("trunc40");
@@ -154,6 +154,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
    for(unsigned int i=0;i<ObjName.size();i++){
       TH1D*       HdedxMIP           = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_MIP"               ).c_str() );
+      TH1D*       HdedxSIG           = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_SIG"               ).c_str() );
       TH1D*       HMass              = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Mass"              ).c_str() );
       TH2D*       HdedxVsP           = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP"           ).c_str() );
       TH2D*       HdedxVsQP          = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsQP"          ).c_str() );
@@ -283,6 +284,40 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxMIP->SetAxisRange(0,5,"X");
       HdedxMIP->Draw("");
       SaveCanvas(c1, "pictures/", ObjName[i] + "_MIP", true);
+      delete c1;
+
+      c1 = new TCanvas("c1", "c1", 600,600);
+      c1->SetLogy(true);
+      c1->SetGridx(true);
+      HdedxSIG->SetStats(kFALSE);
+      HdedxSIG->GetXaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
+      HdedxSIG->GetYaxis()->SetTitle("number of tracks");
+      HdedxSIG->SetAxisRange(0,5,"X");
+      HdedxSIG->Draw("");
+      SaveCanvas(c1, "pictures/", ObjName[i] + "_SIG", true);
+      delete c1;
+
+      c1 = new TCanvas("c1", "c1", 600,600);
+      c1->SetLogy(true);
+      c1->SetGridx(true);
+      TLegend* leg = new TLegend (0.50, 0.80, 0.80, 0.90);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(0);
+      leg->SetBorderSize(0);
+      HdedxSIG->SetStats(kFALSE);
+      HdedxSIG->GetXaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
+      HdedxSIG->GetYaxis()->SetTitle("number of tracks");
+      HdedxSIG->SetAxisRange(0,5,"X");
+      HdedxMIP->SetLineColor (kBlue);
+      HdedxMIP->Scale(1.0/HdedxMIP->Integral());
+      HdedxSIG->Scale(1.0/HdedxSIG->Integral());
+      leg->AddEntry (HdedxMIP, "Background", "P");
+      leg->AddEntry (HdedxSIG, "Signal"    , "P");
+      HdedxSIG->Draw("hist");
+      HdedxMIP->Draw("same");
+      leg->Draw();
+      SaveCanvas(c1, "pictures/", ObjName[i] + "_SIG", true);
+      delete leg;
       delete c1;
 
       std::cout << "TESTC\n";
