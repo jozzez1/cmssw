@@ -178,7 +178,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       c1->SetLogz(true);
       HdedxVsP->SetStats(kFALSE);
       HdedxVsP->GetXaxis()->SetTitle("momentum (GeV/c)");
-      HdedxVsP->GetYaxis()->SetTitle("dE/dx (MeV/cm)");
+      HdedxVsP->GetYaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxVsP->SetAxisRange(0,5,"X");
       HdedxVsP->SetAxisRange(0,15,"Y");
       HdedxVsP->Draw("COLZ");
@@ -187,7 +187,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       KaonLine->Draw("same");
       ProtonLine->Draw("same");
       DeuteronLine->Draw("same");
-      TritonLine->Draw("same");
+//      TritonLine->Draw("same");
       ProtonLineFit->Draw("same");
       T->Draw("same");
       SaveCanvas(c1, "pictures/", ObjName[i] + "_dedxVsP", true);
@@ -200,7 +200,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       c1->SetLogz(true);
       HdedxVsQP->SetStats(kFALSE);
       HdedxVsQP->GetXaxis()->SetTitle("charge * momentum (GeV/c)");
-      HdedxVsQP->GetYaxis()->SetTitle("dE/dx (MeV/cm)");
+      HdedxVsQP->GetYaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxVsQP->SetAxisRange(-5,5,"X");
       HdedxVsQP->SetAxisRange(0,15,"Y");
       HdedxVsQP->Draw("COLZ");
@@ -232,7 +232,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxVsPProfile->SetStats(kFALSE);
       HdedxVsPProfile->SetAxisRange(2.5,5,"Y");
       HdedxVsPProfile->GetXaxis()->SetTitle("track momentum (GeV/c)");
-      HdedxVsPProfile->GetYaxis()->SetTitle("dE/dx (MeV/cm)");
+      HdedxVsPProfile->GetYaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxVsPProfile->Draw("");
       SaveCanvas(c1, "pictures/", ObjName[i] + "_Profile");
       delete c1;
@@ -262,7 +262,15 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxVsP_NS->GetXaxis()->SetTitle("track momentum (GeV/c)");
       HdedxVsP_NS->GetYaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxVsP_NS->GetZaxis()->SetTitle("Number of saturated strips");
+      HdedxVsP_NS->SetAxisRange(0.0, 5.0, "X");
       HdedxVsP_NS->Draw("COLZ");
+      PionLine->Draw("same");
+      KaonLine->Draw("same");
+      ProtonLine->Draw("same");
+      DeuteronLine->Draw("same");
+//      TritonLine->Draw("same");
+      ProtonLineFit->Draw("same");
+      T->Draw("same");
       SaveCanvas(c1, "pictures/", ObjName[i] + "_dedxVsP_NS");
       delete c1;
 
@@ -270,7 +278,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       c1->SetLogy(true);
       c1->SetGridx(true);
       HdedxMIP->SetStats(kFALSE);
-      HdedxMIP->GetXaxis()->SetTitle("dE/dx (MeV/cm)");
+      HdedxMIP->GetXaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxMIP->GetYaxis()->SetTitle("number of tracks");
       HdedxMIP->SetAxisRange(0,5,"X");
       HdedxMIP->Draw("");
@@ -316,7 +324,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             lineKaon->Draw("same");
             lineProton->Draw("same");
             lineDeuteron->Draw("same");
-            lineTriton->Draw("same");
+//            lineTriton->Draw("same");
             SaveCanvas(c1, "pictures/", ObjName[i] + "_Mass", true);
             delete c1;
       } else continue;

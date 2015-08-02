@@ -51,6 +51,7 @@ if sys.argv[1]=='1':
 elif sys.argv[1]=='2':
         for DATASET in datasetList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
+	   os.system('rm -f Histos_'+DATASET[0]+'.root')
            os.system('hadd -f Histos_'+DATASET[0]+'.root ' + indir + '*.root')
            os.system('./MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
            os.system('mv pictures pictures_'+DATASET[0]+' && MakePlot_'+DATASET[0]+'.log pictures_'+DATASET[0])
