@@ -178,9 +178,11 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    TH3F* dEdxTemplates    = NULL;
    TH3F* dEdxTemplatesInc = NULL;
    if(isData){   //FIXME update template on data directory
+	 dEdxSF           = 1.0;
          dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
          dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false);
    }else{
+	 dEdxSF           = 1.09708;
          dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
          dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false); 
    }
@@ -242,7 +244,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          if(track->p() > 5){
             for(unsigned int h=0;h<dedxHits->size();h++){
                 DetId detid(dedxHits->detId(h));
-                double scaleFactor = 1.0;
+                double scaleFactor = dEdxSF;
                 double Norm = (detid.subdetId()<3)?3.61e-06:3.61e-06*265;
                 double ChargeOverPathlength = scaleFactor*Norm*dedxHits->charge(h)/dedxHits->pathlength(h);
 
@@ -254,7 +256,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    if(!results[R]->usePixel and detid.subdetId() <3)continue; // skip pixels
                    if(!results[R]->useStrip and detid.subdetId()>=3)continue; // skip strips
          
-                   results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, dedxHits->charge(h)/(dedxHits->pathlength(h)*10)); 
+                   results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor*dedxHits->charge(h)/(dedxHits->pathlength(h)*10)); 
                    if(detid.subdetId()>=3)results[R]->Charge_Vs_FS[moduleGeometry]->Fill(dedxHits->stripCluster(h)->firstStrip(),  dedxHits->charge(h)); 
                    results[R]->HHit->Fill(ChargeOverPathlength);
                 }

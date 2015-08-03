@@ -28,11 +28,11 @@ datasetList = [
 ]
 
 signalList = [
-   ["MCGluino_1000_f10", "Gluino_13TeV_M1000_f10"],
-   ["MCGluino_1400_f10", "Gluino_13TeV_M1200_f10"],
-   ["MCGluino_1800_f10", "Gluino_13TeV_M1200_f10"],
-   ["MCGMStau_494", "GMStau_13TeV_M494"],
-   ["MCStop_M1000", "Stop_13TeV_M1000"],
+   ["MCGluino_1000_f10", "/storage/data/cms/users/quertenmont/HSCP/2015/Gluino_13TeV_M1000_f10.root"],
+   ["MCGluino_1400_f10", "/storage/data/cms/users/quertenmont/HSCP/2015/Gluino_13TeV_M1400_f10.root"],
+   ["MCGluino_1800_f10", "/storage/data/cms/users/quertenmont/HSCP/2015/Gluino_13TeV_M1800_f10.root"],
+   ["MCGMStau_494", "/storage/data/cms/users/quertenmont/HSCP/2015/GMStau_13TeV_M494.root"],
+   ["MCStop_M1000", "/storage/data/cms/users/quertenmont/HSCP/2015/Stop_13TeV_M1000.root"],
 ]
 
 if sys.argv[1]=='1':
@@ -72,7 +72,7 @@ elif sys.argv[1]=='2':
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
            os.system('rm -f Histos_'+DATASET[0]+'.root')
            os.system('hadd -f Histos_'+DATASET[0]+'.root ' + indir + '*.root')
-           os.system('sh MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
+           os.system('sh MakePlot.sh Histos_'+DATASET[0]+'.root')
            os.system('mv pictures pictures_'+DATASET[0]+' && MakePlot_'+DATASET[0]+'.log pictures_'+DATASET[0])
 
 elif sys.argv[1]=='3':

@@ -27,7 +27,7 @@
 using namespace std;
 
 
-void getScaleFactor(TFile* InputFile, string OutName, string ObjName1, string ObjName2);
+void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string OutName, string ObjName);
 void ExtractConstants(TH2D* input);
 void DrawComparisons (TFile* InputFile1, TFile* InputFile2=NULL, string ObjName1="Ias_SO", string ObjName2="Ias_SO_inc");
 
@@ -137,8 +137,13 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    TritonLineLeft->SetLineColor(1);
    TritonLineLeft->SetLineWidth(2);
 
-   TFile* InputFile = new TFile(INPUT.c_str());
+   TFile* InputFile  = new TFile(INPUT .c_str());
+   TFile* InputFile2 = INPUT2=="EMPTY" ? NULL : new TFile(INPUT2.c_str());
+
+
    std::vector<string> ObjName;
+   ObjName.push_back("hit_SO");
+   ObjName.push_back("hit_SO_raw");
    ObjName.push_back("harm2_SO");
 //   ObjName.push_back("harm2_SP");
 //   ObjName.push_back("harm2_PO_raw");
@@ -153,15 +158,25 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    DrawComparisons (InputFile);
 
    for(unsigned int i=0;i<ObjName.size();i++){
+      TH3F*       dEdxTemplate       = (TH3F*)      GetObjectFromPath(InputFile, (ObjName[i] + "_ChargeVsPath"      ).c_str() );
       TH1D*       HdedxMIP           = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_MIP"               ).c_str() );
       TH1D*       HdedxSIG           = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_SIG"               ).c_str() );
       TH1D*       HMass              = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Mass"              ).c_str() );
       TH2D*       HdedxVsP           = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP"           ).c_str() );
       TH2D*       HdedxVsQP          = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsQP"          ).c_str() );
       TProfile*   HdedxVsPProfile    = (TProfile*)  GetObjectFromPath(InputFile, (ObjName[i] + "_Profile"           ).c_str() );
-      TH2D*       HdedxVsEta         = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Eta2D" ).c_str() );
-      TProfile*   HdedxVsEtaProfile  = (TProfile*)  GetObjectFromPath(InputFile, (ObjName[i] + "_Eta" ).c_str() );
-      TProfile2D* HdedxVsP_NS        = (TProfile2D*)GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP_NS" ).c_str() );
+      TH2D*       HdedxVsEta         = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Eta2D"             ).c_str() );
+      TProfile*   HdedxVsEtaProfile  = (TProfile*)  GetObjectFromPath(InputFile, (ObjName[i] + "_Eta"               ).c_str() );
+      TProfile2D* HdedxVsP_NS        = (TProfile2D*)GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP_NS"        ).c_str() );
+
+      if (ObjName[i].find("hit")!=string::npos){
+         dEdxTemplate->SetName("Charge_Vs_Path");
+         string SaveName (INPUT.c_str());
+         size_t firstToken = SaveName.find_first_of ("_"),
+                lastToken  = SaveName.size()/sizeof(char) - firstToken;
+         dEdxTemplate->SaveAs (("dEdxTemplate_" + ObjName[i] + SaveName.substr (firstToken,lastToken)).c_str());
+         continue;
+      }
 
       ExtractConstants(HdedxVsP);
 
@@ -300,7 +315,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       c1 = new TCanvas("c1", "c1", 600,600);
       c1->SetLogy(true);
       c1->SetGridx(true);
-      TLegend* leg = new TLegend (0.50, 0.80, 0.80, 0.90);
+      TLegend* leg = new TLegend (0.10, 0.80, 0.40, 0.90);
       leg->SetFillColor(0);
       leg->SetFillStyle(0);
       leg->SetBorderSize(0);
@@ -311,12 +326,12 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxMIP->SetLineColor (kBlue);
       HdedxMIP->Scale(1.0/HdedxMIP->Integral());
       HdedxSIG->Scale(1.0/HdedxSIG->Integral());
-      leg->AddEntry (HdedxMIP, "Background", "P");
-      leg->AddEntry (HdedxSIG, "Signal"    , "P");
+      leg->AddEntry (HdedxMIP, "Background", "L");
+      leg->AddEntry (HdedxSIG, "Signal"    , "L");
       HdedxSIG->Draw("hist");
       HdedxMIP->Draw("same");
       leg->Draw();
-      SaveCanvas(c1, "pictures/", ObjName[i] + "_SIG", true);
+      SaveCanvas(c1, "pictures/", ObjName[i] + "_SIGvsMIP", true);
       delete leg;
       delete c1;
 
@@ -368,17 +383,18 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
    }
 
-//   getScaleFactor(InputFile, "All_Rescale", "All_SelTrack_Pixel", "All_SelTrack_StripCleaned");
+   getScaleFactor(InputFile, InputFile2, "All_Rescale", "harm2_SO");
 }
 
 
 
-void getScaleFactor(TFile* InputFile, string OutName, string ObjName1, string ObjName2){
-   TProfile*   HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile, (ObjName1 + "_Profile"  ).c_str() );
-   TProfile*   HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile, (ObjName2 + "_Profile"  ).c_str() );
+void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string OutName, string ObjName){
+   if (!InputFile2) return;
+   TProfile*   HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName + "_Profile"  ).c_str() );
+   TProfile*   HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile2, (ObjName + "_Profile"  ).c_str() );
 
-   TH1D*       HdedxMIP1        = (TProfile*)GetObjectFromPath(InputFile, (ObjName1 + "_MIP"  ).c_str() );
-   TH1D*       HdedxMIP2        = (TProfile*)GetObjectFromPath(InputFile, (ObjName2 + "_MIP"  ).c_str() );
+   TH1D*       HdedxMIP1        = (TProfile*)GetObjectFromPath(InputFile1, (ObjName + "_MIP"  ).c_str() );
+   TH1D*       HdedxMIP2        = (TProfile*)GetObjectFromPath(InputFile2, (ObjName + "_MIP"  ).c_str() );
 
    TF1* mygausMIP = new TF1("mygausMIP","gaus", 1, 5);
    HdedxMIP1->Fit("mygausMIP","Q0","");
