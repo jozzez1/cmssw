@@ -91,6 +91,7 @@ TProfile*  HCuts_I_Flip;
 TProfile*  HCuts_TOF_Flip;
 
 std::vector<stSample> samples;
+std::vector<stSample> samplesFull;
 std::map<std::string, stPlots> plotsMap;
 
 std::vector< float > BgLumiMC; //MC                                           
@@ -210,6 +211,7 @@ void Analysis_Step1_EventLoop(string MODE="COMPILE", int TypeMode_=0, string Inp
    // get all the samples and clean the list to keep only the one we want to run on... Also initialize the BaseDirectory
    InitBaseDirectory();
    GetSampleDefinition(samples);
+   samplesFull = samples;
    if(MODE.find("ANALYSE_")==0){
       int sampleIdStart, sampleIdEnd; sscanf(MODE.c_str(),"ANALYSE_%d_to_%d",&sampleIdStart, &sampleIdEnd);
       keepOnlyTheXtoYSamples(samples,sampleIdStart,sampleIdEnd);
@@ -235,8 +237,7 @@ void Analysis_Step1_EventLoop(string MODE="COMPILE", int TypeMode_=0, string Inp
    LumiWeightsMCSyst = edm::LumiReWeighting(BgLumiMC, TrueDistSyst);
 
    //create histogram file and run the analyis
-//   HistoFile = new TFile((string(Buffer)+"/Histos_"+samples[0].Name+"_"+samples[0].FileName+".root").c_str(),"RECREATE");
-   HistoFile = new TFile((string(Buffer)+"/Histos_"+samples[0].Name+".root").c_str(),"RECREATE");      
+   HistoFile = new TFile((string(Buffer)+"/Histos_"+samples[0].Name+"_"+samples[0].FileName+".root").c_str(),"RECREATE");
    Analysis_Step1_EventLoop(Buffer);
    HistoFile->Write();
    HistoFile->Close();
@@ -956,9 +957,12 @@ void Analysis_Step1_EventLoop(char* SavePath)
       bool isMC     = (samples[s].Type==1);
       bool isSignal = (samples[s].Type>=2);
 
-      dEdxSF = 1.00;
-      if(isData){    dEdxTemplates = loadDeDxTemplate("../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root");
-      }else{         dEdxTemplates = loadDeDxTemplate("../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root");
+      if(isData){ 
+         dEdxSF           = 1.00000;
+         dEdxTemplates = loadDeDxTemplate("../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
+      }else{  
+         dEdxSF           = 1.09708;      
+         dEdxTemplates = loadDeDxTemplate("../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
       }
 
       if(isData){    LoadDeDxCalibration(TrackerGains, "../../data/Data13TeVGains.root"); 
@@ -1031,7 +1035,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
               if(MaxEntry>0 && ientry>MaxEntry)break;
               NMCevents += GetPUWeight(ev, samples[s].Pileup, PUSystFactor, LumiWeightsMC, LumiWeightsMCSyst);
             }
-            if(samples[s].Type==1)SampleWeight = GetSampleWeightMC(IntegratedLuminosity,FileName, samples[s].XSec, ev.size(), NMCevents);
+            if(samples[s].Type==1)SampleWeight = GetSampleWeightMC(IntegratedLuminosity,FileName, samples[s].XSec, ev.size(), NMCevents, numberOfMatchingSamples(samples[s].Name, samplesFull));
             else                  SampleWeight = GetSampleWeight  (IntegratedLuminosity,IntegratedLuminosityBeforeTriggerChange,samples[s].XSec,NMCevents, period);
          }
 
