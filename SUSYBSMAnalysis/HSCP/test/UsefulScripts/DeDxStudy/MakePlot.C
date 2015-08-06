@@ -140,16 +140,16 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
 
    std::vector<string> ObjName;
-/*   ObjName.push_back("hit_SP");
+   ObjName.push_back("hit_SP");
    ObjName.push_back("hit_SP_in");
    ObjName.push_back("harm2_SO");
    ObjName.push_back("harm2_SP");
    ObjName.push_back("harm2_SO_in");
-   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
-   ObjName.push_back("harm2_SO_raw"); // FIXME does not fit well
-   ObjName.push_back("harm2_SP_raw"); // FIXME does not fit well
+//   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
+//   ObjName.push_back("harm2_SO_raw"); // FIXME does not fit well
+//   ObjName.push_back("harm2_SP_raw"); // FIXME does not fit well
    ObjName.push_back("Ias_SO_inc");
-   ObjName.push_back("Ias_SO");*/
+   ObjName.push_back("Ias_SO");
 
    ofstream ExtractConstantsReport, ExtractConstantsReport2;
    ExtractConstantsReport.open ((SaveDir + "ConstantsReport" + SaveName + ".txt").c_str(), ofstream::out);
@@ -206,7 +206,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             TProfile2D* Charge_Vs_XYNCSize = (TProfile2D*) GetObjectFromPath (InputFile, (ObjName[i]+"_ChargeVsXYNCSize" + Id).c_str());
 
             TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYH->SetStats(kFALSE);
             Charge_Vs_XYH->GetXaxis()->SetTitle("local x coordinate");
             Charge_Vs_XYH->GetYaxis()->SetTitle("local y coordinate");
@@ -217,7 +216,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             delete c1;
 
             c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYN->SetStats(kFALSE);
             Charge_Vs_XYN->GetXaxis()->SetTitle("normalized x coordinate");
             Charge_Vs_XYN->GetYaxis()->SetTitle("normalized y coordinate");
@@ -228,18 +226,17 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             delete c1;
 
             c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYCSize->SetStats(kFALSE);
             Charge_Vs_XYCSize->GetXaxis()->SetTitle("local x coordinate");
             Charge_Vs_XYCSize->GetYaxis()->SetTitle("local y coordinate");
             Charge_Vs_XYCSize->SetAxisRange (-7,7,"X");
             Charge_Vs_XYCSize->SetAxisRange (-15,15,"Y");
+            Charge_Vs_XYCSize->SetMaximum (5);
             Charge_Vs_XYCSize->Draw("COLZ");
             SaveCanvas (c1, SaveDir, ObjName[i]+SaveSuffix+"_ChargeVsXYCSize"+string(Id), true);
             delete c1;
 
             c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYHN->SetStats(kFALSE);
             Charge_Vs_XYHN->GetXaxis()->SetTitle("normalized x coordinate");
             Charge_Vs_XYHN->GetYaxis()->SetTitle("normalized y coordinate");
@@ -250,7 +247,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             delete c1;
 
             c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYLN->SetStats(kFALSE);
             Charge_Vs_XYLN->GetXaxis()->SetTitle("normalized x coordinate");
             Charge_Vs_XYLN->GetYaxis()->SetTitle("normalized y coordinate");
@@ -261,12 +257,12 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             delete c1;
 
             c1 = new TCanvas ("c1", "c1", 600, 600);
-            c1->SetLogz();
             Charge_Vs_XYNCSize->SetStats(kFALSE);
             Charge_Vs_XYNCSize->GetXaxis()->SetTitle("normalized x coordinate");
             Charge_Vs_XYNCSize->GetYaxis()->SetTitle("normalized y coordinate");
             Charge_Vs_XYNCSize->SetAxisRange (-1.5,1.5,"X");
             Charge_Vs_XYNCSize->SetAxisRange (-1.5,1.5,"Y");
+            Charge_Vs_XYNCSize->SetMaximum (5);
             Charge_Vs_XYNCSize->Draw("COLZ");
             SaveCanvas (c1, SaveDir, ObjName[i]+SaveSuffix+"_ChargeVsXYNCSize"+string(Id), true);
             delete c1;
@@ -294,7 +290,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                TProfile2D* Charge_Vs_XYNCSize2 = (TProfile2D*) GetObjectFromPath (InputFile2, (ObjName[i]+"_ChargeVsXYNCSize" + Id).c_str());
 
                TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYH2->SetStats(kFALSE);
                Charge_Vs_XYH2->GetXaxis()->SetTitle("local x coordinate");
                Charge_Vs_XYH2->GetYaxis()->SetTitle("local y coordinate");
@@ -305,7 +300,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYN2->SetStats(kFALSE);
                Charge_Vs_XYN2->GetXaxis()->SetTitle("normalized x coordinate");
                Charge_Vs_XYN2->GetYaxis()->SetTitle("normalized y coordinate");
@@ -316,18 +310,17 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYCSize2->SetStats(kFALSE);
                Charge_Vs_XYCSize2->GetXaxis()->SetTitle("local x coordinate");
                Charge_Vs_XYCSize2->GetYaxis()->SetTitle("local y coordinate");
                Charge_Vs_XYCSize2->SetAxisRange (-7,7,"X");
                Charge_Vs_XYCSize2->SetAxisRange (-15,15,"Y");
+               Charge_Vs_XYCSize2->SetMaximum (5);
                Charge_Vs_XYCSize2->Draw("COLZ");
                SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_ChargeVsXYCSize"+string(Id), true);
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYHN2->SetStats(kFALSE);
                Charge_Vs_XYHN2->GetXaxis()->SetTitle("normalized x coordinate");
                Charge_Vs_XYHN2->GetYaxis()->SetTitle("normalized module y coordinate");
@@ -338,7 +331,6 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYLN2->SetStats(kFALSE);
                Charge_Vs_XYLN2->GetXaxis()->SetTitle("normalized x coordinate");
                Charge_Vs_XYLN2->GetYaxis()->SetTitle("normalized y coordinate");
@@ -349,12 +341,12 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
-               c1->SetLogz();
                Charge_Vs_XYNCSize2->SetStats(kFALSE);
                Charge_Vs_XYNCSize2->GetXaxis()->SetTitle("normalized x coordinate");
                Charge_Vs_XYNCSize2->GetYaxis()->SetTitle("normalized y coordinate");
                Charge_Vs_XYNCSize2->SetAxisRange (-1.5,1.5,"X");
                Charge_Vs_XYNCSize2->SetAxisRange (-1.5,1.5,"Y");
+               Charge_Vs_XYNCSize2->SetMaximum (5);
                Charge_Vs_XYNCSize2->Draw("COLZ");
                SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_ChargeVsXYNCSize"+string(Id), true);
              
@@ -606,7 +598,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       delete c1;
 
       c1 = new TCanvas("c1", "c1", 600,600);
-      leg = new TLegend (0.50, 0.80, 0.80, 0.90);
+      leg = new TLegend (0.50, 0.70, 0.80, 0.80);
       leg->SetFillColor(0);
       leg->SetFillStyle(0);
       leg->SetBorderSize(0);
@@ -615,7 +607,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxMIP->SetStats(kFALSE);
       HdedxMIP->GetXaxis()->SetTitle(ObjName[i].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
       HdedxMIP->GetYaxis()->SetTitle("fraction of tracks");
-      HdedxMIP->GetXaxis()->SetRangeUser(0,15);
+      HdedxMIP->GetXaxis()->SetRangeUser(0,8);
       HdedxMIP->GetYaxis()->SetRangeUser(5e-7,6e-1);
       HdedxMIP->SetLineColor(kBlack);
       HdedxMIP->SetLineWidth(2);
@@ -790,6 +782,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    }
    CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO"  , "Ias_SO_inc");
    CompareDeDx (InputFile, SaveDir, SaveName, "harm2_SO", "harm2_SO_in");
+   CompareDeDx (InputFile, SaveDir, SaveName, "harm2_SO_raw", "harm2_PO_raw");
    CompareDeDx (InputFile, SaveDir, SaveName, "hit_SP"  , "hit_SP_in");
 
    ExtractConstantsReport.close();
@@ -798,6 +791,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
       CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO"  , "Ias_SO_inc");
       CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_SO", "harm2_SO_in");
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_SO_raw", "harm2_PO_raw");
       CompareDeDx (InputFile2, SaveDir, SaveName2, "hit_SP"  , "hit_SP_in");
 
       // now produce the ROC curve
@@ -809,7 +803,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       ObjNames.push_back ("harm2_SP");
 
       TCanvas* c1   = new TCanvas ("c1", "c1", 600,600); 
-      TLegend* leg  = new TLegend (0.50, 0.60, 0.80, 0.80);
+      TLegend* leg  = new TLegend (0.50, 0.50, 0.80, 0.70);
       leg->SetFillColor(0);
       leg->SetFillStyle(0);
       leg->SetBorderSize(0);
@@ -820,28 +814,27 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       h.GetYaxis()->SetTitle("signal efficiency");
       h.GetYaxis()->SetNdivisions(5);
       h.SetAxisRange (0,1,"Y");
-      //h.SetAxisRange (0.00001,1,"X");
       h.SetStats(0);
       h.Draw();
       TGraph** ROC = new TGraph* [ObjNames.size()];
       for (size_t NameIndex = 0; NameIndex < ObjNames.size(); NameIndex++)
       {
          int divide = 1;
-         TH1D* HdedxSIG1 = (TH1D*) GetObjectFromPath(InputFile , (ObjNames[NameIndex] + "_SIG").c_str() );
+         TH1D* HdedxMIP1 = (TH1D*) GetObjectFromPath(InputFile , (ObjNames[NameIndex] + "_MIP").c_str() );
          TH1D* HdedxSIG2 = (TH1D*) GetObjectFromPath(InputFile2, (ObjNames[NameIndex] + "_SIG").c_str() );
-         ROC[NameIndex]  = new TGraph(HdedxSIG1->GetNbinsX()/divide);
+         ROC[NameIndex]  = new TGraph(HdedxMIP1->GetNbinsX()/divide);
 
-         double fullBkg  = HdedxSIG1->Integral(),
+         double fullBkg  = HdedxMIP1->Integral(),
                 fullSig  = HdedxSIG2->Integral();
-         for (unsigned int cut_i = 1; cut_i <= HdedxSIG1->GetNbinsX()/divide; cut_i++)
-            ROC[NameIndex]->SetPoint (cut_i-1, 1 - HdedxSIG1->Integral(1, cut_i*divide)/fullBkg, 1 - HdedxSIG2->Integral(1, cut_i*divide)/fullSig);
+         for (unsigned int cut_i = 1; cut_i <= HdedxMIP1->GetNbinsX()/divide; cut_i++)
+            ROC[NameIndex]->SetPoint (cut_i-1, 1 - HdedxMIP1->Integral(1, cut_i*divide)/fullBkg, 1 - HdedxSIG2->Integral(1, cut_i*divide)/fullSig);
 
          ROC[NameIndex]->SetLineColor(NameIndex+1);
          ROC[NameIndex]->SetLineWidth(2);
          ROC[NameIndex]->Draw("same");
 
          leg->AddEntry (ROC[NameIndex], ObjNames[NameIndex].c_str(), "L");
-         HdedxSIG1->~TH1D(); HdedxSIG2->~TH1D();
+         HdedxMIP1->~TH1D(); HdedxSIG2->~TH1D();
       }
       leg->Draw();
       SaveCanvas(c1, SaveDir, "Comparison_ROC");
@@ -923,7 +916,6 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    TCanvas* c1 = new TCanvas("c1", "c1", 600,600);
    TLegend* leg = new TLegend (0.50, 0.75, 0.80, 0.90);
    leg->SetHeader ("Fitting the MIP");
-   leg->SetHeader (SaveName.c_str());
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
    leg->SetBorderSize(0);
@@ -966,9 +958,8 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    delete c1;
 
    c1 = new TCanvas("c1", "c1", 600,600);
-   leg = new TLegend (0.50, 0.75, 0.80, 0.90);
+   leg = new TLegend (0.30, 0.25, 0.80, 0.55);
    leg->SetHeader ("Fitting the Profile");
-   leg->SetHeader (SaveName.c_str());
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
    leg->SetBorderSize(0);
@@ -990,9 +981,9 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    HdedxVsPProfile4->SetMarkerColor(4);
    HdedxVsPProfile4->Scale(AbsGain);
    HdedxVsPProfile4->Draw("same");
-   leg->AddEntry (HdedxVsPProfile1, "preferred", "L");
-   leg->AddEntry (HdedxVsPProfile2, "unshifted", "L");
-   leg->AddEntry (HdedxVsPProfile4, "shifted",   "L");
+   leg->AddEntry (HdedxVsPProfile1, "preferred", "P");
+//   leg->AddEntry (HdedxVsPProfile2, "unshifted", "P");
+   leg->AddEntry (HdedxVsPProfile4, "shifted",   "P");
    leg->Draw();
 
    SaveCanvas(c1, SaveDir, "Rescale"+Prefix+"_"+ObjName1+ObjName2 + "_Profile");
