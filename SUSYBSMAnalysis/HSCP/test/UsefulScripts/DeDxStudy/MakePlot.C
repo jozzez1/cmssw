@@ -808,12 +808,12 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       leg->SetFillStyle(0);
       leg->SetBorderSize(0);
       c1->SetLogx(true);
-      TH1D h ("tmp", "tmp", 1, 1E-4, 1);
+      TH1D h ("tmp", "tmp", 1, 6E-9, 1);
       h.GetXaxis()->SetTitle("background efficiency");
       h.GetXaxis()->SetNdivisions(5);
       h.GetYaxis()->SetTitle("signal efficiency");
       h.GetYaxis()->SetNdivisions(5);
-      h.SetAxisRange (0,1,"Y");
+      h.SetAxisRange (0,1.0,"Y");
       h.SetStats(0);
       h.Draw();
       TGraph** ROC = new TGraph* [ObjNames.size()];
@@ -1208,9 +1208,9 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
          c1->SetLogy (true);
          leg->SetHeader (("Module No. " + string(Id)).c_str());
          leg->SetHeader (SaveName.c_str());
-      	leg->SetFillColor(0);
-      	leg->SetFillStyle(0);
-      	leg->SetBorderSize(0);
+         leg->SetFillColor(0);
+         leg->SetFillStyle(0);
+         leg->SetBorderSize(0);
          ProjX1->SetStats(kFALSE);
          ProjX1->SetLineColor (kBlack);
          ProjX2->SetLineColor (kBlue);
