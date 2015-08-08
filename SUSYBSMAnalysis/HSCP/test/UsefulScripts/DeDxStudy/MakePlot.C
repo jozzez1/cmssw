@@ -142,14 +142,14 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    std::vector<string> ObjName;
    ObjName.push_back("hit_SP");
    ObjName.push_back("hit_SP_in");
-   ObjName.push_back("harm2_SO");
-   ObjName.push_back("harm2_SP");
-   ObjName.push_back("harm2_SO_in");
+//   ObjName.push_back("harm2_SO");
+//   ObjName.push_back("harm2_SP");
+//   ObjName.push_back("harm2_SO_in");
 //   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SP_raw"); // FIXME does not fit well
-   ObjName.push_back("Ias_SO_inc");
-   ObjName.push_back("Ias_SO");
+//   ObjName.push_back("Ias_SO_inc");
+//   ObjName.push_back("Ias_SO");
 
    ofstream ExtractConstantsReport, ExtractConstantsReport2;
    ExtractConstantsReport.open ((SaveDir + "ConstantsReport" + SaveName + ".txt").c_str(), ofstream::out);
@@ -196,7 +196,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          MakeMapPlots (dEdxTemplate, ObjName[i], SaveDir, "Map" + SaveName);
 
          // all the other graphs -- Charge_Vs_XYNLetc.
-         for (unsigned int g=0;g<15;g++){
+         for (unsigned int g=0;g<16;g++){
             char Id[255]; sprintf (Id, "%02i", g);
             TH2D*            Charge_Vs_XYH = (TH2D*)       GetObjectFromPath (InputFile, (ObjName[i]+"_ChargeVsXYH"      + Id).c_str());
             TH2D*            Charge_Vs_XYN = (TH2D*)       GetObjectFromPath (InputFile, (ObjName[i]+"_ChargeVsXYN"      + Id).c_str());
@@ -780,7 +780,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       } else continue;
       
    }
-   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO"  , "Ias_SO_inc");
+//   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO"  , "Ias_SO_inc");
    CompareDeDx (InputFile, SaveDir, SaveName, "harm2_SO", "harm2_SO_in");
    CompareDeDx (InputFile, SaveDir, SaveName, "harm2_SO_raw", "harm2_PO_raw");
    CompareDeDx (InputFile, SaveDir, SaveName, "hit_SP"  , "hit_SP_in");
@@ -789,15 +789,15 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    if (InputFile2) {
       ExtractConstantsReport2.close();
 
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO"  , "Ias_SO_inc");
+//      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO"  , "Ias_SO_inc");
       CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_SO", "harm2_SO_in");
       CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_SO_raw", "harm2_PO_raw");
       CompareDeDx (InputFile2, SaveDir, SaveName2, "hit_SP"  , "hit_SP_in");
 
       // now produce the ROC curve
       vector <string> ObjNames;
-      ObjNames.push_back ("Ias_SO");
-      ObjNames.push_back ("Ias_SO_inc");
+//      ObjNames.push_back ("Ias_SO");
+//      ObjNames.push_back ("Ias_SO_inc");
       ObjNames.push_back ("harm2_SO");
       ObjNames.push_back ("harm2_SO_in");
       ObjNames.push_back ("harm2_SP");
@@ -1194,7 +1194,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    	HdedxVsEtaProfile1->~TProfile(); HdedxVsEtaProfile2->~TProfile();
    	HdedxMIP1->~TH1D();              HdedxMIP2->~TH1D();
    } else if (ObjName1.find("hit")!=string::npos && ObjName2.find("hit")!=string::npos){
-      for (unsigned int g=0;g<15;g++){
+      for (unsigned int g=0;g<16;g++){
          char Id[255]; sprintf (Id, "%02i", g);
          TH2D* Charge_Vs_XYLN1 = (TH2D*) GetObjectFromPath (InputFile, (ObjName1 + "_ChargeVsXYLN" + Id).c_str());
          TH2D* Charge_Vs_XYLN2 = (TH2D*) GetObjectFromPath (InputFile, (ObjName2 + "_ChargeVsXYLN" + Id).c_str());

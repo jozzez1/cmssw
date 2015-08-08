@@ -23,8 +23,8 @@ if len(sys.argv)==1:
 
 
 datasetList = [
-#  ["Run251252", "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/"],
-#  ["MCMinBias", "/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
+  ["Run251252", "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/"],
+  ["MCMinBias", "/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
 ]
 
 signalList = [
