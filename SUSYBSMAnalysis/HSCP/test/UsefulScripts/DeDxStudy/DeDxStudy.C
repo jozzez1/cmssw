@@ -58,11 +58,11 @@ const double P_Min               = 1   ;
 const double P_Max               = 16  ; // 1 + 14 + 1; final one is for pixel!
 const int    P_NBins             = 15  ; // 15th bin = pixel; 0 is underflow
 const double Path_Min            = 0.2 ;
-const double Path_Max            = 1.6 ;
-const int    Path_NBins          = 42  ;
+const double Path_Max            = 4.4 ; // 0.2 + 1.4*3
+const int    Path_NBins          = 126 ; // 42*3
 const double Charge_Min          = 0   ;
-const double Charge_Max          = 5000;
-const int    Charge_NBins        = 500 ;
+const double Charge_Max          = 15000; // 5000*3
+const int    Charge_NBins        = 1500;  // 500*3
 
 struct dEdxStudyObj
 {
@@ -221,29 +221,29 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          dEdxSF [1] = 1.21836;
 //         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
 //         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false);
-         dEdxTemplatesPO      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, false, true );
-         dEdxTemplatesSOInc   = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, true , false);
-         dEdxTemplatesSO      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_Run251252.root"  , true , true , false);
-         dEdxTemplatesSOInInc = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_Run251252.root", false, true , false);
-         dEdxTemplatesSOIn    = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_Run251252.root", true , true , false);
-         dEdxTemplatesSPInc   = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, true , true );
-         dEdxTemplatesSP      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_Run251252.root"  , true , true , true );
-         dEdxTemplatesSPInInc = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_Run251252.root", false, true , true );
-         dEdxTemplatesSPIn    = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_Run251252.root", true , true , true );
+         dEdxTemplatesPO      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, false, true );
+         dEdxTemplatesSOInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, true , false);
+         dEdxTemplatesSO      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Run251252.root"  , true , true , false);
+         dEdxTemplatesSOInInc = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_Run251252.root", false, true , false);
+         dEdxTemplatesSOIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_Run251252.root", true , true , false);
+         dEdxTemplatesSPInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Run251252.root"  , false, true , true );
+         dEdxTemplatesSP      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Run251252.root"  , true , true , true );
+         dEdxTemplatesSPInInc = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_Run251252.root", false, true , true );
+         dEdxTemplatesSPIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_Run251252.root", true , true , true );
    }else{
          dEdxSF [0] = 1.09708;
          dEdxSF [1] = 1.01875;
 //         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
 //         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false); 
-         dEdxTemplatesPO      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, false, true );
-         dEdxTemplatesSOInc   = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, true , false);
-         dEdxTemplatesSO      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , true , true , false);
-         dEdxTemplatesSOInInc = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", false, true , false);
-         dEdxTemplatesSOIn    = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", true , true , false);
-         dEdxTemplatesSPInc   = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, true , true );
-         dEdxTemplatesSP      = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , true , true , true );
-         dEdxTemplatesSPInInc = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", false, true , true );
-         dEdxTemplatesSPIn    = loadDeDxTemplate ("Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", true , true , true );
+         dEdxTemplatesPO      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, false, true );
+         dEdxTemplatesSOInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, true , false);
+         dEdxTemplatesSO      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , true , true , false);
+         dEdxTemplatesSOInInc = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", false, true , false);
+         dEdxTemplatesSOIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", true , true , false);
+         dEdxTemplatesSPInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , false, true , true );
+         dEdxTemplatesSP      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"  , true , true , true );
+         dEdxTemplatesSPInInc = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", false, true , true );
+         dEdxTemplatesSPIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_MCMinBias.root", true , true , true );
    }
 
    std::unordered_map<unsigned int,double> TrackerGains;
@@ -264,15 +264,16 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("harm2_SO"    , 1, 2, NULL            , &TrackerGains) );
    results.push_back(new dEdxStudyObj("harm2_SO_in" , 1, 2, NULL            , &TrackerGains, true) );
    results.push_back(new dEdxStudyObj("harm2_SP"    , 1, 3, NULL            , &TrackerGains) );
+   results.push_back(new dEdxStudyObj("harm2_SP_in" , 1, 3, NULL            , &TrackerGains, true) );
    results.push_back(new dEdxStudyObj("Ias_PO"       , 2, 1, dEdxTemplatesPO        , NULL) );
    results.push_back(new dEdxStudyObj("Ias_SO_inc"   , 2, 2, dEdxTemplatesSOInc     , NULL) );
    results.push_back(new dEdxStudyObj("Ias_SO"       , 2, 2, dEdxTemplatesSO        , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in"    , 2, 2, dEdxTemplatesSOIn      , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in_inc", 2, 2, dEdxTemplatesSOInInc   , NULL) );
+   results.push_back(new dEdxStudyObj("Ias_SO_in"    , 2, 2, dEdxTemplatesSOIn      , NULL, true) );
+   results.push_back(new dEdxStudyObj("Ias_SO_in_inc", 2, 2, dEdxTemplatesSOInInc   , NULL, true) );
    results.push_back(new dEdxStudyObj("Ias_SP_inc"   , 2, 3, dEdxTemplatesSPInc     , NULL) );
    results.push_back(new dEdxStudyObj("Ias_SP"       , 2, 3, dEdxTemplatesSP        , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in"    , 2, 3, dEdxTemplatesSPIn      , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in_inc", 2, 3, dEdxTemplatesSPInInc   , NULL) );
+   results.push_back(new dEdxStudyObj("Ias_SP_in"    , 2, 3, dEdxTemplatesSPIn      , NULL, true) );
+   results.push_back(new dEdxStudyObj("Ias_SP_in_inc", 2, 3, dEdxTemplatesSPInInc   , NULL, true) );
 
    fwlite::ChainEvent ev(FileName);
    printf("Progressing Bar              :0%%       20%%       40%%       60%%       80%%       100%%\n");
