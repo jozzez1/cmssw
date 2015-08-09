@@ -142,14 +142,22 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    std::vector<string> ObjName;
    ObjName.push_back("hit_SP");
    ObjName.push_back("hit_SP_in");
-//   ObjName.push_back("harm2_SO");
-//   ObjName.push_back("harm2_SP");
-//   ObjName.push_back("harm2_SO_in");
+   ObjName.push_back("harm2_SO");
+   ObjName.push_back("harm2_SP");
+   ObjName.push_back("harm2_SO_in");
+   ObjName.push_back("harm2_SP_in");
 //   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SP_raw"); // FIXME does not fit well
-//   ObjName.push_back("Ias_SO_inc");
-//   ObjName.push_back("Ias_SO");
+   ObjName.push_back("Ias_SO_inc");
+   ObjName.push_back("Ias_SO");
+   ObjName.push_back("Ias_SO_in_inc");
+   ObjName.push_back("Ias_SO_in");
+   ObjName.push_back("Ias_PO");
+   ObjName.push_back("Ias_SP_inc");
+   ObjName.push_back("Ias_SP");
+   ObjName.push_back("Ias_SP_in_inc");
+   ObjName.push_back("Ias_SP_in");
 
    ofstream ExtractConstantsReport, ExtractConstantsReport2;
    ExtractConstantsReport.open ((SaveDir + "ConstantsReport" + SaveName + ".txt").c_str(), ofstream::out);
@@ -796,8 +804,15 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
       // now produce the ROC curve
       vector <string> ObjNames;
-//      ObjNames.push_back ("Ias_SO");
-//      ObjNames.push_back ("Ias_SO_inc");
+      ObjNames.push_back ("Ias_SO");
+      ObjNames.push_back ("Ias_SO_inc");
+      ObjNames.push_back ("Ias_SO_in");
+      ObjNames.push_back ("Ias_SO_in_inc");
+      ObjNames.push_back ("Ias_PO");
+      ObjNames.push_back ("Ias_SP");
+      ObjNames.push_back ("Ias_SP_inc");
+      ObjNames.push_back ("Ias_SP_in");
+      ObjNames.push_back ("Ias_SP_in_inc");
       ObjNames.push_back ("harm2_SO");
       ObjNames.push_back ("harm2_SO_in");
       ObjNames.push_back ("harm2_SP");
@@ -1259,11 +1274,17 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
 
 void MakeMapPlots(TH3F* Charge_Vs_Path3D, string ObjName, string SaveDir, string Prefix)
 {
-   for(int x=0;x<15;x++){
+   for(int x=0;x<17;x++){
       char xProjName[255];
       if(x==0){
-         sprintf(xProjName,"%s","inc");
+         sprintf(xProjName,"%s","SO_inc");
          Charge_Vs_Path3D->GetXaxis()->SetRange(0,15);
+      }else if (x==16){
+         sprintf(xProjName,"%s","SP_inc");
+         Charge_Vs_Path3D->GetXaxis()->SetRange(0,16);
+      }else if (x==15){
+         sprintf(xProjName,"%s", "PO");
+         Charge_Vs_Path3D->GetXaxis()->SetRange(x,x);
       }else{
          sprintf(xProjName,"%02i",x);
          Charge_Vs_Path3D->GetXaxis()->SetRange(x,x);

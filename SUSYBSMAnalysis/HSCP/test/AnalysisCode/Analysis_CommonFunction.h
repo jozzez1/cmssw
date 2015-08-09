@@ -500,10 +500,12 @@ TH3F* loadDeDxTemplate(string path, bool splitByModuleType, bool useStrip, bool 
    TH3F* DeDxMap_ = (TH3F*)GetObjectFromPath(InputFile, "Charge_Vs_Path");
    if(!DeDxMap_){printf("dEdx templates in file %s can't be open\n", path.c_str()); exit(0);}
 
-   if (!usePixel  &&  useStrip) DeDxMap_->GetXaxis()->SetRange( 1,15); // bins 1-14 are for Strips
-   if ( usePixel  && !useStrip) DeDxMap_->GetXaxis()->SetRange(15,16); // 15th bin is for Pixel
-   if ( usePixel  &&  useStrip) DeDxMap_->GetXaxis()->SetRange( 1,16); // take all
+   int P_Min, P_Max, P_NBins;
    TH3F* Prob_ChargePath  = (TH3F*)(DeDxMap_->Clone("Prob_ChargePath")); 
+   if      (!usePixel  &&  useStrip){ P_Min =  1; P_Max = 15; P_NBins = 14;}
+   else if ( usePixel  && !useStrip){ P_Min = 15; P_Max = 16; P_NBins =  1;}
+   else if ( usePixel  &&  useStrip){ P_Min =  1; P_Max = 16; P_NBins = 15;}
+   Prob_ChargePath->GetXaxis()->Set(P_NBins, P_Min, P_Max);
    Prob_ChargePath->Reset();
    Prob_ChargePath->SetDirectory(0); 
 
@@ -511,14 +513,14 @@ TH3F* loadDeDxTemplate(string path, bool splitByModuleType, bool useStrip, bool 
       Prob_ChargePath->RebinX(Prob_ChargePath->GetNbinsX());
    }
 
-   for(int i=0;i<=Prob_ChargePath->GetXaxis()->GetNbins()+1;i++){
+   for(int i=1;i<=Prob_ChargePath->GetXaxis()->GetNbins();i++){// do not include under/overflow here
       for(int j=0;j<=Prob_ChargePath->GetYaxis()->GetNbins()+1;j++){
          double Ni = 0;
-         for(int k=0;k<=Prob_ChargePath->GetZaxis()->GetNbins()+1;k++){ Ni+=DeDxMap_->GetBinContent(i,j,k);} 
+         for(int k=0;k<=Prob_ChargePath->GetZaxis()->GetNbins()+1;k++){Ni+=DeDxMap_->GetBinContent(i+P_Min-1,j,k);} 
 
          for(int k=0;k<=Prob_ChargePath->GetZaxis()->GetNbins()+1;k++){
             double tmp = 0;
-            for(int l=0;l<=k;l++){ tmp+=DeDxMap_->GetBinContent(i,j,l);}
+            for(int l=0;l<=k;l++){ tmp+=DeDxMap_->GetBinContent(i+P_Min-1,j,l);}
 
             if(Ni>0){
                Prob_ChargePath->SetBinContent (i, j, k, tmp/Ni);
