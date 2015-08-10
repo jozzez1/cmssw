@@ -288,7 +288,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             dEdxTemplate2->SaveAs (("dEdxTemplate_" + ObjName[i] + SaveName2 + ".root").c_str());
             MakeMapPlots (dEdxTemplate2, ObjName[i], SaveDir, "Map" + SaveName2);
 
-            for (unsigned int g=0;g<15;g++){
+            for (unsigned int g=0;g<16;g++){
                char Id[255]; sprintf (Id, "%02i", g);
                TH2D*            Charge_Vs_XYH2 = (TH2D*)       GetObjectFromPath (InputFile2, (ObjName[i]+"_ChargeVsXYH"      + Id).c_str());
                TH2D*            Charge_Vs_XYN2 = (TH2D*)       GetObjectFromPath (InputFile2, (ObjName[i]+"_ChargeVsXYN"      + Id).c_str());
