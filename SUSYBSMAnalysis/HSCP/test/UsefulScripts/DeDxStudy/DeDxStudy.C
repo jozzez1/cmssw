@@ -64,6 +64,16 @@ const double Charge_Min          = 0   ;
 const double Charge_Max          = 5000;
 const int    Charge_NBins        = 500 ;
 
+const double PO_Min              = 0;
+const double PO_Max              = 1;
+const int    PO_NBins            = 1   ;
+const double POPath_Min          = 0.0 ; // I don't know the thickness of the pixels
+const double POPath_Max          = 2.1 ;
+const int    POPath_NBins        = 63  ;
+const double POCharge_Min        = 0   ;
+const double POCharge_Max        = 45000;
+const int    POCharge_NBins      = 150 ; // bins are wider by a factor of 30
+
 struct dEdxStudyObj
 {
    string Name;
@@ -77,6 +87,7 @@ struct dEdxStudyObj
    bool mustBeInside;
 
    TH3D* Charge_Vs_Path;
+   TH3D* Charge_Vs_Path_PO;
    TH1D* HdedxMIP;
    TH1D* HdedxSIG;
    TH2D* HdedxVsPHSCP;
@@ -102,10 +113,10 @@ struct dEdxStudyObj
    TH2D* Charge_Vs_XYLN[15];
 
 
-   TH3F* dEdxTemplates = NULL;
+   TH3F** dEdxTemplates = NULL;
    std::unordered_map<unsigned int,double>* TrackerGains = NULL;
 
-   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false){
+   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F** dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false){
       Name = Name_;
 
       if     (type_==0){ isHit=true;  isEstim= false; isDiscrim = false;}
@@ -123,10 +134,11 @@ struct dEdxStudyObj
 
       string HistoName;
       //HitLevel plot      
-      if(isHit){ 
+      if(isHit){
          HistoName = Name + "_Hit";               HHit                  = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20); 
          if(usePixel && useStrip){ 
-            HistoName = Name + "_ChargeVsPath";      Charge_Vs_Path        = new TH3D(      HistoName.c_str(), HistoName.c_str(), P_NBins, P_Min, P_Max, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
+            HistoName = Name + "_ChargeVsPath";      Charge_Vs_Path        = new TH3D(HistoName.c_str(), HistoName.c_str(), P_NBins , P_Min , P_Max , Path_NBins  , Path_Min  , Path_Max  , Charge_NBins  , Charge_Min  , Charge_Max);
+            HistoName = Name + "_ChargeVsPathPO";    Charge_Vs_Path_PO     = new TH3D(HistoName.c_str(), HistoName.c_str(), PO_NBins, PO_Min, PO_Max, POPath_NBins, POPath_Min, POPath_Max, POCharge_NBins, POCharge_Min, POCharge_Max);
             for(unsigned int g=0;g<15;g++){
                char Id[255]; sprintf(Id, "%02i", g);
                HistoName = Name + "_ChargeVsFS"+Id;       Charge_Vs_FS[g]       = new TProfile  ( HistoName.c_str(), HistoName.c_str(),  769, 0, 769);
@@ -186,7 +198,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
         isSignal = (INPUT.find("Gluino")   !=string::npos) ||
                    (INPUT.find("Stop")     !=string::npos) ||
                    (INPUT.find("Stau")     !=string::npos) ||
-                   (INPUT.find("DY_13TeV") !=string::npos) ;
+                   (INPUT.find("DY_13TeV") !=string::npos) ,
+	removeCosmics = false; // we need the beamspot information, which we don't have!
    std::vector<string> FileName;
    if(INPUT.find(".root")<std::string::npos){
       char* pch=strtok(&INPUT[0],",");
@@ -204,8 +217,10 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
       GetInputFiles(sample, BaseDirectory, FileName, 0);
    }
 
-   TH3F* dEdxTemplates    = NULL;
-   TH3F* dEdxTemplatesInc = NULL;
+   TH3F** dEdxTemplates      = new TH3F* [2];
+   TH3F** dEdxTemplatesInc   = new TH3F* [2];
+   TH3F** dEdxTemplatesIn    = new TH3F* [2];
+   TH3F** dEdxTemplatesInInc = new TH3F* [2];
    if(isData){   //FIXME update template on data directory
          dEdxSF [0] = 1.00000;
          dEdxSF [1] = 1.21836;
@@ -236,8 +251,16 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("harm2_SO"    , 1, 2, NULL            , &TrackerGains) );
    results.push_back(new dEdxStudyObj("harm2_SO_in" , 1, 2, NULL            , &TrackerGains, true) );
    results.push_back(new dEdxStudyObj("harm2_SP"    , 1, 3, NULL            , &TrackerGains) );
-   results.push_back(new dEdxStudyObj("Ias_SO_inc"  , 2, 2, dEdxTemplatesInc, NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO"      , 2, 2, dEdxTemplates   , NULL) );
+   results.push_back(new dEdxStudyObj("harm2_SP_in" , 1, 3, NULL            , &TrackerGains, true) );
+//   results.push_back(new dEdxStudyObj("Ias_PO"         , 2, 1, dEdxTemplates     , NULL) );
+   results.push_back(new dEdxStudyObj("Ias_SO_inc"     , 2, 2, dEdxTemplatesInc  , NULL) );
+   results.push_back(new dEdxStudyObj("Ias_SO"         , 2, 2, dEdxTemplates     , NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in_inc"  , 2, 2, dEdxTemplatesInInc, NULL, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in"      , 2, 2, dEdxTemplatesIn   , NULL, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_inc"     , 2, 3, dEdxTemplatesInc  , NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SP"         , 2, 3, dEdxTemplates     , NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in_inc"  , 2, 3, dEdxTemplatesInInc, NULL, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in"      , 2, 3, dEdxTemplatesIn   , NULL, true) );
 
    fwlite::ChainEvent ev(FileName);
    printf("Progressing Bar              :0%%       20%%       40%%       60%%       80%%       100%%\n");
@@ -267,6 +290,29 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          if(track.isNull())continue;
          if(track->chi2()/track->ndof()>5 )continue;  //WAS >1
          if(track->found()<8)continue;
+         //remove tracks compatible with cosmics from the data -- shamelessly copied from Analysis_Step1_EventLoop.C
+         if(isData && removeCosmics){
+            fwlite::Handle<reco::BeamSpot> beamSpotCollHandle;
+            beamSpotCollHandle.getByLabel(ev,"offlineBeamSpot");
+            if (!beamSpotCollHandle.isValid()){printf("Beamspot collection not found!\n"); continue;}
+            const reco::BeamSpot& beamSpotColl = *beamSpotCollHandle;
+
+            double OpenAngle = -1;
+            for (unsigned int c2=0;c2<trackCollHandle->size();c++){
+               if (c2==c) continue;
+               reco::TrackRef track2 = reco::TrackRef(trackCollHandle.product(), c2);
+               if (fabs(track->pt()-track2->pt())<1 && deltaR (track->eta(), track->phi(), track2->eta(), track2->phi())<0.1)
+                  continue;
+               TVector3 v1 = TVector3 (track ->momentum().x(), track ->momentum().y(), track ->momentum().z());
+               TVector3 v2 = TVector3 (track2->momentum().x(), track2->momentum().y(), track2->momentum().z());
+               double dR = v1.Angle(v2);
+               if (dR>OpenAngle) OpenAngle=dR;
+            }
+            bool DXYSB = fabs(track->dxy(beamSpotColl.position())) > 0.5,
+                 DZSB  = fabs(track->dz (beamSpotColl.position())) > 0.5,
+                 OASB  = OpenAngle >= 2.8;
+            if (DXYSB && DZSB && OASB) continue;
+         }
 
          //load dEdx informations
          const DeDxHitInfo* dedxHits = NULL;
@@ -310,7 +356,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
                    results[R]->HHit->Fill(ChargeOverPathlength);
                    if(results[R]->usePixel && results[R]->useStrip){
-                      results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10)); 
+                      if      (moduleGeometry  > 0) results[R]->Charge_Vs_Path   ->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10));
+                      else if (moduleGeometry == 0) results[R]->Charge_Vs_Path_PO->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10));
                       if(detid.subdetId()>=3)results[R]->Charge_Vs_FS[moduleGeometry]->Fill(dedxHits->stripCluster(h)->firstStrip(),  dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XY[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y(), dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XYH[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y()); 
@@ -342,7 +389,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
           for(unsigned int R=0;R<results.size();R++){
              if(!results[R]->isEstim and !results[R]->isDiscrim ) continue; //only consider results related to estimator/discriminator variables here
 
-             DeDxData* dedxObj = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates,             results[R]->usePixel, useClusterCleaning, false, false, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside );
+             DeDxData* dedxObj = computedEdx(dedxHits, dEdxSF, (TH3**) results[R]->dEdxTemplates, useClusterCleaning, false, false, results[R]->TrackerGains, results[R]->useStrip, results[R]->usePixel, results[R]->mustBeInside);
 
              results[R]->HdedxVsP    ->Fill(track->p(), dedxObj->dEdx() );
              results[R]->HdedxVsQP   ->Fill(track->p()*track->charge(), dedxObj->dEdx() );

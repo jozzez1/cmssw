@@ -101,7 +101,7 @@ edm::LumiReWeighting LumiWeightsMC;
 edm::LumiReWeighting LumiWeightsMCSyst;
 //reweight::PoissonMeanShifter PShift(0.6);//0.6 for upshift, -0.6 for downshift
 
-TH3F* dEdxTemplates = NULL;
+TH3F** dEdxTemplates = NULL;
 std::unordered_map<unsigned int,double> TrackerGains;
 double dEdxSF [2] = {
    1.00000,   // [0]  unchanged
@@ -1190,8 +1190,8 @@ void Analysis_Step1_EventLoop(char* SavePath)
 
                //Compute dE/dx on the fly
                //computedEdx(dedxHits, Data/MC scaleFactor, templateHistoForDiscriminator, usePixel, useClusterCleaning, reverseProb)
-               DeDxData* dedxSObj = computedEdx(dedxHits, dEdxSF, dEdxTemplates, false, useClusterCleaning, TypeMode==5, false, TrackerGains.size()>0?&TrackerGains:NULL);
-               DeDxData* dedxMObj = computedEdx(dedxHits, dEdxSF, NULL,          false, useClusterCleaning, false      , false, TrackerGains.size()>0?&TrackerGains:NULL);
+               DeDxData* dedxSObj = computedEdx(dedxHits, dEdxSF, (TH3**) dEdxTemplates, useClusterCleaning, TypeMode==5, false, TrackerGains.size()>0?&TrackerGains:NULL);
+               DeDxData* dedxMObj = computedEdx(dedxHits, dEdxSF, NULL                 , useClusterCleaning, false      , false, TrackerGains.size()>0?&TrackerGains:NULL);
                if(TypeMode==5)OpenAngle = deltaROpositeTrack(hscpColl, hscp); //OpenAngle is a global variable... that's uggly C++, but that's the best I found so far
 
                //compute systematic uncertainties on signal

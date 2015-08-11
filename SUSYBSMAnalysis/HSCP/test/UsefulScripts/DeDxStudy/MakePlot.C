@@ -1263,7 +1263,7 @@ void MakeMapPlots(TH3F* Charge_Vs_Path3D, string ObjName, string SaveDir, string
       char xProjName[255];
       if(x==0){
          sprintf(xProjName,"%s","inc");
-         Charge_Vs_Path3D->GetXaxis()->SetRange(0,15);
+         Charge_Vs_Path3D->GetXaxis()->SetRange(1,14);
       }else{
          sprintf(xProjName,"%02i",x);
          Charge_Vs_Path3D->GetXaxis()->SetRange(x,x);
