@@ -472,7 +472,7 @@ class DuplicatesClass{
 
 
 TH3F* loadDeDxTemplate(string path, bool splitByModuleType=false, bool useStrip=true, bool usePixel=false);
-reco::DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, bool usePixel=false, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false, std::unordered_map<unsigned int,double>* TrackerGains=NULL, bool useStrip=true, bool mustBeInside=false);
+reco::DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false, std::unordered_map<unsigned int,double>* TrackerGains=NULL, bool useStrip=true, bool usePixel=false, bool mustBeInside=false);
 bool clusterCleaning(const SiStripCluster*   cluster,  bool crosstalkInv=false );
 void printStripCluster(FILE* pFile, const SiStripCluster*   cluster, const DetId& DetId);
 
@@ -585,7 +585,7 @@ bool isHitInsideTkModule(const LocalPoint hitPos, const DetId& detid){
 
 
 
-DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto, bool usePixel, bool useClusterCleaning, bool reverseProb, bool useTruncated, std::unordered_map<unsigned int,double>* TrackerGains, bool useStrip, bool mustBeInside){
+DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto, bool useClusterCleaning, bool reverseProb, bool useTruncated, std::unordered_map<unsigned int,double>* TrackerGains, bool useStrip, bool usePixel, bool mustBeInside){
      if(!dedxHits) return NULL;
 //     if(templateHisto)usePixel=false; //never use pixel for discriminator
 

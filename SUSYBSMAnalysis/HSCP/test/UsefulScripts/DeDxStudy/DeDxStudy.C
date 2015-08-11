@@ -58,11 +58,11 @@ const double P_Min               = 1   ;
 const double P_Max               = 16  ; // 1 + 14 + 1; final one is for pixel!
 const int    P_NBins             = 15  ; // 15th bin = pixel; 0 is underflow
 const double Path_Min            = 0.2 ;
-const double Path_Max            = 4.4 ; // 0.2 + 1.4*3
-const int    Path_NBins          = 126 ; // 42*3
+const double Path_Max            = 1.6 ; // 0.2 + 1.4*3
+const int    Path_NBins          = 42  ; // 42*3
 const double Charge_Min          = 0   ;
-const double Charge_Max          = 15000; // 5000*3
-const int    Charge_NBins        = 1500;  // 500*3
+const double Charge_Max          = 5000; // 5000*3
+const int    Charge_NBins        = 500 ; // 500*3
 
 struct dEdxStudyObj
 {
@@ -347,7 +347,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
                    results[R]->HHit->Fill(ChargeOverPathlength);
                    if(results[R]->usePixel && results[R]->useStrip){
-                      results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10)); 
+                      results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10*detid.subdetId()<3?265:1)); 
                       if(detid.subdetId()>=3)results[R]->Charge_Vs_FS[moduleGeometry]->Fill(dedxHits->stripCluster(h)->firstStrip(),  dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XY[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y(), dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XYH[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y()); 
@@ -379,7 +379,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
           for(unsigned int R=0;R<results.size();R++){
              if(!results[R]->isEstim and !results[R]->isDiscrim ) continue; //only consider results related to estimator/discriminator variables here
 
-             DeDxData* dedxObj = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates,             results[R]->usePixel, useClusterCleaning, false, false, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside );
+             DeDxData* dedxObj = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, useClusterCleaning, false, false, results[R]->TrackerGains, results[R]->useStrip, results[R]->usePixel, results[R]->mustBeInside);
 
              results[R]->HdedxVsP    ->Fill(track->p(), dedxObj->dEdx() );
              results[R]->HdedxVsQP   ->Fill(track->p()*track->charge(), dedxObj->dEdx() );
