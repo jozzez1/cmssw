@@ -142,22 +142,20 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
    std::vector<string> ObjName;
    ObjName.push_back("hit_SP");
    ObjName.push_back("hit_SP_in");
-   ObjName.push_back("harm2_SO");
+/*   ObjName.push_back("harm2_SO");
    ObjName.push_back("harm2_SP");
    ObjName.push_back("harm2_SO_in");
    ObjName.push_back("harm2_SP_in");
-//   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
+   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SO_raw"); // FIXME does not fit well
 //   ObjName.push_back("harm2_SP_raw"); // FIXME does not fit well
-   ObjName.push_back("Ias_SO_inc");
-   ObjName.push_back("Ias_SO");
-   ObjName.push_back("Ias_SO_in_inc");
-   ObjName.push_back("Ias_SO_in");
    ObjName.push_back("Ias_PO");
-   ObjName.push_back("Ias_SP_inc");
+   ObjName.push_back("Ias_SO");
+   ObjName.push_back("Ias_SO_in");
+   ObjName.push_back("Ias_SO_inc");
    ObjName.push_back("Ias_SP");
-   ObjName.push_back("Ias_SP_in_inc");
    ObjName.push_back("Ias_SP_in");
+   ObjName.push_back("Ias_SP_inc");*/
 
    ofstream ExtractConstantsReport, ExtractConstantsReport2;
    ExtractConstantsReport.open ((SaveDir + "ConstantsReport" + SaveName + ".txt").c_str(), ofstream::out);
@@ -804,18 +802,18 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
       // now produce the ROC curve
       vector <string> ObjNames;
-      ObjNames.push_back ("Ias_SO");
-      ObjNames.push_back ("Ias_SO_inc");
-      ObjNames.push_back ("Ias_SO_in");
-      ObjNames.push_back ("Ias_SO_in_inc");
       ObjNames.push_back ("Ias_PO");
+      ObjNames.push_back ("Ias_SO");
+      ObjNames.push_back ("Ias_SO_in");
+      ObjNames.push_back ("Ias_SO_inc");
       ObjNames.push_back ("Ias_SP");
-      ObjNames.push_back ("Ias_SP_inc");
       ObjNames.push_back ("Ias_SP_in");
-      ObjNames.push_back ("Ias_SP_in_inc");
+      ObjNames.push_back ("Ias_SP_inc");
+      ObjNames.push_back ("harm2_PO_raw");
       ObjNames.push_back ("harm2_SO");
       ObjNames.push_back ("harm2_SO_in");
       ObjNames.push_back ("harm2_SP");
+      ObjNames.push_back ("harm2_SP_in");
 
       TCanvas* c1   = new TCanvas ("c1", "c1", 600,600); 
       TLegend* leg  = new TLegend (0.50, 0.50, 0.80, 0.70);

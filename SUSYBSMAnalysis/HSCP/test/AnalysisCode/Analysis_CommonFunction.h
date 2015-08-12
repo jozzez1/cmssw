@@ -505,10 +505,10 @@ TH3F* loadDeDxTemplate(string path, bool splitByModuleType){
    Prob_ChargePath->SetDirectory(0); 
 
    if(!splitByModuleType){
-      Prob_ChargePath->RebinX(Prob_ChargePath->GetNbinsX());
+      Prob_ChargePath->RebinX(Prob_ChargePath->GetNbinsX()-1); // <-- do not include pixel in the inclusive
    }
 
-   for(int i=0;i<=Prob_ChargePath->GetXaxis()->GetNbins()+1;i++){// do not include under/overflow here
+   for(int i=0;i<=Prob_ChargePath->GetXaxis()->GetNbins()+1;i++){
       for(int j=0;j<=Prob_ChargePath->GetYaxis()->GetNbins()+1;j++){
          double Ni = 0;
          for(int k=0;k<=Prob_ChargePath->GetZaxis()->GetNbins()+1;k++){Ni+=DeDxMap_->GetBinContent(i,j,k);}

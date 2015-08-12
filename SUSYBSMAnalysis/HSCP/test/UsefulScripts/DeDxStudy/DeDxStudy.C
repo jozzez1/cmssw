@@ -58,11 +58,11 @@ const double P_Min               = 1   ;
 const double P_Max               = 16  ; // 1 + 14 + 1; final one is for pixel!
 const int    P_NBins             = 15  ; // 15th bin = pixel; 0 is underflow
 const double Path_Min            = 0.2 ;
-const double Path_Max            = 1.6 ; // 0.2 + 1.4*3
-const int    Path_NBins          = 42  ; // 42*3
+const double Path_Max            = 1.6 ;
+const int    Path_NBins          = 42  ;
 const double Charge_Min          = 0   ;
-const double Charge_Max          = 5000; // 5000*3
-const int    Charge_NBins        = 500 ; // 500*3
+const double Charge_Max          = 5000;
+const int    Charge_NBins        = 500 ;
 
 struct dEdxStudyObj
 {
@@ -184,7 +184,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
    bool isData   = !(INPUT.find("MC")!=string::npos),
         isSignal = false,
-        removeCosmics = false;
+        removeCosmics = true;
    std::vector<string> FileName;
    if(INPUT.find(".root")<std::string::npos){
       char* pch=strtok(&INPUT[0],",");
@@ -281,28 +281,22 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          if(track.isNull())continue;
          if(track->chi2()/track->ndof()>5 )continue;  //WAS >1
          if(track->found()<8)continue;
-         if(isData && removeCosmics){
+         //remove tracks compatible with cosmics -- i.e. tracks which are more than 0.5 cm away from any vertex
+         if(removeCosmics){
             fwlite::Handle < std::vector<reco::Vertex> > vertexCollHandle;
             vertexCollHandle.getByLabel(ev, "offlinePrimaryVertices");
             if(!vertexCollHandle.isValid()){printf("Vertex Collection not found!\n"); continue;}
             const std::vector<reco::Vertex>& vertexColl = *vertexCollHandle;
             if(vertexColl.size()<1){printf("NO VERTICES\n"); continue;}
 
-            double OpenAngle = -1;
-            for (unsigned int c2=0;c2<trackCollHandle->size();c++){
-               if (c2==c) continue;
-               reco::TrackRef track2 = reco::TrackRef(trackCollHandle.product(), c2);
-               if (fabs(track->pt()-track2->pt())<1 && deltaR (track->eta(), track->phi(), track2->eta(), track2->phi())<0.1)
-                  continue;
-               TVector3 v1 = TVector3 (track ->momentum().x(), track ->momentum().y(), track ->momentum().z());
-               TVector3 v2 = TVector3 (track2->momentum().x(), track2->momentum().y(), track2->momentum().z());
-               double dR = v1.Angle(v2);
-               if (dR>OpenAngle) OpenAngle=dR;
+            bool isTooFarAwayInXYPlane = true,
+                 isTooFarAwayInZPlane  = true;
+            for (unsigned int vertex_i=0;vertex_i<vertexCollHandle->size();vertex_i++){
+               if (fabs(track->dz (vertexColl[vertex_i].position())) < 0.5) isTooFarAwayInXYPlane = false;
+               if (fabs(track->dxy(vertexColl[vertex_i].position())) < 0.5) isTooFarAwayInZPlane  = false;
+	       if (!isTooFarAwayInXYPlane || !isTooFarAwayInZPlane) break;
             }
-            bool DXYSB = fabs(track->dxy(vertexColl[0].position())) > 0.5,
-                 DZSB  = fabs(track->dz (vertexColl[0].position())) > 0.5,
-                 OASB  = OpenAngle >= 2.8;
-            if (DXYSB && DZSB && OASB) continue;
+            if (isTooFarAwayInXYPlane && isTooFarAwayInZPlane) continue;
          }
 
          //load dEdx informations
@@ -348,7 +342,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
                    results[R]->HHit->Fill(ChargeOverPathlength);
                    if(results[R]->usePixel && results[R]->useStrip){
-                      results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10*detid.subdetId()<3?265:1)); 
+                      results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * dedxHits->charge(h)/(dedxHits->pathlength(h)*10*(detid.subdetId()<3?265:1))); 
                       if(detid.subdetId()>=3)results[R]->Charge_Vs_FS[moduleGeometry]->Fill(dedxHits->stripCluster(h)->firstStrip(),  dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XY[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y(), dedxHits->charge(h)); 
                       results[R]->Charge_Vs_XYH[moduleGeometry]->Fill(dedxHits->pos(h).x(), dedxHits->pos(h).y()); 
