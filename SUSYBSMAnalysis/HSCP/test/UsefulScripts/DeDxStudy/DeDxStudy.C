@@ -85,6 +85,7 @@ struct dEdxStudyObj
    TProfile2D* HdedxVsP_NS;
    TProfile* HdedxVsPProfile;
    TProfile* HdedxVsEtaProfile;
+   TProfile* HdedxVsNOH;
    TH2D* HdedxVsEta;
    TProfile* HNOSVsEtaProfile;
    TProfile* HNOMVsEtaProfile;
@@ -151,6 +152,7 @@ struct dEdxStudyObj
          HistoName = Name + "_dedxVsP_NS";        HdedxVsP_NS           = new TProfile2D(HistoName.c_str(), HistoName.c_str(), 3000, 0, 30,1500,0, isDiscrim?1.0:15);
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),  100, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),  100,-3,  3);
+         HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
          HistoName = Name + "_Eta2D";             HdedxVsEta            = new TH2D(      HistoName.c_str(), HistoName.c_str(),  100,-3,  3, 1000,0, isDiscrim?1.0:5);
          HistoName = Name + "_NOS";               HNOSVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),  100,-3,  3);
          HistoName = Name + "_NOM";               HNOMVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),  100,-3,  3);
@@ -280,6 +282,15 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          reco::TrackRef track = reco::TrackRef( trackCollHandle.product(), c );
          if(track.isNull())continue;
          if(track->chi2()/track->ndof()>5 )continue;  //WAS >1
+         for(unsigned int R=0;R<results.size();R++){ 
+            if(results[R]->isHit) continue;
+            const DeDxHitInfo* dedxHits = NULL;
+            DeDxHitInfoRef dedxHitsRef = dedxCollH->get(track.key());
+            if(!dedxHitsRef.isNull())dedxHits = &(*dedxHitsRef);
+            if(!dedxHits)continue;
+            DeDxData* dedxObj = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, useClusterCleaning, false, false, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside);
+            results[R]->HdedxVsNOH->Fill(dedxObj->dEdx(), track->found());
+         }
          if(track->found()<8)continue;
          //remove tracks compatible with cosmics -- i.e. tracks which are more than 0.5 cm away from any vertex
          if(removeCosmics){

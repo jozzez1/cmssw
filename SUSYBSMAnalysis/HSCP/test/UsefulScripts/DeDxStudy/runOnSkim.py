@@ -24,12 +24,12 @@ if len(sys.argv)==1:
 
 datasetList = [
 #  ["Run251252", "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/"],
-#  ["Run251252", "/home/fynu/jzobec/scratch/crab_DeDxSkimmerWithVertexNEW/150811_131054/0000"],
+  ["Run251252", "/home/fynu/jzobec/scratch/crab_DeDxSkimmerWithVertexNEW/150811_131054/0000"],
   ["MCMinBias", "/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
 ]
 
 signalList = [
-#  ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
+  ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
 #  ["MCGluino_M1400_f10", "Gluino_13TeV_M1400_f10"],
 #  ["MCGluino_M1800_f10", "Gluino_13TeV_M1800_f10"],
 #  ["MCGMStau_M494",      "GMStau_13TeV_M494"],

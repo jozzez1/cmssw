@@ -629,7 +629,7 @@ DeDxData* computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* te
         if (detid.subdetId()<3) scaleFactor *= scaleFactors[1]; // add pixel scaling
 
         if(templateHisto){  //save discriminator probability
-           double ChargeOverPathlength = scaleFactor*ClusterCharge/(dedxHits->pathlength(h)*10.0);
+           double ChargeOverPathlength = scaleFactor*ClusterCharge/(dedxHits->pathlength(h)*10.0*(detid.subdetId()<3?265:1));
            int moduleGeometry = 0; // underflow for debug
            if (detid.subdetId()<3) moduleGeometry = 15; // 15 == pixel
            else {SiStripDetId SSdetId(detid); moduleGeometry = SSdetId.moduleGeometry();}
