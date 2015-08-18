@@ -658,15 +658,13 @@ std::cout<<"TESTA\n";
          }else if(SQRTS==8){
             ThXSec   [k] = new TGraph(sizeof(THXSEC8TeV_Gluino_Mass)/sizeof(double),THXSEC8TeV_Gluino_Mass,THXSEC8TeV_Gluino_Cen);
             ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC8TeV_Gluino_Mass)/sizeof(double),THXSEC8TeV_Gluino_Mass,THXSEC8TeV_Gluino_Low,THXSEC8TeV_Gluino_High, PlotMinScale, PlotMaxScale);
-         }else if(SQRTS==13){ //FIXME
-            ThXSec   [k] = new TGraph(sizeof(THXSEC8TeV_Gluino_Mass)/sizeof(double),THXSEC8TeV_Gluino_Mass,THXSEC8TeV_Gluino_Cen);
-            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC8TeV_Gluino_Mass)/sizeof(double),THXSEC8TeV_Gluino_Mass,THXSEC8TeV_Gluino_Low,THXSEC8TeV_Gluino_High, PlotMinScale, PlotMaxScale);
-         }
-	 else {
-	   const int NMass=sizeof(THXSEC8TeV_Gluino_Mass)/sizeof(double);
-	   double ones[NMass];
-	   for(int i=0; i<NMass; i++) ones[i]=1;
-	   ThXSec   [k] = new TGraph(NMass,THXSEC8TeV_Gluino_Mass,ones);
+         }else if(SQRTS==13){ 
+            ThXSec   [k] = new TGraph(sizeof(THXSEC13TeV_Gluino_Mass)/sizeof(double),THXSEC13TeV_Gluino_Mass,THXSEC13TeV_Gluino_Cen);
+            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC13TeV_Gluino_Mass)/sizeof(double),THXSEC13TeV_Gluino_Mass,THXSEC13TeV_Gluino_Low,THXSEC13TeV_Gluino_High, PlotMinScale, PlotMaxScale);
+         }else{
+ 	    const int NMass=sizeof(THXSEC13TeV_Gluino_Mass)/sizeof(double);
+	    double ones[NMass]; for(int i=0; i<NMass; i++) ones[i]=1;
+	    ThXSec   [k] = new TGraph(NMass,THXSEC13TeV_Gluino_Mass,ones);
 	 }
       }else if(modelVector[k].find("Stop"  )!=string::npos){
          if(SQRTS==7){
@@ -675,15 +673,13 @@ std::cout<<"TESTA\n";
          }else if(SQRTS==8){
             ThXSec   [k] = new TGraph(sizeof(THXSEC8TeV_Stop_Mass)/sizeof(double),THXSEC8TeV_Stop_Mass,THXSEC8TeV_Stop_Cen);
             ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC8TeV_Stop_Mass)/sizeof(double),THXSEC8TeV_Stop_Mass,THXSEC8TeV_Stop_Low,THXSEC8TeV_Stop_High, PlotMinScale, PlotMaxScale);
-         }else if(SQRTS==13){ //FIXME
-            ThXSec   [k] = new TGraph(sizeof(THXSEC8TeV_Stop_Mass)/sizeof(double),THXSEC8TeV_Stop_Mass,THXSEC8TeV_Stop_Cen);
-            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC8TeV_Stop_Mass)/sizeof(double),THXSEC8TeV_Stop_Mass,THXSEC8TeV_Stop_Low,THXSEC8TeV_Stop_High, PlotMinScale, PlotMaxScale);
-         }
-         else {
-           const int NMass=sizeof(THXSEC8TeV_Stop_Mass)/sizeof(double);
-           double ones[NMass];
-           for(int i=0; i<NMass; i++) ones[i]=1;
-           ThXSec   [k] = new TGraph(NMass,THXSEC8TeV_Stop_Mass,ones);
+         }else if(SQRTS==13){
+            ThXSec   [k] = new TGraph(sizeof(THXSEC13TeV_Stop_Mass)/sizeof(double),THXSEC13TeV_Stop_Mass,THXSEC13TeV_Stop_Cen);
+            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr",sizeof(THXSEC13TeV_Stop_Mass)/sizeof(double),THXSEC13TeV_Stop_Mass,THXSEC13TeV_Stop_Low,THXSEC13TeV_Stop_High, PlotMinScale, PlotMaxScale);
+         }else{
+            const int NMass=sizeof(THXSEC13TeV_Stop_Mass)/sizeof(double);
+            double ones[NMass]; for(int i=0; i<NMass; i++) ones[i]=1;
+            ThXSec   [k] = new TGraph(NMass,THXSEC13TeV_Stop_Mass,ones);
          }
       }else if(modelVector[k].find("GMStau"  )!=string::npos){
          if(SQRTS==7){
@@ -692,15 +688,20 @@ std::cout<<"TESTA\n";
          }else if(SQRTS==8){
             ThXSec   [k] = MakePlot(NULL, NULL, TkPattern,modelVector[k], 0, modelMap[modelVector[k]], LInt);
             ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC8TeV_GMStau_Mass)/sizeof(double),THXSEC8TeV_GMStau_Mass,THXSEC8TeV_GMStau_Low,THXSEC8TeV_GMStau_High, PlotMinScale, PlotMaxScale);
-         }else if(SQRTS==13){ //FIXME
+         }else if(SQRTS==13){ 
+//            #Prospino xsection that I get looks very weird, use pythia for the time being
+//            ThXSec   [k] = new TGraph(sizeof(THXSEC13TeV_GMStau_Mass)/sizeof(double),THXSEC13TeV_GMStau_Mass,THXSEC13TeV_GMStau_Cen);
+//            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC13TeV_GMStau_Mass)/sizeof(double),THXSEC13TeV_GMStau_Mass,THXSEC13TeV_GMStau_Low,THXSEC13TeV_GMStau_High, PlotMinScale, PlotMaxScale);
             ThXSec   [k] = MakePlot(NULL, NULL, TkPattern,modelVector[k], 0, modelMap[modelVector[k]], LInt);
-            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC8TeV_GMStau_Mass)/sizeof(double),THXSEC8TeV_GMStau_Mass,THXSEC8TeV_GMStau_Low,THXSEC8TeV_GMStau_High, PlotMinScale, PlotMaxScale);
-         }
-         else {
-           const int NMass=sizeof(THXSEC8TeV_GMStau_Mass)/sizeof(double);
-           double ones[NMass];
-           for(int i=0; i<NMass; i++) ones[i]=1;
-           ThXSec   [k] = new TGraph(NMass,THXSEC8TeV_GMStau_Mass,ones);
+            double* XSecErrLow  = new double[ThXSec[k]->GetN()];
+            double* XSecErrHigh = new double[ThXSec[k]->GetN()];
+            for(int i=0;i<ThXSec[k]->GetN();i++){ XSecErrLow[i] = ThXSec[k]->GetY()[i]*0.90; XSecErrHigh[i] = ThXSec[k]->GetY()[i]*1.10; }
+            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", ThXSec[k]->GetN(),ThXSec[k]->GetX(),XSecErrLow,XSecErrHigh, PlotMinScale, PlotMaxScale);
+            
+         }else{
+            const int NMass=sizeof(THXSEC13TeV_GMStau_Mass)/sizeof(double);
+            double ones[NMass]; for(int i=0; i<NMass; i++) ones[i]=1;
+            ThXSec   [k] = new TGraph(NMass,THXSEC13TeV_GMStau_Mass,ones);
          }
       }else if(modelVector[k].find("PPStau"  )!=string::npos){
          if(SQRTS==7){
@@ -710,14 +711,18 @@ std::cout<<"TESTA\n";
             ThXSec   [k] = MakePlot(NULL, NULL, TkPattern,modelVector[k], 0, modelMap[modelVector[k]], LInt);
             ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC8TeV_PPStau_Mass)/sizeof(double),THXSEC8TeV_PPStau_Mass,THXSEC8TeV_PPStau_Low,THXSEC8TeV_PPStau_High, PlotMinScale, PlotMaxScale);
          }else if(SQRTS==13){
-            ThXSec   [k] = MakePlot(NULL, NULL, TkPattern,modelVector[k], 0, modelMap[modelVector[k]], LInt);
-            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC8TeV_PPStau_Mass)/sizeof(double),THXSEC8TeV_PPStau_Mass,THXSEC8TeV_PPStau_Low,THXSEC8TeV_PPStau_High, PlotMinScale, PlotMaxScale);
-         }
-         else {
-           const int NMass=sizeof(THXSEC8TeV_PPStau_Mass)/sizeof(double);
-           double ones[NMass];
-           for(int i=0; i<NMass; i++) ones[i]=1;
-           ThXSec   [k] = new TGraph(NMass,THXSEC8TeV_PPStau_Mass,ones);
+//            #Prospino xsection that I get looks very weird, use pythia for the time being
+//            ThXSec   [k] = new TGraph(sizeof(THXSEC13TeV_PPStau_Mass)/sizeof(double),THXSEC13TeV_PPStau_Mass,THXSEC13TeV_PPStau_Cen);
+//            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", sizeof(THXSEC13TeV_PPStau_Mass)/sizeof(double),THXSEC13TeV_PPStau_Mass,THXSEC13TeV_PPStau_Low,THXSEC13TeV_PPStau_High, PlotMinScale, PlotMaxScale);
+            ThXSec   [k] = MakePlot(NULL, NULL, TkPattern,modelVector[k], 0, modelMap[modelVector[k]], LInt);            
+            double* XSecErrLow  = new double[ThXSec[k]->GetN()];
+            double* XSecErrHigh = new double[ThXSec[k]->GetN()];
+            for(int i=0;i<ThXSec[k]->GetN();i++){ XSecErrLow[i] = ThXSec[k]->GetY()[i]*0.90; XSecErrHigh[i] = ThXSec[k]->GetY()[i]*1.10; }
+            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", ThXSec[k]->GetN(),ThXSec[k]->GetX(),XSecErrLow,XSecErrHigh, PlotMinScale, PlotMaxScale);
+         }else{
+           const int NMass=sizeof(THXSEC13TeV_PPStau_Mass)/sizeof(double);
+           double ones[NMass]; for(int i=0; i<NMass; i++) ones[i]=1;
+           ThXSec   [k] = new TGraph(NMass,THXSEC13TeV_PPStau_Mass,ones);
          }
        }else{
          //if(modelVector[k].find("o3")!=string::npos){
@@ -731,8 +736,8 @@ std::cout<<"TESTA\n";
          double* XSecErrHigh = new double[ThXSec[k]->GetN()];
          //assume 10% error on xsection
          for(int i=0;i<ThXSec[k]->GetN();i++){ XSecErrLow[i] = ThXSec[k]->GetY()[i]*0.90; XSecErrHigh[i] = ThXSec[k]->GetY()[i]*1.10; }
-            ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", ThXSec[k]->GetN(),ThXSec[k]->GetX(),XSecErrLow,XSecErrHigh, PlotMinScale, PlotMaxScale); 
-     }
+         ThXSecErr[k] = GetErrorBand(modelVector[k]+"ThErr", ThXSec[k]->GetN(),ThXSec[k]->GetX(),XSecErrLow,XSecErrHigh, PlotMinScale, PlotMaxScale); 
+       }
    }
 
 std::cout<<"TESTB\n";
@@ -867,45 +872,53 @@ std::cout<<"TESTC\n";
    //HQGraphMap["DY_Q8"        ]->SetLineColor(14); HQGraphMap["DY_Q8"        ]->SetMarkerColor(14);  HQGraphMap["DY_Q8"        ]->SetLineWidth(2);   HQGraphMap["DY_Q8"        ]->SetLineStyle(1);  HQGraphMap["DY_Q8"        ]->SetMarkerStyle(24);
 
 std::cout<<"TESTD\n";
-   ThGraphMap["GMStau"     ]->SetMinimum(PlotMinScale);
-
    c1 = new TCanvas("c1", "c1",600,600);
-   TMultiGraph* MGMu = new TMultiGraph();
-   if(!Combine) {
-   MGMu->Add(ThGraphMap["Gluino_f10" ]      ,"L");
-   MGMu->Add(ThGraphMap["Stop"       ]      ,"L");
-   MGMu->Add(ThGraphMap["GMStau"     ]      ,"L");
-   MGMu->Add(ThGraphMap["PPStau"     ]      ,"L");
-   //MGMu->Add(ThGraphMap["DY_Q2o3"    ]     ,"L");
-   //MGMu->Add(ThGraphMap["DY_Q1"    ]     ,"L");
-   }   
-   MGMu->Add(MuGraphMap["Gluino_f10" ]      ,"LP");
-   //MGMu->Add(MuGraphMap["Gluino_f50" ]      ,"LP");
-   MGMu->Add(MuGraphMap["Stop"       ]      ,"LP");
-   MGMu->Add(MuGraphMap["GMStau"     ]      ,"LP");
-   MGMu->Add(MuGraphMap["PPStau"     ]      ,"LP");
-   //MGMu->Add(MuGraphMap["DY_Q2o3"    ]     ,"LP");
-   //MGMu->Add(MuGraphMap["DY_Q1"    ]     ,"LP");
-   MGMu->Draw("A");
+   c1->SetLogy(true);
+
+   TH1D* frame = new TH1D("frame", "frame", 1,50, 2650);
+   frame->GetXaxis()->SetNdivisions(505);
+   frame->SetTitle("");
+   frame->SetStats(kFALSE);
+   frame->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
+   frame->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
+   frame->GetYaxis()->SetTitleOffset(1.40);
+   frame->SetMaximum(PlotMaxScale);
+   frame->SetMinimum(PlotMinScale);
+   frame->Draw("AXIS");
+
+
+//   MGMu->Draw("A");
+
 
    if(!Combine) {
-   ThErrorMap["Gluino_f10"]->Draw("f");
-   ThErrorMap["Stop"      ]->Draw("f");
-   ThErrorMap["GMStau"    ]->Draw("f");
-   ThErrorMap["PPStau"    ]->Draw("f");
-   //ThErrorMap["DY_Q2o3"   ]->Draw("f");
-   //ThErrorMap["DY_Q1"   ]->Draw("f");
+      ThErrorMap["Gluino_f10"]->Draw("F");
+      ThGraphMap["Gluino_f10" ]->Draw("L");
+
+      ThErrorMap["Stop"      ]->Draw("F");
+      ThGraphMap["Stop"       ]->Draw("L");
+
+      ThErrorMap["GMStau"    ]->Draw("F");
+      ThGraphMap["GMStau"     ]->Draw("L");
+
+      ThErrorMap["PPStau"    ]->Draw("F");
+      ThGraphMap["PPStau"     ]->Draw("L");
+
+      //ThErrorMap["DY_Q2o3"   ]->Draw("F");
+      //ThGraphMap["DY_Q2o3"    ]->Draw("L");
+
+      //ThErrorMap["DY_Q1"   ]->Draw("F");
+      //ThGraphMap["DY_Q1"    ]->Draw("L");
    }else{
       TLine* LineAtOne = new TLine(50,1,1550,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
    }
 
-   MGMu->Draw("same");
-   MGMu->SetTitle("");
-   MGMu->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
-   MGMu->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
-   MGMu->GetYaxis()->SetTitleOffset(1.40);
-   MGMu->GetYaxis()->SetRangeUser(PlotMinScale,PlotMaxScale);
-   MGMu->GetXaxis()->SetRangeUser(50,2650);
+   MuGraphMap["Gluino_f10" ]->Draw("LP");
+   //MuGraphMap["Gluino_f50" ]->Draw("LP");
+   MuGraphMap["Stop"       ]->Draw("LP");
+   MuGraphMap["GMStau"     ]->Draw("LP");
+   MuGraphMap["PPStau"     ]->Draw("LP");
+   //MuGraphMap["DY_Q2o3"    ]->Draw("LP");
+   //MuGraphMap["DY_Q1"    ]->Draw("LP");
 
    DrawPreliminary(LegendFromType(MuPattern).c_str(), SQRTS, IntegratedLuminosityFromE(SQRTS), false);
    TLegend* LEGMu = !Combine ? new TLegend(0.50,0.92-7*0.043,0.83,0.92) : new TLegend(0.50,0.15,0.83,0.15+7*0.043);
@@ -952,49 +965,51 @@ std::cout<<"TESTD\n";
    LEGTh->Draw();
    }
    LEGMu->Draw();
+
    c1->SetLogy(true);
    SaveCanvas(c1, outpath, string("MuExclusionLog"));
    delete c1;
 
    c1 = new TCanvas("c1", "c1",600,600);
-   TMultiGraph* MGTk = new TMultiGraph();
-   if(!Combine) {
-   MGTk->Add(ThGraphMap["Gluino_f10" ]     ,"L");
-   MGTk->Add(ThGraphMap["Stop"       ]     ,"L");
-   MGTk->Add(ThGraphMap["GMStau"     ]     ,"L");  
-   MGTk->Add(ThGraphMap["PPStau"     ]     ,"L");
-   //MGTk->Add(ThGraphMap["DY_Q2o3"    ]     ,"L");
-   }
-
-   MGTk->Add(TkGraphMap["Gluino_f10" ]     ,"LP");
-   //MGTk->Add(TkGraphMap["Gluino_f50" ]     ,"LP");
-   MGTk->Add(TkGraphMap["GluinoN_f10"]     ,"LP");
-   MGTk->Add(TkGraphMap["Stop"       ]     ,"LP");
-   MGTk->Add(TkGraphMap["StopN"      ]     ,"LP");
-   MGTk->Add(TkGraphMap["GMStau"     ]     ,"LP");
-   MGTk->Add(TkGraphMap["PPStau"     ]     ,"LP");
-   //MGTk->Add(TkGraphMap["DY_Q2o3"    ]     ,"LP");
-   MGTk->Draw("A");
+   c1->SetLogy(true);
+   frame = new TH1D("frame", "frame", 1,50, 2650);
+   frame->GetXaxis()->SetNdivisions(505);
+   frame->SetTitle("");
+   frame->SetStats(kFALSE);
+   frame->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
+   frame->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
+   frame->GetYaxis()->SetTitleOffset(1.40);
+   frame->SetMaximum(PlotMaxScale);
+   frame->SetMinimum(PlotMinScale);
+   frame->Draw("AXIS");
 
    if(!Combine) {
-   ThErrorMap["Gluino_f10"]->Draw("f");
-   ThErrorMap["Stop"      ]->Draw("f");
-   ThErrorMap["GMStau"    ]->Draw("f");
-   ThErrorMap["PPStau"    ]->Draw("f");
-   //ThErrorMap["DY_Q2o3"   ]->Draw("f");
+      ThErrorMap["Gluino_f10"]->Draw("F");
+      ThGraphMap["Gluino_f10"]->Draw("L");
+
+      ThErrorMap["Stop"      ]->Draw("F");
+      ThGraphMap["Stop"      ]->Draw("L");
+
+      ThErrorMap["GMStau"    ]->Draw("F");
+      ThGraphMap["GMStau"    ]->Draw("L");
+
+      ThErrorMap["PPStau"    ]->Draw("F");
+      ThGraphMap["PPStau"    ]->Draw("L");
+
+      //ThErrorMap["DY_Q2o3"   ]->Draw("F");
+      //ThGraphMap["DY_Q2o3"   ]->Draw("L");
    }else{
       TLine* LineAtOne = new TLine(50,1,1550,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
    }
 
-   MGTk->Draw("same");
-   MGTk->SetTitle("");
-   MGTk->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
-   MGTk->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
-   MGTk->GetYaxis()->SetTitleOffset(1.40);
-   MGTk->GetYaxis()->SetRangeUser(PlotMinScale,PlotMaxScale);
-   //if(Combine) MGTk->GetYaxis()->SetRangeUser(PlotMinScale,50);
-   //else MGTk->GetYaxis()->SetRangeUser(PlotMinScale,700);
-   MGTk->GetXaxis()->SetRangeUser(50,2650);
+   TkGraphMap["Gluino_f10" ]->Draw("LP");
+   //TkGraphMap["Gluino_f50" ]->Draw("LP");
+   TkGraphMap["GluinoN_f10"]->Draw("LP");
+   TkGraphMap["Stop"       ]->Draw("LP");
+   TkGraphMap["StopN"      ]->Draw("LP");
+   TkGraphMap["GMStau"     ]->Draw("LP");
+   TkGraphMap["PPStau"     ]->Draw("LP");
+   //TkGraphMap["DY_Q2o3"    ]->Draw("LP");
 
    DrawPreliminary(LegendFromType(TkPattern).c_str(), SQRTS, IntegratedLuminosityFromE(SQRTS), false);
 
@@ -1054,34 +1069,30 @@ std::cout<<"F\n";
 if(Combine){
 
    c1 = new TCanvas("c1", "c1",600,600);
-   MGTk = new TMultiGraph();
+   frame = new TH1D("frame", "frame", 1,90, 570);
+   frame->GetXaxis()->SetNdivisions(505);
+   frame->SetTitle("");
+   frame->SetStats(kFALSE);
+   frame->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
+   frame->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
+   frame->GetYaxis()->SetTitleOffset(1.40);
+   frame->SetMaximum(20);
+   frame->SetMinimum(1e-3);
+   frame->Draw("AXIS");
 
    MuGraphMap["GMStau"       ]->SetLineColor(2);  MuGraphMap["GMStau"       ]->SetMarkerColor(2);   MuGraphMap["GMStau"       ]->SetLineWidth(2);   MuGraphMap["GMStau"       ]->SetLineStyle(1);  MuGraphMap["GMStau"       ]->SetMarkerStyle(22);
    TkGraphMap["GMStau"       ]->SetLineColor(1);  TkGraphMap["GMStau"       ]->SetMarkerColor(1);   TkGraphMap["GMStau"       ]->SetLineWidth(2);   TkGraphMap["GMStau"       ]->SetLineStyle(1);  TkGraphMap["GMStau"       ]->SetMarkerStyle(23);
 
-
    MuGraphMap["PPStau"       ]->SetLineColor(2);  MuGraphMap["PPStau"       ]->SetMarkerColor(2);   MuGraphMap["PPStau"       ]->SetLineWidth(2);   MuGraphMap["PPStau"       ]->SetLineStyle(2);  MuGraphMap["PPStau"       ]->SetMarkerStyle(26);
    TkGraphMap["PPStau"       ]->SetLineColor(1);  TkGraphMap["PPStau"       ]->SetMarkerColor(1);   TkGraphMap["PPStau"       ]->SetLineWidth(2);   TkGraphMap["PPStau"       ]->SetLineStyle(2);  TkGraphMap["PPStau"       ]->SetMarkerStyle(32);
 
-   MGTk->Add(MuGraphMap["PPStau"     ]     ,"LP");
-   MGTk->Add(TkGraphMap["PPStau"     ]     ,"LP");
-   MGTk->Add(MuGraphMap["GMStau"     ]     ,"LP");
-   MGTk->Add(TkGraphMap["GMStau"     ]     ,"LP");
-   MGTk->Draw("A");
+   MuGraphMap["PPStau"     ]->Draw("LP");
+   TkGraphMap["PPStau"     ]->Draw("LP");
+   MuGraphMap["GMStau"     ]->Draw("LP");
+   TkGraphMap["GMStau"     ]->Draw("LP");
 
    TLine* LineAtOne = new TLine(90,1,570,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
-//60.6,533.4
 
-   MGTk->Draw("same");
-   MGTk->SetTitle("");
-   MGTk->GetXaxis()->SetTitle("Mass (GeV/#font[12]{c}^{2})");
-   MGTk->GetYaxis()->SetTitle(Combine?"95% CL limit on #sigma/#sigma_{th}":"95% CL limit on #sigma (pb)");
-   MGTk->GetYaxis()->SetTitleOffset(1.40);
-   MGTk->GetYaxis()->SetRangeUser(1e-3,20);
-   //if(Combine) MGTk->GetYaxis()->SetRangeUser(PlotMinScale,50);
-   //else MGTk->GetYaxis()->SetRangeUser(PlotMinScale,700);
-   MGTk->GetXaxis()->SetRangeUser(90,570);
-   
    DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS), false);
 
    LEGTk = !Combine ? new TLegend(0.50,0.92-3*0.043,0.83,0.92) : new TLegend(0.45,0.15+4*0.043,0.80,0.15+7*0.043);
@@ -2141,8 +2152,11 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
    //prepare output directory and log file
    string outpath = InputPattern + "/"+SHAPESTRING+EXCLUSIONDIR+"/";
    MakeDirectories(outpath);
-   FILE* pFile = fopen((outpath+"/"+signal+".info").c_str(),"w");
-   if(!pFile)printf("Can't open file : %s\n",(outpath+"/"+signal+".info").c_str());
+   FILE* pFile=NULL;
+   if(OptimCutIndex<0){ //create the info file only if we need to optimize the cuts
+      pFile = fopen((outpath+"/"+signal+".info").c_str(),"w");
+      if(!pFile)printf("Can't open file : %s\n",(outpath+"/"+signal+".info").c_str());
+   }
 
    stAllInfo result;
    stAllInfo toReturn;
@@ -2157,10 +2171,10 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
       if(HCuts_Pt ->GetBinContent(CutIndex+1) < 50 && TypeMode!=4){printf("Skip cut=%i because of too lose pT cut\n", CutIndex); continue; }
 
       //make sure we have a reliable prediction of the number of events      
-      if(OptimCutIndex<0 && H_E->GetBinContent(CutIndex+1) >0 && (H_A->GetBinContent(CutIndex+1)<25 || H_F->GetBinContent(CutIndex+1)<25 || H_G->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (AFG/EE) is not reliable
-      if(OptimCutIndex<0 && H_E->GetBinContent(CutIndex+1)==0 && H_A->GetBinContent(CutIndex+1)>0 && (H_C->GetBinContent(CutIndex+1)<25 || H_B->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CB/A) is not reliable
-      if(OptimCutIndex<0 && H_F->GetBinContent(CutIndex+1)>0 && H_A->GetBinContent(CutIndex+1)==0 && (H_B->GetBinContent(CutIndex+1)<25 || H_H->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CB/A) is not reliable
-      if(OptimCutIndex<0 && H_G->GetBinContent(CutIndex+1)>0 && H_F->GetBinContent(CutIndex+1)==0 && (H_C->GetBinContent(CutIndex+1)<25 || H_H->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CH/G) is not reliable
+      if(OptimCutIndex<0 && H_E->GetBinContent(CutIndex+1) >0 &&(H_A->GetBinContent(CutIndex+1)<25 ||  H_F->GetBinContent(CutIndex+1)<25 || H_G->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (AFG/EE) is not reliable
+      if(OptimCutIndex<0 && H_E->GetBinContent(CutIndex+1)==0 && H_A->GetBinContent(CutIndex+1)<=0 && (H_C->GetBinContent(CutIndex+1)<25 || H_B->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CB/A) is not reliable
+      if(OptimCutIndex<0 && H_F->GetBinContent(CutIndex+1) >0 && H_A->GetBinContent(CutIndex+1)<=0 && (H_B->GetBinContent(CutIndex+1)<25 || H_H->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CB/A) is not reliable
+      if(OptimCutIndex<0 && H_G->GetBinContent(CutIndex+1) >0 && H_F->GetBinContent(CutIndex+1)==0 && (H_C->GetBinContent(CutIndex+1)<25 || H_H->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CH/G) is not reliable
    
       //make sure we have a reliable prediction of the shape 
       if(TypeMode<=2){
@@ -2190,18 +2204,21 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
       }
 
       //report the result for this point in the log file
-      fprintf(pFile  ,"%10s: Testing CutIndex=%4i (Pt>%6.2f I>%6.3f TOF>%6.3f) %3.0f<M<inf Ndata=%+6.2E NPred=%6.3E+-%6.3E SignalEff=%6.3f ExpLimit=%6.3E (%6.3E) Reach=%6.3E",signal.c_str(),CutIndex,HCuts_Pt ->GetBinContent(CutIndex+1), HCuts_I  ->GetBinContent(CutIndex+1), HCuts_TOF->GetBinContent(CutIndex+1), MinRange,result.NData,result.NPred, result.NPredErr,result.Eff,result.XSec_Exp, result.XSec_Obs, result.XSec_5Sigma);fflush(stdout);
-      fprintf(stdout ,"%10s: Testing CutIndex=%4i (Pt>%6.2f I>%6.3f TOF>%6.3f) %3.0f<M<inf Ndata=%+6.2E NPred=%6.3E+-%6.3E SignalEff=%6.3f ExpLimit=%6.3E (%6.3E) Reach=%6.3E",signal.c_str(),CutIndex,HCuts_Pt ->GetBinContent(CutIndex+1), HCuts_I  ->GetBinContent(CutIndex+1), HCuts_TOF->GetBinContent(CutIndex+1), MinRange,result.NData,result.NPred, result.NPredErr,result.Eff,result.XSec_Exp, result.XSec_Obs, result.XSec_5Sigma);fflush(stdout);
+      if(pFile)fprintf(pFile  ,"%10s: Testing CutIndex=%4i (Pt>%6.2f I>%6.3f TOF>%6.3f) %3.0f<M<inf Ndata=%+6.2E NPred=%6.3E+-%6.3E SignalEff=%6.3f ExpLimit=%6.3E (%6.3E) Reach=%6.3E",signal.c_str(),CutIndex,HCuts_Pt ->GetBinContent(CutIndex+1), HCuts_I  ->GetBinContent(CutIndex+1), HCuts_TOF->GetBinContent(CutIndex+1), MinRange,result.NData,result.NPred, result.NPredErr,result.Eff,result.XSec_Exp, result.XSec_Obs, result.XSec_5Sigma);
+      fprintf(stdout ,"%10s: Testing CutIndex=%4i (Pt>%6.2f I>%6.3f TOF>%6.3f) %3.0f<M<inf Ndata=%+6.2E NPred=%6.3E+-%6.3E SignalEff=%6.3f ExpLimit=%6.3E (%6.3E) Reach=%6.3E",signal.c_str(),CutIndex,HCuts_Pt ->GetBinContent(CutIndex+1), HCuts_I  ->GetBinContent(CutIndex+1), HCuts_TOF->GetBinContent(CutIndex+1), MinRange,result.NData,result.NPred, result.NPredErr,result.Eff,result.XSec_Exp, result.XSec_Obs, result.XSec_5Sigma);
       if(OptimCutIndex>=0 || (result.XSec_5Sigma>0 && result.XSec_5Sigma<toReturn.XSec_5Sigma)){
          toReturn=result;
-         fprintf(pFile  ," BestSelection\n");fflush(stdout);
-         fprintf(stdout ," BestSelection\n");fflush(stdout);
+         if(pFile)fprintf(pFile  ," BestSelection\n");
+         fprintf(stdout ," BestSelection\n");
       }else{
-         fprintf(pFile  ,"\n");fflush(stdout);
-         fprintf(stdout ,"\n");fflush(stdout);
+         if(pFile)fprintf(pFile  ,"\n");
+         fprintf(stdout ,"\n");
       }
+ 
+      if(pFile)fflush(pFile);
+      fflush(stdout);
    }//end of selection cut loop
-   fclose(pFile);   
+   if(pFile)fclose(pFile);   
  
    //recompute the limit for the final point and save the output in the final directory (also save some plots for the shape based analysis)
    if(TypeMode<=2){runCombine(false, true, true, InputPattern, signal, toReturn.Index, shape, false, toReturn, MassData, MassPred, MassSign, MassSignP, MassSignI, MassSignM, MassSignT, MassSignPU);
@@ -2400,14 +2417,14 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
       //NSign       = MassSign  ->GetBinContent(CutIndex+1) / signalsMeanHSCPPerEvent;
       //NSignErr    = MassSign  ->GetBinError  (CutIndex+1) / signalsMeanHSCPPerEvent;
 
-      MassSignProj      = ((TH2D*)MassSign )->ProjectionY("MassSignPro"  ,CutIndex+1,CutIndex+1);
+      MassSignProj       = ((TH2D*)MassSign )->ProjectionY("MassSignPro"  ,CutIndex+1,CutIndex+1);
       MassSignProjP      = ((TH2D*)MassSignP )->ProjectionY("MassSignProP"  ,CutIndex+1,CutIndex+1);
       MassSignProjI      = ((TH2D*)MassSignI )->ProjectionY("MassSignProI"  ,CutIndex+1,CutIndex+1);
       MassSignProjM      = ((TH2D*)MassSignM )->ProjectionY("MassSignProM"  ,CutIndex+1,CutIndex+1);
       MassSignProjT      = ((TH2D*)MassSignT )->ProjectionY("MassSignProT"  ,CutIndex+1,CutIndex+1);
       MassSignProjPU     = ((TH2D*)MassSignPU)->ProjectionY("MassSignProPU" ,CutIndex+1,CutIndex+1);
 
-      NSign      = MassSignProj ->IntegralAndError(0, MassSignProj ->GetNbinsX()+1, NSignErr)  / signalsMeanHSCPPerEvent;  NSignErr /= signalsMeanHSCPPerEvent;
+      NSign       = MassSignProj  ->IntegralAndError(0, MassSignProj  ->GetNbinsX()+1, NSignErr )  / signalsMeanHSCPPerEvent;  NSignErr  /= signalsMeanHSCPPerEvent;
       NSignP      = MassSignProjP ->IntegralAndError(0, MassSignProjP ->GetNbinsX()+1, NSignPErr)  / signalsMeanHSCPPerEvent;  NSignPErr /= signalsMeanHSCPPerEvent;
       NSignI      = MassSignProjI ->IntegralAndError(0, MassSignProjI ->GetNbinsX()+1, NSignIErr)  / signalsMeanHSCPPerEvent;  NSignIErr /= signalsMeanHSCPPerEvent;
       NSignM      = MassSignProjM ->IntegralAndError(0, MassSignProjM ->GetNbinsX()+1, NSignMErr)  / signalsMeanHSCPPerEvent;  NSignMErr /= signalsMeanHSCPPerEvent;
@@ -2441,9 +2458,6 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
    if(Eff==0){printf("SkipThisPoint --> Signal acceptance is null\n"); return false;}
 //   if(Eff<=1E-5)return false; // if Eff<0.001% -> limit will hardly converge and we are probably not interested by this point anyway
 
-   //no way that this point is optimal
-   bool pointMayBeOptimal = (fastOptimization && !getXsection && getSignificance && ((NPred-3*NPredErr)<=result.NPred || Eff>=result.Eff));
-
    //save these info to the result structure
    result.Eff       = Eff;
    result.Eff_SYSTP = EffP;
@@ -2461,20 +2475,27 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
    result.NPred     = NPred;
    result.NPredErr  = NPredErr;
    result.NSign     = NSign;
-//   NSign/=(result.XSec_Th*100.0); //normalize xsection to 10fb
-   NSign/=(100.0); //normalize xsection to 10fb
+   NSign /= (result.XSec_Th*result.LInt); //normalize signal to 1pb
+   double SignalScaleFactor = 1.0;
+   for(unsigned int i=0;i<20 && NSign<1e-1; i++){SignalScaleFactor*=10.0;  NSign*=10.0;}  
+   if(NPred<0.001) {NPred=0.001; NPredErr=NPred;}
+
+
+   //no way that this point is optimal
+   bool pointMayBeOptimal = (fastOptimization && !getXsection && getSignificance && ((NPred-3*NPredErr)<=result.NPred || Eff>=result.Eff));
+
 
    //for shape based analysis we need to save all histograms into a root file
    char CutIndexStr[255];sprintf(CutIndexStr, "SQRTS%02.0fCut%03.0f",SQRTS, result.Index);
    if(Shape){
       //prepare the histograms and variation
       //scale to 10fb xsection and to observed events instead of observed tracks
-      MassSignProj  ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
-      MassSignProjP ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
-      MassSignProjI ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
-      MassSignProjM ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
-      MassSignProjT ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
-      MassSignProjPU->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*100));
+      MassSignProj  ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
+      MassSignProjP ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
+      MassSignProjI ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
+      MassSignProjM ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
+      MassSignProjT ->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
+      MassSignProjPU->Scale(1.0/(result.XSec_Th*signalsMeanHSCPPerEvent*result.LInt));
 
       //Rebin --> keep CPU time reasonable and error small
       MassDataProj  ->Rebin(2);
@@ -2558,14 +2579,13 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
    char TypeStr[255]; sprintf(TypeStr,"Type%i", TypeMode);
    string JobName = TypeStr+signal;
    string datacardPath = "/tmp/shape_"+JobName+".dat";
-
    makeDataCard(datacardPath,string("shape_")+JobName+".root", TypeStr,signal, NData, NPred, 1.0+(Shape?RescaleError:NPredErr/NPred), NSign, 1.0+fabs(EffErr/Eff), SignalUnc, Shape);
 
    char massStr[255]; sprintf(massStr,"%.0f",result.Mass);
    string test = massStr + signal;
    if(getSignificance && Temporary){
       if(NPred<0.001) NPred=0.001;
-      double SignifValue=0.0; double PrevSignifValue=0; double Strength=0.1*(3*sqrt(NPred)/NSign);  if(result.XSec_5Sigma>0 && result.XSec_5Sigma<1E48)Strength=result.XSec_5Sigma/result.XSec_Th;
+      double SignifValue=0.0; double PrevSignifValue=0; double Strength=0.1*(3*sqrt(NPred)/NSign);  if(result.XSec_5Sigma>0 && result.XSec_5Sigma<1E48)Strength=result.XSec_5Sigma / (SignalScaleFactor/result.LInt);
 //      double SignifValue=0.0;double Strength=0.0005;  if(result.XSec_5Sigma>0 && result.XSec_5Sigma<1E50)Strength=result.XSec_5Sigma/result.XSec_Th;
       double previousXSec_5Sigma=result.XSec_5Sigma; result.XSec_5Sigma = -1;
       //find signal strength needed to get a 5sigma significance
@@ -2577,16 +2597,16 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
          printf("%i SIGNAL STRENGTH = %E --> SIGNIFICANCE=%E (countDecrease=%f)\n",l, Strength,SignifValue,CountDecrease);fflush(stdout);
 
          if(SignifValue<=PrevSignifValue || SignifValue<=0){CountDecrease++;}else{CountDecrease=0;}
-         if(CountDecrease>=2){result.XSec_5Sigma  = 1E49; break;}
+         if(CountDecrease>=3){result.XSec_5Sigma  = 1E49; break;}
 
          //we found the signal strength that lead to a significance close enough to the 5sigma to stop the loop 
          //OR we know that this point is not going to be a good one --> can do a coarse approximation since the begining
 //         if(fabs(SignifValue-5)<0.75 || (fastOptimization && Strength>=previousXSec_5Sigma && SignifValue<5)){
-         if(fabs(SignifValue-5)<1.00 || (fastOptimization && previousXSec_5Sigma>=0 && Strength>=previousXSec_5Sigma/(result.XSec_Th/100.0) && SignifValue<5 && SignifValue>=0)){
+         if(fabs(SignifValue-5)<1.00 || (fastOptimization && previousXSec_5Sigma>=0 && Strength>=previousXSec_5Sigma*(SignalScaleFactor/result.LInt) && SignifValue<5 && SignifValue>=0)){
             if(fabs(SignifValue-5)<1.00){printf("Full Converge\n");
             }else{printf("Fast Converge\n");}
-            result.XSec_5Sigma  = Strength * (5/SignifValue) * (result.XSec_Th/100.0);//xsection in pb
-            printf("XSection for 5sigma discovery = %f = %f * %f * %f\n",result.XSec_5Sigma, Strength,  (5/SignifValue), (result.XSec_Th/100.0));
+            result.XSec_5Sigma  = Strength * (5/SignifValue) * (SignalScaleFactor/result.LInt);//xsection in pb
+            printf("XSection for 5sigma discovery = %f = %f * %f * (%f/%f)\n",result.XSec_5Sigma, Strength,  (5/SignifValue), SignalScaleFactor, result.LInt);
             break;
          }
 
@@ -2612,7 +2632,7 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.840 >> shape_" + JobName + "Exp.log;";
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.025 >> shape_" + JobName + "Exp.log;";
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.975 >> shape_" + JobName + "Exp.log;";
-      CodeToExecute += "hadd higgsCombine"+JobName+".HybridNew.mH"+massStr+".Merged.root higgsCombine"+JobName+".HybridNew.mH"+massStr+"*.root";
+      CodeToExecute += "hadd -f higgsCombine"+JobName+".HybridNew.mH"+massStr+".Merged.root higgsCombine"+JobName+".HybridNew.mH"+massStr+"*.root";
       system(CodeToExecute.c_str());
 
       //if all went well, the combine tool created a new file containing the result of the limit in the form of a TTree
@@ -2629,13 +2649,13 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
       tree->GetBranch("quantileExpected")->SetAddress(&TquantExp);
       for(int ientry=0;ientry<tree->GetEntriesFast();ientry++){
         tree->GetEntry(ientry);
-        printf("Quantile=%f --> Limit = %f\n", TquantExp, Tlimit);
-        if(TquantExp==0.025f){ result.XSec_Exp2Down = Tlimit*(result.XSec_Th/100.0);
-        }else if(TquantExp==0.160f){ result.XSec_ExpDown  = Tlimit*(result.XSec_Th/100.0);
-        }else if(TquantExp==0.500f){ result.XSec_Exp      = Tlimit*(result.XSec_Th/100.0);
-        }else if(TquantExp==0.840f){ result.XSec_ExpUp    = Tlimit*(result.XSec_Th/100.0);
-        }else if(TquantExp==0.975f){ result.XSec_Exp2Up   = Tlimit*(result.XSec_Th/100.0);
-        }else if(TquantExp==-1    ){ result.XSec_Obs      = Tlimit*(result.XSec_Th/100.0);
+        printf("Quantile=%f --> Limit = %f\n", TquantExp, Tlimit*(SignalScaleFactor/result.LInt));
+        if(TquantExp==0.025f){ result.XSec_Exp2Down = Tlimit*(SignalScaleFactor/result.LInt);
+        }else if(TquantExp==0.160f){ result.XSec_ExpDown  = Tlimit*(SignalScaleFactor/result.LInt);
+        }else if(TquantExp==0.500f){ result.XSec_Exp      = Tlimit*(SignalScaleFactor/result.LInt);
+        }else if(TquantExp==0.840f){ result.XSec_ExpUp    = Tlimit*(SignalScaleFactor/result.LInt);
+        }else if(TquantExp==0.975f){ result.XSec_Exp2Up   = Tlimit*(SignalScaleFactor/result.LInt);
+        }else if(TquantExp==-1    ){ result.XSec_Obs      = Tlimit*(SignalScaleFactor/result.LInt);
         }else{printf("Quantil %f unused by the analysis --> check the code\n", TquantExp);
         }
       }
@@ -2833,7 +2853,9 @@ bool Combine(string InputPattern, string signal7, string signal8){
    printf("Combined Significance = %f (%s)\n", result.Significance, (outpath+"shape_"+JobName+".dat").c_str());
 
    double NPred = result.NPred;
-   double NSign = result.NSign / 100.0;
+   double NSign = result.NSign;
+   double SignalScaleFactor = 1.0;
+   for(unsigned int i=0;i<20 && NSign<1e-1; i++){SignalScaleFactor*=10.0;  NSign*=10.0;}
 
    //ALL CODE BELOW IS A BIT DIFFERENT THAN THE ONE USED IN runCombined, BECAUSE HERE WE KEEP THE RESULTS ON LIMIT IN TERMS OF SIGNAL STRENGTH (r=SigmaObs/SigmaTH)
    if(true){
@@ -2850,7 +2872,7 @@ bool Combine(string InputPattern, string signal7, string signal8){
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.840 >> shape_" + JobName + "Exp.log;";
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.025 >> shape_" + JobName + "Exp.log;";
       CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat --expectedFromGrid 0.975 >> shape_" + JobName + "Exp.log;";
-      CodeToExecute += "hadd higgsCombine"+JobName+".HybridNew.mH"+massStr+".Merged.root higgsCombine"+JobName+".HybridNew.mH"+massStr+"*.root";
+      CodeToExecute += "hadd -f higgsCombine"+JobName+".HybridNew.mH"+massStr+".Merged.root higgsCombine"+JobName+".HybridNew.mH"+massStr+"*.root";
       system(CodeToExecute.c_str());
 
       //if all went well, the combine tool created a new file containing the result of the limit in the form of a TTree
@@ -2867,12 +2889,12 @@ bool Combine(string InputPattern, string signal7, string signal8){
       tree->GetBranch("quantileExpected")->SetAddress(&TquantExp);
       for(int ientry=0;ientry<tree->GetEntriesFast();ientry++){
         tree->GetEntry(ientry);
-        if(TquantExp==0.025f){ result.XSec_Exp2Down = Tlimit/100.0;
-        }else if(TquantExp==0.160f){ result.XSec_ExpDown  = Tlimit/100.0;
-        }else if(TquantExp==0.500f){ result.XSec_Exp      = Tlimit/100.0;
-        }else if(TquantExp==0.840f){ result.XSec_ExpUp    = Tlimit/100.0;
-        }else if(TquantExp==0.975f){ result.XSec_Exp2Up   = Tlimit/100.0;
-        }else if(TquantExp==-1    ){ result.XSec_Obs      = Tlimit/100.0;
+        if(TquantExp==0.025f){ result.XSec_Exp2Down = Tlimit*SignalScaleFactor;
+        }else if(TquantExp==0.160f){ result.XSec_ExpDown  = Tlimit*SignalScaleFactor;
+        }else if(TquantExp==0.500f){ result.XSec_Exp      = Tlimit*SignalScaleFactor;
+        }else if(TquantExp==0.840f){ result.XSec_ExpUp    = Tlimit*SignalScaleFactor;
+        }else if(TquantExp==0.975f){ result.XSec_Exp2Up   = Tlimit*SignalScaleFactor;
+        }else if(TquantExp==-1    ){ result.XSec_Obs      = Tlimit*SignalScaleFactor;
         }else{printf("Quantil %f unused by the analysis --> check the code\n", TquantExp);
         }
       }

@@ -103,7 +103,12 @@ edm::LumiReWeighting LumiWeightsMCSyst;
 
 TH3F* dEdxTemplates = NULL;
 std::unordered_map<unsigned int,double> TrackerGains;
-double dEdxSF = 1.0;
+double dEdxSF [2] = {
+   1.00000,   // [0]  unchanged
+   1.21836    // [1]  Pixel data to SiStrip data
+};
+
+
 bool useClusterCleaning = true;
 /////////////////////////// CODE PARAMETERS /////////////////////////////
 
@@ -958,10 +963,12 @@ void Analysis_Step1_EventLoop(char* SavePath)
       bool isSignal = (samples[s].Type>=2);
 
       if(isData){ 
-         dEdxSF           = 1.00000;
+         dEdxSF [0] = 1.00000;
+         dEdxSF [1] = 1.21836;
          dEdxTemplates = loadDeDxTemplate("../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
       }else{  
-         dEdxSF           = 1.09708;      
+         dEdxSF [0] = 1.09708;
+         dEdxSF [1] = 1.01875;
          dEdxTemplates = loadDeDxTemplate("../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
       }
 

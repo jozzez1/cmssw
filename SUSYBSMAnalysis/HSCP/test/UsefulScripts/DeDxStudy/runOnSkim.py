@@ -9,8 +9,16 @@ import commands
 import json
 import collections # kind of map
 
+
+
+
 def getChunksFromList(MyList, n):
   return [MyList[x:x+n] for x in range(0, len(MyList), n)]
+
+def initProxy():
+   if(not os.path.isfile(os.path.expanduser('~/x509_user_proxy/x509_proxy')) or ((time.time() - os.path.getmtime(os.path.expanduser('~/x509_user_proxy/x509_proxy')))>600)):
+      print "You are going to run on a sample over grid using either CRAB or the AAA protocol, it is therefore needed to initialize your grid certificate"
+      os.system('mkdir -p ~/x509_user_proxy; voms-proxy-init --voms cms -valid 192:00 --out ~/x509_user_proxy/x509_proxy')#all must be done in the same command to avoid environement problems.  Note that the first sourcing is only needed in Louvain
 
 
 if len(sys.argv)==1:
@@ -23,9 +31,18 @@ if len(sys.argv)==1:
 
 
 datasetList = [
-   ["Run251252", "/storage/data/cms/store/user/jozobec/ZeroBias/crab_DeDxSkimmerNEW/150720_122314/0000/"],
-   ["MCMinBias", "/home/fynu/jzobec/scratch/CMSSW_7_4_6/src/SUSYBSMAnalysis/HSCP/test/UsefulScripts/SampleProduction/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
+  ["Run251252", "/storage/data/cms/users/jzobec/crab_DeDxSkimmerWithVertexNEW/150811_131054/0000/"],
+  ["MCMinBias", "/storage/data/cms/users/jzobec/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
+
+  ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
+  ["MCGluino_M1400_f10", "Gluino_13TeV_M1400_f10"],
+  ["MCGluino_M1800_f10", "Gluino_13TeV_M1800_f10"],
+  ["MCGMStau_M494", "GMStau_13TeV_M494"],
+  ["MCStop_M1000", "Stop_13TeV_M1000_f10"],
 ]
+
+isLocal = False  #allow to access data in Louvain from remote sites
+if(commands.getstatusoutput("hostname -f")[1].find("ucl.ac.be")!=-1): isLocal = True
 
 if sys.argv[1]=='1':
         os.system("sh " + os.getcwd() + "/DeDxStudy.sh ") #just compile
@@ -39,8 +56,26 @@ if sys.argv[1]=='1':
 	   LaunchOnCondor.Jobs_Queue = '8nh'
 	   LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 
-	   FILELIST = LaunchOnCondor.GetListOfFiles('', DATASET[1]+'/*.root', '')
-           for inFileList in getChunksFromList(FILELIST,len(FILELIST)/15): #30 jobs, this is a trade off between hadding time and processing time
+ 	   FILELIST = []        
+           if(DATASET[1][-1]=='/'): #file path is a directory, consider all files from the directory
+              if(isLocal):
+      	         FILELIST = LaunchOnCondor.GetListOfFiles('', DATASET[1]+'/*.root', '')
+              else:
+                 initProxy()
+                 initCommand = 'export X509_USER_PROXY=~/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;'
+                 LaunchOnCondor.Jobs_InitCmds = [initCommand]
+                 print initCommand+'lcg-ls -b -D srmv2 "srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2?SFN='+DATASET[1]+'" | xargs -I {} basename {}'
+                 print commands.getstatusoutput(initCommand+'lcg-ls -b -D srmv2 "srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2?SFN='+DATASET[1]+'" | xargs -I {} basename {}')
+                 LocalFileList = commands.getstatusoutput(initCommand+'lcg-ls -b -D srmv2 "srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2?SFN='+DATASET[1]+'" | xargs -I {} basename {}')[1].split('\n')
+                 for f in LocalFileList:
+                    if(f[-5:].find('.root')==-1):continue #only .root file considered
+                    FILELIST += ["root://cms-xrd-global.cern.ch/"+DATASET[1].replace('/storage/data/cms/store/','/store/')+f]
+           else: #file path is an HSCP sample name, use the name to run the job
+              FILELIST += [DATASET[1]]
+             
+
+           print FILELIST
+           for inFileList in getChunksFromList(FILELIST,max(1,len(FILELIST)/15)): #15 jobs, this is a trade off between hadding time and processing time
               InputListCSV = ''
   	      for inFile in inFileList:
                  InputListCSV+= inFile + ','
@@ -49,14 +84,17 @@ if sys.argv[1]=='1':
 	   LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='2':
-        for DATASET in datasetList :
+        for DATASET in datasetList :#+signalList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
+           os.system('rm -f Histos_'+DATASET[0]+'.root')
            os.system('hadd -f Histos_'+DATASET[0]+'.root ' + indir + '*.root')
+	for DATASET in signalList:
+	   indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
+	   os.system('cp ' + indir + 'dEdx*.root ' + 'Histos_'+DATASET[0]+'.root')
 
 elif sys.argv[1]=='3':
-        for DATASET in datasetList :
-           os.system('./MakePlot.sh Histos_'+DATASET[0]+'.root > MakePlot_'+DATASET[0]+'.log 2>&1')
-           os.system('mv pictures pictures_'+DATASET[0]+' && MakePlot_'+DATASET[0]+'.log pictures_'+DATASET[0])
+        for DATASET in datasetList+signalList :
+           os.system('sh MakePlot.sh Histos_'+DATASET[0]+'.root')
 
 else:
    print "Invalid argument"
