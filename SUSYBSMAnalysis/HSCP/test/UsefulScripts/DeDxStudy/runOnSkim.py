@@ -31,18 +31,21 @@ if len(sys.argv)==1:
 
 
 datasetList = [
-  ["Run251252", "/storage/data/cms/users/jzobec/crab_DeDxSkimmerWithVertexNEW/150811_131054/0000/"],
-  ["MCMinBias", "/storage/data/cms/users/jzobec/FARM_MC_13TeV_MinBias_TuneCUETP8M1_SIMAOD/outputs/"],
+  ["Run251252", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/Run251252/"],
+  ["MCMinBias", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/MC13TeVMinBiasTuneCUETP8M1_SIMAOD/"],
 
   ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
   ["MCGluino_M1400_f10", "Gluino_13TeV_M1400_f10"],
   ["MCGluino_M1800_f10", "Gluino_13TeV_M1800_f10"],
   ["MCGMStau_M494", "GMStau_13TeV_M494"],
-  ["MCStop_M1000", "Stop_13TeV_M1000_f10"],
+  ["MCStop_M1000", "Stop_13TeV_M1000"],
+  ["MCDYM2600Q2", "DY_13TeV_M2600_Q2"],
 ]
 
 isLocal = False  #allow to access data in Louvain from remote sites
 if(commands.getstatusoutput("hostname -f")[1].find("ucl.ac.be")!=-1): isLocal = True
+os.system('rm ~/x509_user_proxy/x509_proxy')
+
 
 if sys.argv[1]=='1':
         os.system("sh " + os.getcwd() + "/DeDxStudy.sh ") #just compile
@@ -75,7 +78,7 @@ if sys.argv[1]=='1':
              
 
            print FILELIST
-           for inFileList in getChunksFromList(FILELIST,max(1,len(FILELIST)/15)): #15 jobs, this is a trade off between hadding time and processing time
+           for inFileList in getChunksFromList(FILELIST,max(1,len(FILELIST)/50)): #50 jobs, this is a trade off between hadding time and processing time
               InputListCSV = ''
   	      for inFile in inFileList:
                  InputListCSV+= inFile + ','
@@ -87,13 +90,10 @@ elif sys.argv[1]=='2':
         for DATASET in datasetList :#+signalList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
            os.system('rm -f Histos_'+DATASET[0]+'.root')
-           os.system('hadd -f Histos_'+DATASET[0]+'.root ' + indir + '*.root')
-	for DATASET in signalList:
-	   indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
-	   os.system('cp ' + indir + 'dEdx*.root ' + 'Histos_'+DATASET[0]+'.root')
+           os.system('find ' + indir + '*.root  -type f -size +1024c | xargs hadd -f Histos_'+DATASET[0]+'.root  &> Histos_'+DATASET[0]+'.log &')
 
 elif sys.argv[1]=='3':
-        for DATASET in datasetList+signalList :
+        for DATASET in datasetList :
            os.system('sh MakePlot.sh Histos_'+DATASET[0]+'.root')
 
 else:
