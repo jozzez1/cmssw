@@ -29,11 +29,11 @@ if len(sys.argv)==1:
         sys.exit()
 
 
+subTool='condor'
 
 datasetList = [
   ["Run251252", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/Run251252/"],
   ["MCMinBias", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/MC13TeVMinBiasTuneCUETP8M1_SIMAOD/"],
-
   ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
   ["MCGluino_M1400_f10", "Gluino_13TeV_M1400_f10"],
   ["MCGluino_M1800_f10", "Gluino_13TeV_M1800_f10"],
@@ -44,7 +44,7 @@ datasetList = [
 
 isLocal = False  #allow to access data in Louvain from remote sites
 if(commands.getstatusoutput("hostname -f")[1].find("ucl.ac.be")!=-1): isLocal = True
-os.system('rm ~/x509_user_proxy/x509_proxy')
+os.system('rm -f ~/x509_user_proxy/x509_proxy')
 
 
 if sys.argv[1]=='1':
@@ -90,7 +90,7 @@ elif sys.argv[1]=='2':
         for DATASET in datasetList :#+signalList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
            os.system('rm -f Histos_'+DATASET[0]+'.root')
-           os.system('find ' + indir + '*.root  -type f -size +1024c | xargs hadd -f Histos_'+DATASET[0]+'.root  &> Histos_'+DATASET[0]+'.log &')
+           os.system('find ' + indir + '*.root  -type f -size +1024c | xargs hadd -f Histos_'+DATASET[0]+'.root')
 
 elif sys.argv[1]=='3':
         for DATASET in datasetList :
