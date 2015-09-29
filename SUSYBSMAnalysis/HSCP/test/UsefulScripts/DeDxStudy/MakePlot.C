@@ -1223,6 +1223,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    	HdedxMIP1->GetXaxis()->SetTitle(ObjName1.find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
    	HdedxMIP1->GetYaxis()->SetTitle("fraction of tracks");
    	HdedxMIP1->SetAxisRange(0,5,"X");
+   	HdedxMIP1->SetAxisRange(1e-6,1,"Y");
    	HdedxMIP1->SetLineColor (kBlack);
    	HdedxMIP2->SetLineColor (kBlue);
    	HdedxMIP2->Scale(1.0/HdedxMIP2->Integral());

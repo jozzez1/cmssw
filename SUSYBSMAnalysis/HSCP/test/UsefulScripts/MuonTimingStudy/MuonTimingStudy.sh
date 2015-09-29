@@ -1,3 +1,6 @@
+# Original Author:  Loic Quertenmont
+
+
 #!/bin/bash
 executable=`echo $0 | sed 's/.sh/.C/'` #assume the .sh and .C file have the same name
 arguments=''
@@ -9,7 +12,6 @@ if [ $# -ge 4 ]; then arguments=$arguments",\"$4\"" ;fi
 if [ $# -ge 5 ]; then arguments=$arguments",\"$5\"" ;fi
 if [ $# -ge 6 ]; then arguments=$arguments",\"$6\"" ;fi
 if [ $# -ge 1 ]; then arguments=$arguments");" ;fi
-echo $arguments
 
 root -l -b << EOF
   TString makeshared(gSystem->GetMakeSharedLib());

@@ -1,4 +1,7 @@
 #!/bin/bash
+# Original Author:  Loic Quertenmont
+
+
 executable=`echo $0 | sed 's/.sh/.C/'` #assume the .sh and .C file have the same name
 arguments=''
 if [ $# -ge 1 ]; then arguments=$arguments"(\"`dirname $0`\"" ;fi
@@ -26,6 +29,6 @@ root -l -b << EOF
   gSystem->Load("libDataFormatsCommon.so");
   gSystem->Load("libDataFormatsHepMCCandidate.so");
   gSystem->Load("libPhysicsToolsUtilities.so");
-  .x $executable+$arguments
+  .x $executable+
 EOF
 
