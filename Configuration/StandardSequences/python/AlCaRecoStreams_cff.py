@@ -110,11 +110,15 @@ from Calibration.TkAlCaRecoProducers.ALCARECOPromptCalibProdSiStrip_cff import *
 from Calibration.TkAlCaRecoProducers.ALCARECOPromptCalibProdSiStripGains_cff import *
 
 from Calibration.TkAlCaRecoProducers.ALCARECOSiStripPCLHistos_cff import *
+from Alignment.CommonAlignmentProducer.ALCARECOPromptCalibProdSiPixelAli_cff import *
 
 
+###############################################################
+# hotline skim workflows
+###############################################################
+from Calibration.Hotline.hotlineSkims_cff import *
 
-
-# NOTE: the ALCARECO DQM modules can not be placed together in a single path 
+# NOTE: the ALCARECO DQM modules can not be placed together in a single path
 # because the non-DQM sequences act as filters.
 # They are therefore inserted per ALCARECO path.
 from DQMOffline.Configuration.AlCaRecoDQM_cff import *
@@ -181,7 +185,27 @@ pathALCARECOMuAlGlobalCosmics = cms.Path(seqALCARECOMuAlGlobalCosmics*ALCARECOMu
 pathALCARECOPromptCalibProd = cms.Path(seqALCARECOPromptCalibProd)
 pathALCARECOPromptCalibProdSiStrip = cms.Path(seqALCARECOPromptCalibProdSiStrip)
 pathALCARECOPromptCalibProdSiStripGains = cms.Path(seqALCARECOPromptCalibProdSiStripGains)
+pathALCARECOPromptCalibProdSiPixelAli = cms.Path(seqALCARECOPromptCalibProdSiPixelAli)
 pathALCARECOSiStripPCLHistos = cms.Path(seqALCARECOSiStripPCLHistos)
+pathHotlineSkimSingleMuon = cms.Path(seqHotlineSkimSingleMuon)
+pathHotlineSkimDoubleMuon = cms.Path(seqHotlineSkimDoubleMuon)
+pathHotlineSkimTripleMuon = cms.Path(seqHotlineSkimTripleMuon)
+pathHotlineSkimSingleElectron = cms.Path(seqHotlineSkimSingleElectron)
+pathHotlineSkimDoubleElectron = cms.Path(seqHotlineSkimDoubleElectron)
+pathHotlineSkimTripleElectron = cms.Path(seqHotlineSkimTripleElectron)
+pathHotlineSkimSinglePhoton = cms.Path(seqHotlineSkimSinglePhoton)
+pathHotlineSkimDoublePhoton = cms.Path(seqHotlineSkimDoublePhoton)
+pathHotlineSkimTriplePhoton = cms.Path(seqHotlineSkimTriplePhoton)
+pathHotlineSkimSingleJet = cms.Path(seqHotlineSkimSingleJet)
+pathHotlineSkimDoubleJet = cms.Path(seqHotlineSkimDoubleJet)
+pathHotlineSkimMultiJet = cms.Path(seqHotlineSkimMultiJet)
+pathHotlineSkimHT = cms.Path(seqHotlineSkimHT)
+pathHotlineSkimMassiveDimuon = cms.Path(seqHotlineSkimMassiveDimuon)
+pathHotlineSkimMassiveDielectron = cms.Path(seqHotlineSkimMassiveDielectron)
+pathHotlineSkimMassiveEMu = cms.Path(seqHotlineSkimMassiveEMu)
+pathHotlineSkimPFMET = cms.Path(seqHotlineSkimPFMET)
+pathHotlineSkimCaloMET = cms.Path(seqHotlineSkimCaloMET)
+pathHotlineSkimCondMET = cms.Path(seqHotlineSkimCondMET)
 
 # AlCaReco event content definitions:
 
@@ -580,6 +604,16 @@ ALCARECOStreamPromptCalibProdSiStripGains = cms.FilteredStream(
 
 
 
+ALCARECOStreamPromptCalibProdSiPixelAli = cms.FilteredStream(
+	responsible = 'Gianluca Cerminara',
+	name = 'PromptCalibProdSiPixelAli',
+	paths  = (pathALCARECOPromptCalibProdSiPixelAli),
+	content = OutALCARECOPromptCalibProdSiPixelAli.outputCommands,
+	selectEvents = OutALCARECOPromptCalibProdSiPixelAli.SelectEvents,
+	dataTier = cms.untracked.string('ALCARECO')
+	)
+
+
 ALCARECOStreamSiStripPCLHistos = cms.FilteredStream(
 	responsible = 'Gianluca Cerminara',
 	name = 'SiStripPCLHistos',
@@ -589,5 +623,33 @@ ALCARECOStreamSiStripPCLHistos = cms.FilteredStream(
 	dataTier = cms.untracked.string('ALCARECO')
 	)
 
+ALCARECOStreamHotline = cms.FilteredStream(
+        responsible = 'Dustin Anderson',
+        name = 'Hotline',
+        paths = (
+            pathHotlineSkimSingleMuon,
+            pathHotlineSkimDoubleMuon,
+            pathHotlineSkimTripleMuon,
+            pathHotlineSkimSingleElectron,
+            pathHotlineSkimDoubleElectron,
+            pathHotlineSkimTripleElectron,
+            pathHotlineSkimSinglePhoton,
+            pathHotlineSkimDoublePhoton,
+            pathHotlineSkimTriplePhoton,
+            pathHotlineSkimSingleJet,
+            pathHotlineSkimDoubleJet,
+            pathHotlineSkimMultiJet,
+            pathHotlineSkimHT,
+            pathHotlineSkimMassiveDimuon,
+            pathHotlineSkimMassiveDielectron,
+            pathHotlineSkimMassiveEMu,
+            pathHotlineSkimPFMET,
+            pathHotlineSkimCaloMET,
+            pathHotlineSkimCondMET
+            ),
+        content = OutALCARECOHotline.outputCommands,
+        selectEvents = OutALCARECOHotline.SelectEvents,
+        dataTier = cms.untracked.string('ALCARECO')
+        )
 
 from Configuration.StandardSequences.AlCaRecoStream_Specials_cff import *
