@@ -32,6 +32,21 @@ if len(sys.argv)==1:
 
 datasetList = [
   ["Run251252", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/Run251252/"],
+  ["Run257395", "/storage/data/cms/store/user/jozobec/out/257395/"],
+  ["Run257396", "/storage/data/cms/store/user/jozobec/out/257396/"],
+  ["Run257490", "/storage/data/cms/store/user/jozobec/out/257490/"],
+  ["Run257599", "/storage/data/cms/store/user/jozobec/out/257599/"],
+  ["Run257805", "/storage/data/cms/store/user/jozobec/out/257805/"],
+  ["Run257816", "/storage/data/cms/store/user/jozobec/out/257816/"],
+  ["Run257819", "/storage/data/cms/store/user/jozobec/out/257819/"],
+  ["Run257823", "/storage/data/cms/store/user/jozobec/out/257823/"],
+  ["Run258443", "/storage/data/cms/store/user/jozobec/out/258443/"],
+  ["Run258446", "/storage/data/cms/store/user/jozobec/out/258446/"],
+  ["Run258655", "/storage/data/cms/store/user/jozobec/out/258655/"],
+  ["Run258694", "/storage/data/cms/store/user/jozobec/out/258694/"],
+  ["Run258705", "/storage/data/cms/store/user/jozobec/out/258705/"],
+  ["Run258741", "/storage/data/cms/store/user/jozobec/out/258741/"],
+  ["Run258750", "/storage/data/cms/store/user/jozobec/out/258750/"],
   ["MCMinBias", "/storage/data/cms/store/user/querten/AAA/HSCP/dedxSkim/MC13TeVMinBiasTuneCUETP8M1_SIMAOD/"],
 
   ["MCGluino_M1000_f10", "Gluino_13TeV_M1000_f10"],
@@ -44,7 +59,7 @@ datasetList = [
 
 isLocal = False  #allow to access data in Louvain from remote sites
 if(commands.getstatusoutput("hostname -f")[1].find("ucl.ac.be")!=-1): isLocal = True
-os.system('rm ~/x509_user_proxy/x509_proxy')
+os.system('rm -rf ~/x509_user_proxy/x509_proxy')
 
 
 if sys.argv[1]=='1':
@@ -90,7 +105,10 @@ elif sys.argv[1]=='2':
         for DATASET in datasetList :#+signalList :
            indir =  os.getcwd() + "/Histos/"+DATASET[0]+'/'
            os.system('rm -f Histos_'+DATASET[0]+'.root')
-           os.system('find ' + indir + '*.root  -type f -size +1024c | xargs hadd -f Histos_'+DATASET[0]+'.root  &> Histos_'+DATASET[0]+'.log &')
+           os.system('find ' + indir + '*.root  -type f -size +1024c | xargs hadd -f Histos_'+DATASET[0]+'.root')
+	# finally merge all the runs into the histogram with data
+	os.system('rm -f Histos_Data.root')
+	os.system('hadd -f Histos_Data.root Histos_Run*.root')
 
 elif sys.argv[1]=='3':
         for DATASET in datasetList :
