@@ -6,98 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 // general purpose code 
 
-vector <unsigned int> get_ChangeGains (void){
-   vector <unsigned int> ChangeGains;
-   ChangeGains.push_back (252116);
-   ChangeGains.push_back (254227);
-   ChangeGains.push_back (254437);
-   ChangeGains.push_back (254532);
-   ChangeGains.push_back (254790);
-   ChangeGains.push_back (254879);
-   ChangeGains.push_back (255031);
-   ChangeGains.push_back (256630);
-   ChangeGains.push_back (256734);
-   ChangeGains.push_back (256941);
-   ChangeGains.push_back (256957);
-   ChangeGains.push_back (257490);
-   ChangeGains.push_back (257531);
-   ChangeGains.push_back (257682);
-   ChangeGains.push_back (257823);
-   ChangeGains.push_back (258129);
-   ChangeGains.push_back (258174);
-   ChangeGains.push_back (258287);
-   ChangeGains.push_back (258702);
-   ChangeGains.push_back (258713);
-   ChangeGains.push_back (258750);
-   ChangeGains.push_back (259237);
-   ChangeGains.push_back (259352);
-   ChangeGains.push_back (259399);
-   ChangeGains.push_back (259626);
-   ChangeGains.push_back (259686);
-   ChangeGains.push_back (259809);
-   ChangeGains.push_back (259861);
-   ChangeGains.push_back (260373);
-   ChangeGains.push_back (260069);
-   ChangeGains.push_back (260427);
-   ChangeGains.push_back (260533);
-   ChangeGains.push_back (260577);
-   ChangeGains.push_back (999999);
-
-   return ChangeGains;
-}
-
-vector <unsigned int> get_PromptGains (void){
-   vector <unsigned int> PromptGains;
-   PromptGains.push_back(252116);
-   PromptGains.push_back(254227);
-   PromptGains.push_back(256957);
-   PromptGains.push_back(260373);
-   PromptGains.push_back(260069);
-   PromptGains.push_back(999999);
-
-   return PromptGains;
-}
-
-vector <unsigned int> get_NormalGains (void){
-   vector <unsigned int> NormalGains;
-   NormalGains.push_back(252116);
-   NormalGains.push_back(254227);
-   NormalGains.push_back(254437);
-   NormalGains.push_back(254532);
-   NormalGains.push_back(254790);
-   NormalGains.push_back(254879);
-   NormalGains.push_back(255031);
-   NormalGains.push_back(256630);
-   NormalGains.push_back(256734);
-   NormalGains.push_back(256941);
-   NormalGains.push_back(257490);
-   NormalGains.push_back(257531);
-   NormalGains.push_back(257682);
-   NormalGains.push_back(257823);
-   NormalGains.push_back(258129);
-   NormalGains.push_back(258174);
-   NormalGains.push_back(258287);
-   NormalGains.push_back(258702);
-   NormalGains.push_back(258713);
-   NormalGains.push_back(258750);
-   NormalGains.push_back(259237);
-   NormalGains.push_back(259352);
-   NormalGains.push_back(259399);
-   NormalGains.push_back(259626);
-   NormalGains.push_back(259686);
-   NormalGains.push_back(259809);
-   NormalGains.push_back(259861);
-   NormalGains.push_back(260373);
-   NormalGains.push_back(260427);
-   NormalGains.push_back(260533);
-   NormalGains.push_back(260577);
-   NormalGains.push_back(999999);
-
-   return NormalGains;
-}
-
-
-
 // return the TypeMode from a string inputPattern
 int TypeFromPattern(const std::string& InputPattern){
    if(InputPattern.find("Type0",0)<std::string::npos){       return 0;
@@ -564,26 +472,69 @@ class DuplicatesClass{
 
 
 TH3F* loadDeDxTemplate(string path, bool splitByModuleType=false);
-reco::DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, bool usePixel=false, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false, std::unordered_map<unsigned int,double>* TrackerGains=NULL, bool useStrip=true, bool mustBeInside=false, size_t MaxStripNOM=999, bool correctFEDSat=false, int crossTalkInvAlgo=0);
+reco::DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, bool usePixel=false, bool useClusterCleaning=true, bool reverseProb=false, bool useTruncated=false, std::unordered_map<unsigned int,double>* TrackerGains=NULL, bool useStrip=true, bool mustBeInside=false, size_t MaxStripNOM=999, bool correctFEDSat=false, int crossTalkInvAlgo=0, bool dropLowerDeDxValue=false);
 bool clusterCleaning(const SiStripCluster*   cluster,  int crosstalkInv=0, uint8_t* exitCode=NULL);
 void printStripCluster(FILE* pFile, const SiStripCluster*   cluster, const DetId& DetId);
 void printClusterCleaningMessage (uint8_t exitCode);
 std::vector<int> convert(const vector<unsigned char>& input);
 std::vector<int> CrossTalkInv(const std::vector<int>&  Q, const float x1=0.10, const float x2=0.04, bool way=true,float threshold=20,float thresholdSat=25);
 
-void LoadDeDxCalibration(std::unordered_map<unsigned int,double>& TrackerGains, string path, TFile* gainsFile){
-   TTree* t1 = (TTree*) GetObjectFromPath (gainsFile, path);
 
-   unsigned int  tree_DetId;   t1->SetBranchAddress("DetId"             ,&tree_DetId      );
-   unsigned char tree_APVId;   t1->SetBranchAddress("APVId"             ,&tree_APVId      );
-   double        tree_Gain;    t1->SetBranchAddress("Gain"              ,&tree_Gain       );
 
-   TrackerGains.clear();
-   for (unsigned int ientry = 0; ientry < t1->GetEntries(); ientry++) {
-       t1->GetEntry(ientry);
-       TrackerGains[tree_DetId<<3 | tree_APVId] = tree_Gain;
-   }
-}
+class dedxGainCorrector{
+
+   private:
+      std::map<unsigned int, std::unordered_map<unsigned int, double> > TrackerGainsPerRuns;
+
+   public:
+      std::unordered_map<unsigned int, double>* TrackerGains; 
+      dedxGainCorrector(){TrackerGains=NULL;}
+      ~dedxGainCorrector(){}
+
+      void setRun(unsigned int currentRun){
+         if(TrackerGainsPerRuns.size()<=0){TrackerGains=NULL; return;}
+         std::map<unsigned int, std::unordered_map<unsigned int, double> >::iterator it, itPrev=TrackerGainsPerRuns.begin();
+         for(it=TrackerGainsPerRuns.begin(); it!=TrackerGainsPerRuns.end(); it++){
+            if(it->first>currentRun){TrackerGains = &(itPrev->second); return;}//runs are ordered, so the previous iterator correspond to our run
+            itPrev=it;
+         }
+         TrackerGains = &(itPrev->second); //just in case we go beyond the list of run for which we have a correciton
+      }
+
+
+
+      void LoadDeDxCalibration(string path){
+         TrackerGainsPerRuns.clear();
+         TrackerGains=NULL;
+
+         TFile* InputFile = new TFile(path.c_str(), "r");
+         TList* ObjList = InputFile->GetListOfKeys();
+         for(int i=0;i<ObjList->GetSize();i++){
+            TObject* tmp = GetObjectFromPath(InputFile,ObjList->At(i)->GetName(),false);
+            if(tmp->InheritsFrom("TTree")){
+               string dirName = ObjList->At(i)->GetName();
+               unsigned int FirstRun, LastRun;  sscanf(dirName.c_str(), "Gains_%d_to_%d", &FirstRun, &LastRun);
+               printf("Add a new gain srarting at run %d\n", FirstRun);
+               
+               TTree* t1 = (TTree*) tmp;
+               unsigned int  tree_DetId;   t1->SetBranchAddress("DetId"             ,&tree_DetId      );
+               unsigned char tree_APVId;   t1->SetBranchAddress("APVId"             ,&tree_APVId      );
+               double        tree_Gain;    t1->SetBranchAddress("Gain"              ,&tree_Gain       );
+//               double        tree_PrevGain;t1->SetBranchAddress("PrevGain"          ,&tree_PrevGain   );
+
+               TrackerGains = &TrackerGainsPerRuns[FirstRun];
+               for (unsigned int ientry = 0; ientry < t1->GetEntries(); ientry++) {
+                  t1->GetEntry(ientry);
+                  (*TrackerGains)[tree_DetId<<3 | tree_APVId] = tree_Gain;
+               }
+            }
+         }
+         InputFile->Close();
+         delete InputFile;
+      }
+};
+
+
 
 TH3F* loadDeDxTemplate(string path, bool splitByModuleType){
    TFile* InputFile = new TFile(path.c_str());
@@ -669,15 +620,15 @@ bool isHitInsideTkModule(const LocalPoint hitPos, const DetId& detid, const SiSt
 }
 
 
-
-
-DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto, bool usePixel, bool useClusterCleaning, bool reverseProb, bool useTruncated, std::unordered_map<unsigned int,double>* TrackerGains, bool useStrip, bool mustBeInside, size_t MaxStripNOM, bool correctFEDSat, int crossTalkInvAlgo){
+DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto, bool usePixel, bool useClusterCleaning, bool reverseProb, bool useTruncated, std::unordered_map<unsigned int,double>* TrackerGains, bool useStrip, bool mustBeInside, size_t MaxStripNOM, bool correctFEDSat, int crossTalkInvAlgo, bool dropLowerDeDxValue){
      if(!dedxHits) return DeDxData(-1, -1, -1);
 //     if(templateHisto)usePixel=false; //never use pixel for discriminator
 
      std::vector<double> vect;
      unsigned int NSat=0;
      unsigned int SiStripNOM = 0;
+     double lowerStripDeDx=1000;
+     int lowerStripDeDxIndex=-1;
      for(unsigned int h=0;h<dedxHits->size();h++){
         DetId detid(dedxHits->detId(h));  
         if(!usePixel && detid.subdetId()<3)continue; // skip pixels
@@ -740,10 +691,13 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* tem
            double Norm = (detid.subdetId()<3)?3.61e-06:3.61e-06*265;
            double ChargeOverPathlength = scaleFactor*Norm*ClusterCharge/dedxHits->pathlength(h);
            vect.push_back(ChargeOverPathlength); //save charge
+           if(ChargeOverPathlength<lowerStripDeDx){lowerStripDeDx=ChargeOverPathlength; lowerStripDeDxIndex=vect.size()-1;  }
 
 //           printf("%i - %f / %f = %f\n", h, scaleFactor*Norm*dedxHits->charge(h), dedxHits->pathlength(h), ChargeOverPathlength);
         }
      }
+
+     if(dropLowerDeDxValue && lowerStripDeDxIndex>=0){vect.erase(vect.begin()+lowerStripDeDxIndex);}
 
      double result;
      int size = vect.size();
@@ -767,6 +721,7 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* tem
         }else{  //dEdx estimator
            if(useTruncated){
               //truncated40 estimator
+              std::sort(vect.begin(), vect.end(), std::less<double>() );              
               result=0;
               int nTrunc = size*0.40;
               for(int i = 0; i+nTrunc<size; i ++){
