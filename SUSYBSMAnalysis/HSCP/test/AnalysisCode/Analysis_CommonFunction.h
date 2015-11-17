@@ -6,6 +6,98 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 // general purpose code 
 
+vector <unsigned int> get_ChangeGains (void){
+   vector <unsigned int> ChangeGains;
+   ChangeGains.push_back (252116);
+   ChangeGains.push_back (254227);
+   ChangeGains.push_back (254437);
+   ChangeGains.push_back (254532);
+   ChangeGains.push_back (254790);
+   ChangeGains.push_back (254879);
+   ChangeGains.push_back (255031);
+   ChangeGains.push_back (256630);
+   ChangeGains.push_back (256734);
+   ChangeGains.push_back (256941);
+   ChangeGains.push_back (256957);
+   ChangeGains.push_back (257490);
+   ChangeGains.push_back (257531);
+   ChangeGains.push_back (257682);
+   ChangeGains.push_back (257823);
+   ChangeGains.push_back (258129);
+   ChangeGains.push_back (258174);
+   ChangeGains.push_back (258287);
+   ChangeGains.push_back (258702);
+   ChangeGains.push_back (258713);
+   ChangeGains.push_back (258750);
+   ChangeGains.push_back (259237);
+   ChangeGains.push_back (259352);
+   ChangeGains.push_back (259399);
+   ChangeGains.push_back (259626);
+   ChangeGains.push_back (259686);
+   ChangeGains.push_back (259809);
+   ChangeGains.push_back (259861);
+   ChangeGains.push_back (260373);
+   ChangeGains.push_back (260069);
+   ChangeGains.push_back (260427);
+   ChangeGains.push_back (260533);
+   ChangeGains.push_back (260577);
+   ChangeGains.push_back (999999);
+
+   return ChangeGains;
+}
+
+vector <unsigned int> get_PromptGains (void){
+   vector <unsigned int> PromptGains;
+   PromptGains.push_back(252116);
+   PromptGains.push_back(254227);
+   PromptGains.push_back(256957);
+   PromptGains.push_back(260373);
+   PromptGains.push_back(260069);
+   PromptGains.push_back(999999);
+
+   return PromptGains;
+}
+
+vector <unsigned int> get_NormalGains (void){
+   vector <unsigned int> NormalGains;
+   NormalGains.push_back(252116);
+   NormalGains.push_back(254227);
+   NormalGains.push_back(254437);
+   NormalGains.push_back(254532);
+   NormalGains.push_back(254790);
+   NormalGains.push_back(254879);
+   NormalGains.push_back(255031);
+   NormalGains.push_back(256630);
+   NormalGains.push_back(256734);
+   NormalGains.push_back(256941);
+   NormalGains.push_back(257490);
+   NormalGains.push_back(257531);
+   NormalGains.push_back(257682);
+   NormalGains.push_back(257823);
+   NormalGains.push_back(258129);
+   NormalGains.push_back(258174);
+   NormalGains.push_back(258287);
+   NormalGains.push_back(258702);
+   NormalGains.push_back(258713);
+   NormalGains.push_back(258750);
+   NormalGains.push_back(259237);
+   NormalGains.push_back(259352);
+   NormalGains.push_back(259399);
+   NormalGains.push_back(259626);
+   NormalGains.push_back(259686);
+   NormalGains.push_back(259809);
+   NormalGains.push_back(259861);
+   NormalGains.push_back(260373);
+   NormalGains.push_back(260427);
+   NormalGains.push_back(260533);
+   NormalGains.push_back(260577);
+   NormalGains.push_back(999999);
+
+   return NormalGains;
+}
+
+
+
 // return the TypeMode from a string inputPattern
 int TypeFromPattern(const std::string& InputPattern){
    if(InputPattern.find("Type0",0)<std::string::npos){       return 0;
@@ -479,24 +571,19 @@ void printClusterCleaningMessage (uint8_t exitCode);
 std::vector<int> convert(const vector<unsigned char>& input);
 std::vector<int> CrossTalkInv(const std::vector<int>&  Q, const float x1=0.10, const float x2=0.04, bool way=true,float threshold=20,float thresholdSat=25);
 
-void LoadDeDxCalibration(std::unordered_map<unsigned int,double>& TrackerGains, string path){
-   TChain* t1 = new TChain("SiStripCalib/APVGain");
-   t1->Add(path.c_str());
+void LoadDeDxCalibration(std::unordered_map<unsigned int,double>& TrackerGains, string path, TFile* gainsFile){
+   TTree* t1 = (TTree*) GetObjectFromPath (gainsFile, path);
 
    unsigned int  tree_DetId;   t1->SetBranchAddress("DetId"             ,&tree_DetId      );
    unsigned char tree_APVId;   t1->SetBranchAddress("APVId"             ,&tree_APVId      );
    double        tree_Gain;    t1->SetBranchAddress("Gain"              ,&tree_Gain       );
-   double        tree_PrevGain;t1->SetBranchAddress("PrevGain"          ,&tree_PrevGain   );
 
    TrackerGains.clear();
    for (unsigned int ientry = 0; ientry < t1->GetEntries(); ientry++) {
        t1->GetEntry(ientry);
-       TrackerGains[tree_DetId<<3 | tree_APVId] = tree_Gain / tree_PrevGain;
+       TrackerGains[tree_DetId<<3 | tree_APVId] = tree_Gain;
    }
-   delete t1;
 }
-
-
 
 TH3F* loadDeDxTemplate(string path, bool splitByModuleType){
    TFile* InputFile = new TFile(path.c_str());
