@@ -107,7 +107,7 @@ TH3F* dEdxTemplates = NULL;
 dedxGainCorrector trackerCorrector;
 double dEdxSF [2] = {
    1.00000,   // [0]  unchanged
-   1.21836    // [1]  Pixel data to SiStrip data
+   1.30875    // [1]  Pixel data to SiStrip data
 };
 
 
@@ -986,11 +986,11 @@ std::cout<<"D\n";
 
       if(isData){ 
          dEdxSF [0] = 1.00000;
-         dEdxSF [1] = 1.21836;
+         dEdxSF [1] = 1.29298;
          dEdxTemplates = loadDeDxTemplate("../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
       }else{  
-         dEdxSF [0] = 1.09708;
-         dEdxSF [1] = 1.01875;
+         dEdxSF [0] = 1.07834;
+         dEdxSF [1] = 1.06162;
          dEdxTemplates = loadDeDxTemplate("../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
       }
 

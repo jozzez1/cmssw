@@ -31,11 +31,12 @@ using namespace std;
 
 void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix);
 void ExtractConstants(TH2D* input, int FileIndex=0);
-void CompareDeDx (TFile* InputFile1, string SaveDir, string SaveName, string ObjName1="harm2_SO", string ObjName2="harm2_SO_in");
-void CompareMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString);
-void CompareMIPs2 (TFile* InputFile, string SaveDir, string Prefix, string dEdxString);
-void ShortMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString);
-void DrawPreliminary (void);
+void CompareDeDx (TFile* InputFile1, string SaveDir, string SaveName, string ObjName1="harm2_SO", string ObjName2="harm2_SO_in", uint8_t extraStringMode = 0);
+void CompareMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode=0);
+void CompareMIPs2 (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode=0);
+void ShortMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode=0);
+void DrawPreliminary (uint8_t extraStringMode = 0);
+void SystStudy(TH2D* input, TH2D* input2, string SaveDir, string SaveName, string SaveName2, string ObjName, uint8_t extraStringMode=0);
 void MakeMapPlots(TH3F* Charge_Vs_Path3D, string ObjName, string SaveDir, string Prefix);
 void MakeROCPlot (TFile* InputFile1, TFile* InputFile2, vector<string> ObjNames, vector<string> LegendLabels, vector<Color_t> Colors, string SaveDir, string suffix="", bool WithErrorBars=false);
 void MakeROCGeneral (TFile* InputFile1, TFile* InputFile2, vector<string> HistoNames, vector<string> LegendLabels, vector<Color_t> Colors, string SaveDir, string suffix, bool WithErrorBarse=false, bool Every2ndIsDashed=false);
@@ -73,19 +74,27 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 {
    size_t firstToken = INPUT.find_first_of ("_"),
           lastToken  = INPUT.find_first_of (".") - firstToken;
-   string SaveName (INPUT, firstToken, lastToken),
+   string SaveName (INPUT, firstToken+1, lastToken-1),
           SaveName2 ("");
    if (INPUT2 != "EMPTY"){
       firstToken = INPUT2.find_first_of ("_");
       lastToken  = INPUT2.find_first_of (".") - firstToken;
-      SaveName2  = INPUT2.substr (firstToken, lastToken);
+      SaveName2  = INPUT2.substr (firstToken+1, lastToken-1);
    }
 
-   string SaveDir ("pictures" + SaveName + SaveName2 + "/");
+   uint8_t extraStringMode1 = INPUT.find("MC")!=string::npos?2:1,
+           extraStringMode2 = 0,
+           extraStringMode3 = extraStringMode1;
+   if (INPUT2 != "EMPTY") {
+      extraStringMode2 = INPUT2.find("MC")!=string::npos?2:1;
+      extraStringMode3 = 0;
+   }
+
+   string SaveDir ("pictures_" + SaveName +"_"+ SaveName2 + "/");
    system(("mkdir -p " + SaveDir).c_str());
    system("mkdir -p fit");
 
-   string SaveSuffix = INPUT2=="EMPTY" ? "" : SaveName;
+   string SaveSuffix = INPUT2=="EMPTY" ? "" : "_"+SaveName;
 
    setTDRStyle();
    gStyle->SetPadTopMargin   (0.06);
@@ -146,49 +155,40 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
 
    std::vector<string> ObjName;
-   ObjName.push_back("hit_SP");
-   ObjName.push_back("hit_SP_in_noC");
-   ObjName.push_back("hit_SP_in_noC_CCC");
-   ObjName.push_back("hit_SP_in_noC_CI");
-   ObjName.push_back("hit_SP_in_noC_CC");
-   ObjName.push_back("harm2_SO");
-   ObjName.push_back("harm2_SO_in");
-   ObjName.push_back("harm2_SO_in_noC");
-   ObjName.push_back("harm2_SP");
-   ObjName.push_back("harm2_SP_in");
-   ObjName.push_back("harm2_SP_in_noC");
-   ObjName.push_back("harm2_SP_in_noC_CI");
-   ObjName.push_back("harm2_SP_in_noC_CC");
+//   ObjName.push_back("hit_SP");
+//   ObjName.push_back("hit_SP_in_noC");
+//   ObjName.push_back("hit_SP_in_noC_CI");
+//   ObjName.push_back("hit_SP_in_noC_CC");
+//   ObjName.push_back("hit_SP_in_noC_CCC");
+//   ObjName.push_back("harm2_SO");
+//   ObjName.push_back("harm2_SO_in");
+//   ObjName.push_back("harm2_SO_in_noC");
+//   ObjName.push_back("harm2_SP");
+//   ObjName.push_back("harm2_SP_in");
+//   ObjName.push_back("harm2_SP_in_noC");
+//   ObjName.push_back("harm2_SP_in_noC_CI");
+//   ObjName.push_back("harm2_SP_in_noC_CC");
    ObjName.push_back("harm2_SP_in_noC_CCC");
-   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
-   ObjName.push_back("Ias_PO");
-   ObjName.push_back("Ias_SO_inc");
-   ObjName.push_back("Ias_SO");
-   ObjName.push_back("Ias_SO_in");
-   ObjName.push_back("Ias_SO_in_noC");
-   ObjName.push_back("Ias_SO_in_noC_CI");
-   ObjName.push_back("Ias_SO_in_noC_CC");
+//   ObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
+//   ObjName.push_back("Ias_PO");
+//   ObjName.push_back("Ias_SO_inc");
+//   ObjName.push_back("Ias_SO");
+//   ObjName.push_back("Ias_SO_in");
+//   ObjName.push_back("Ias_SO_in_noC");
+//   ObjName.push_back("Ias_SO_in_noC_CI");
+//   ObjName.push_back("Ias_SO_in_noC_CC");
    ObjName.push_back("Ias_SO_in_noC_CCC");
-   ObjName.push_back("Ias_SP_inc");
-   ObjName.push_back("Ias_SP");
-   ObjName.push_back("Ias_SP_in");
-   ObjName.push_back("Ias_SP_in_noC");
-   ObjName.push_back("Ias_SP_in_noC_CI");
-   ObjName.push_back("Ias_SP_in_noC_CC");
+//   ObjName.push_back("Ias_SP_inc");
+//   ObjName.push_back("Ias_SP");
+//   ObjName.push_back("Ias_SP_in");
+//   ObjName.push_back("Ias_SP_in_noC");
+//   ObjName.push_back("Ias_SP_in_noC_CI");
+//   ObjName.push_back("Ias_SP_in_noC_CC");
    ObjName.push_back("Ias_SP_in_noC_CCC");
 
-   TPaveText* T = new TPaveText(0.05, 0.995, 0.95, 0.945, "NDC");
-   T->SetTextFont(43);  //give the font size in pixel (instead of fraction)
-   T->SetTextSize(21);  //font size
-   T->SetBorderSize(0);
-   T->SetFillColor(0);
-   T->SetFillStyle(0);
-   T->SetTextAlign(22);
-   T->AddText("#bf{CMS} Preliminary   -   2.74 pb^{-1}   -    #sqrt{s} = 13 TeV");
-
    ofstream ExtractConstantsReport, ExtractConstantsReport2;
-   ExtractConstantsReport.open ((SaveDir + "ConstantsReport" + SaveName + ".txt").c_str(), ofstream::out);
-   if (InputFile2) ExtractConstantsReport2.open ((SaveDir + "ConstantsReport" + SaveName2 + ".txt").c_str(), ofstream::out);
+   ExtractConstantsReport.open ((SaveDir + "ConstantsReport_" + SaveName + ".txt").c_str(), ofstream::out);
+   if (InputFile2) ExtractConstantsReport2.open ((SaveDir + "ConstantsReport_" + SaveName2 + ".txt").c_str(), ofstream::out);
 
    for(unsigned int i=0;i<ObjName.size();i++){
       TH3F*       dEdxTemplate       = (TH3F*)      GetObjectFromPath(InputFile, (ObjName[i] + "_ChargeVsPath"      ).c_str() );
@@ -196,6 +196,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       TH1D*       HdedxMIP_U         = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_MIP_U"             ).c_str() );
       TH1D*       HMass              = (TH1D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Mass"              ).c_str() );
       TH2D*       HdedxVsP           = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsP"           ).c_str() );
+      TH2D*       HdedxVsPSyst       = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_dedxVsPSyst"       ).c_str() );
       TProfile*   HdedxVsPProfile    = (TProfile*)  GetObjectFromPath(InputFile, (ObjName[i] + "_Profile"           ).c_str() );
       TH2D*       HdedxVsEta         = (TH2D*)      GetObjectFromPath(InputFile, (ObjName[i] + "_Eta2D"             ).c_str() );
       TProfile*   HdedxVsEtaProfile  = (TProfile*)  GetObjectFromPath(InputFile, (ObjName[i] + "_Eta"               ).c_str() );
@@ -204,6 +205,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       TH1D*       HdedxMIP2_U        = NULL;
       TH1D*       HMass2             = NULL;
       TH2D*       HdedxVsP2          = NULL;
+      TH2D*       HdedxVsPSyst2      = NULL;
       TProfile*   HdedxVsPProfile2   = NULL;
       TH2D*       HdedxVsEta2        = NULL;
       TProfile*   HdedxVsEtaProfile2 = NULL;
@@ -214,6 +216,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          HdedxMIP2_U        = (TH1D*)      GetObjectFromPath(InputFile2, (ObjName[i] + "_MIP_U"         ).c_str() );
          HMass2             = (TH1D*)      GetObjectFromPath(InputFile2, (ObjName[i] + "_Mass"          ).c_str() );
          HdedxVsP2          = (TH2D*)      GetObjectFromPath(InputFile2, (ObjName[i] + "_dedxVsP"       ).c_str() );
+         HdedxVsPSyst2      = (TH2D*)      GetObjectFromPath(InputFile2, (ObjName[i] + "_dedxVsPSyst"   ).c_str() );
          HdedxVsPProfile2   = (TProfile*)  GetObjectFromPath(InputFile2, (ObjName[i] + "_Profile"       ).c_str() );
          HdedxVsEta2        = (TH2D*)      GetObjectFromPath(InputFile2, (ObjName[i] + "_Eta2D"         ).c_str() );
          HdedxVsEtaProfile2 = (TProfile*)  GetObjectFromPath(InputFile2, (ObjName[i] + "_Eta"           ).c_str() );
@@ -221,7 +224,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
       if (ObjName[i].find("hit_SP")!=string::npos){
          dEdxTemplate->SetName("Charge_Vs_Path");
-         dEdxTemplate->SaveAs (("dEdxTemplate_" + ObjName[i] + SaveName + ".root").c_str());
+         dEdxTemplate->SaveAs (("dEdxTemplate_" + ObjName[i] + "_" + SaveName + ".root").c_str());
          MakeMapPlots (dEdxTemplate, ObjName[i], SaveDir, "Map" + SaveName);
          TH1D* hit_MIP = (TH1D*) GetObjectFromPath (InputFile, (ObjName[i]+"_Hit").c_str());
 
@@ -231,8 +234,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          hit_MIP->GetXaxis()->SetTitle("cluster dE/dx");
          hit_MIP->GetYaxis()->SetTitle("number of hits");
          hit_MIP->Draw("hist");
-         T->Draw("same");
-         SaveCanvas (c1, SaveDir, ObjName[i]+SaveName+"_Hit");
+         DrawPreliminary(extraStringMode1);
+         SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveName+"_Hit");
          delete c1;
 
          // all the other graphs -- Charge_Vs_XYNLetc.
@@ -249,7 +252,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             Charge_Vs_XYH->SetAxisRange (-7,7,"X");
             Charge_Vs_XYH->SetAxisRange (-15,15,"Y");
             Charge_Vs_XYH->Draw("COLZ");
-            T->Draw("same");
+            DrawPreliminary (extraStringMode1);
             SaveCanvas (c1, SaveDir, ObjName[i]+SaveSuffix+"_ChargeVsXYH"+string(Id), true);
             delete c1;
 
@@ -260,7 +263,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             Charge_Vs_XYHN->SetAxisRange (-1.5,1.5,"X");
             Charge_Vs_XYHN->SetAxisRange (-1.5,1.5,"Y");
             Charge_Vs_XYHN->Draw("COLZ");
-            T->Draw("same");
+            DrawPreliminary (extraStringMode1);
             SaveCanvas (c1, SaveDir, ObjName[i]+SaveSuffix+"_ChargeVsXYHN"+string(Id), true);
             delete c1;
 
@@ -271,15 +274,15 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             Charge_Vs_XYLN->SetAxisRange (-1.5,1.5,"X");
             Charge_Vs_XYLN->SetAxisRange (-1.5,1.5,"Y");
             Charge_Vs_XYLN->Draw("COLZ");
-            T->Draw("same");
+            DrawPreliminary (extraStringMode1);
             SaveCanvas (c1, SaveDir, ObjName[i]+SaveSuffix+"_ChargeVsXYLN"+string(Id), true);
             delete c1;
          }
 
          if (InputFile2){
             dEdxTemplate2->SetName("Charge_Vs_Path");
-            dEdxTemplate2->SaveAs (("dEdxTemplate_" + ObjName[i] + SaveName2 + ".root").c_str());
-            MakeMapPlots (dEdxTemplate2, ObjName[i], SaveDir, "Map" + SaveName2);
+            dEdxTemplate2->SaveAs (("dEdxTemplate_" + ObjName[i] +"_"+ SaveName2 + ".root").c_str());
+            MakeMapPlots (dEdxTemplate2, ObjName[i], SaveDir, "Map_"+ SaveName2);
             TH1D* hit_MIP2 = (TH1D*) GetObjectFromPath (InputFile2, (ObjName[i]+"_Hit").c_str());
 
             TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
@@ -288,8 +291,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             hit_MIP2->GetXaxis()->SetTitle("cluster dE/dx");
             hit_MIP2->GetYaxis()->SetTitle("number of hits");
             hit_MIP2->Draw("hist");
-            T->Draw("same");
-            SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_Hit");
+            DrawPreliminary (extraStringMode2);
+            SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveName2+"_Hit");
             delete c1;
 
             for (unsigned int g=0;g<16;g++){
@@ -305,8 +308,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                Charge_Vs_XYH2->SetAxisRange (-7,7,"X");
                Charge_Vs_XYH2->SetAxisRange (-15,15,"Y");
                Charge_Vs_XYH2->Draw("COLZ");
-               T->Draw("same");
-               SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_ChargeVsXYH"+string(Id), true);
+               DrawPreliminary (extraStringMode2);
+               SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveName2+"_ChargeVsXYH"+string(Id), true);
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
@@ -316,8 +319,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                Charge_Vs_XYHN2->SetAxisRange (-1.5,1.5,"X");
                Charge_Vs_XYHN2->SetAxisRange (-1.5,1.5,"Y");
                Charge_Vs_XYHN2->Draw("COLZ");
-               T->Draw("same");
-               SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_ChargeVsXYHN"+string(Id), true);
+               DrawPreliminary (extraStringMode2);
+               SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveName2+"_ChargeVsXYHN"+string(Id), true);
                delete c1;
 
                c1 = new TCanvas ("c1", "c1", 600, 600);
@@ -327,8 +330,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
                Charge_Vs_XYLN2->SetAxisRange (-1.5,1.5,"X");
                Charge_Vs_XYLN2->SetAxisRange (-1.5,1.5,"Y");
                Charge_Vs_XYLN2->Draw("COLZ");
-               T->Draw("same");
-               SaveCanvas (c1, SaveDir, ObjName[i]+SaveName2+"_ChargeVsXYLN"+string(Id), true);
+               DrawPreliminary (extraStringMode2);
+               SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveName2+"_ChargeVsXYLN"+string(Id), true);
                delete c1;
             }
          }
@@ -336,10 +339,13 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          continue;
       }
 
-      ExtractConstants(HdedxVsP);
+      ExtractConstants(HdedxVsPSyst);
+//      ExtractConstants(HdedxVsP);
       ExtractConstantsReport << ObjName[i] << " ... K = " << K[0] << " +- " << Kerr[0] << "\t"
                                            << " ... C = " << C[0] << " +- " << Cerr[0] << endl;
 
+      system("rm -rf systematics && mkdir systematics");
+      if (!InputFile2){ SystStudy(HdedxVsPSyst, NULL, SaveDir, SaveName, "", ObjName[i], extraStringMode3); cerr << "Warning! 2nd file not found" << endl;}
 
       std::cout << "TESTA\n";
       TCanvas* c1 = new TCanvas("c1", "c1", 600,600);
@@ -356,7 +362,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       ProtonLine->Draw("same");
       DeuteronLine->Draw("same");
       ProtonLineFit->Draw("same");
-      T->Draw("same");
+      DrawPreliminary (extraStringMode1);
       SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_dedxVsP", true);
       delete c1;
 
@@ -367,12 +373,14 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
       HdedxVsEta->GetYaxis()->SetTitle("I_{as}");
       HdedxVsEta->SetAxisRange(-2.1,2.1,"X");
       HdedxVsEta->Draw("COLZ");
-      T->Draw("same");
+      DrawPreliminary (extraStringMode1);
       SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_Eta2D", true);
       delete c1;
 
       if (InputFile2) {
-         ExtractConstants(HdedxVsP, 1);
+         ExtractConstants(HdedxVsPSyst2, 1);
+         SystStudy(HdedxVsPSyst, HdedxVsPSyst2, SaveDir, SaveName, SaveName2, ObjName[i], extraStringMode3);
+//         ExtractConstants(HdedxVsP2, 1);
          ExtractConstantsReport2 << ObjName[i] << " ... K = " << K[1] << " +- " << Kerr[1] << "\t"
                                                << " ... C = " << C[1] << " +- " << Cerr[1] << endl;
 
@@ -416,8 +424,8 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          DeuteronLine2->Draw("same");
 //         TritonLine->Draw("same");
          ProtonLineFit2->Draw("same");
-         T->Draw("same");
-         SaveCanvas(c1, SaveDir, ObjName[i] + SaveName2 + "_dedxVsP", true);
+         DrawPreliminary (extraStringMode2);
+         SaveCanvas(c1, SaveDir, ObjName[i] +"_"+ SaveName2 + "_dedxVsP", true);
          delete c1;
 
          c1 = new TCanvas("c1", "c1", 600,600);
@@ -427,14 +435,14 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          HdedxVsEta2->GetYaxis()->SetTitle("I_{as}");
          HdedxVsEta2->SetAxisRange(-2.1,2.1,"X");
          HdedxVsEta2->Draw("COLZ");
-         T->Draw("same");
-         SaveCanvas(c1, SaveDir, ObjName[i] + SaveName2 + "_Eta2D", true);
+         DrawPreliminary (extraStringMode2);
+         SaveCanvas(c1, SaveDir, ObjName[i] +"_"+ SaveName2 + "_Eta2D", true);
          delete c1;
       }
 
       std::cout << "TESTB\n";
 
-      SaveSuffix = InputFile2 ? SaveName + SaveName2 : "" ;
+      SaveSuffix = InputFile2 ? "_"+SaveName +"_"+ SaveName2 : "" ;
 
       c1 = new TCanvas("c1", "c1", 600,600);
       TLegend* leg = new TLegend (0.50, 0.80, 0.80, 0.90);
@@ -458,7 +466,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          leg->AddEntry (HdedxVsPProfile2, SaveName2.c_str(), "LP");
          leg->Draw();
       }
-      T->Draw("same");
+      DrawPreliminary (extraStringMode3);
       SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_Profile");
       delete leg;
       delete c1;
@@ -485,7 +493,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          leg->AddEntry (HdedxVsEtaProfile2, SaveName2.c_str(), "LP");
          leg->Draw();
       }
-      T->Draw("same");
+      DrawPreliminary (extraStringMode3);
       SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_HdedxVsEtaProfile");
       delete leg;
       delete c1;
@@ -515,7 +523,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          leg->AddEntry (HdedxMIP2, SaveName2.c_str(), "L");
          leg->Draw();
       }
-      T->Draw("same");
+      DrawPreliminary (extraStringMode3);
       SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_MIP");
       delete leg;
       delete c1;
@@ -543,7 +551,7 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
          HdedxMIP_U->Draw("hist");
          HdedxMIP2_U->Draw("same");
          leg->Draw();
-         T->Draw("same");
+         DrawPreliminary (extraStringMode3);
          SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix + "_MIP_U");
          delete leg;
          delete c1;
@@ -616,59 +624,59 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
             lineKaon->Draw("same");
             lineProton->Draw("same");
             lineDeuteron->Draw("same");
-            T->Draw("same");
+            DrawPreliminary (extraStringMode3);
             SaveCanvas(c1, SaveDir, ObjName[i] + SaveSuffix +  "_Mass");
             delete leg;
             delete c1;
       } else continue;
       
    }
-   CompareDeDx (InputFile, SaveDir, SaveName, "harm2_PO_raw" , "harm2_SO");
-   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_inc"   , "Ias_SO");
-   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO"       , "Ias_SO_in");
-   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_in"    , "Ias_SP_in_noC");
-   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_in_noC", "Ias_SP_in_noC");
-   CompareDeDx (InputFile, SaveDir, SaveName, "hit_SP"       , "hit_SP_in_noC");
+   CompareDeDx (InputFile, SaveDir, SaveName, "harm2_PO_raw" , "harm2_SO", extraStringMode1);
+   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_inc"   , "Ias_SO", extraStringMode1);
+   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO"       , "Ias_SO_in", extraStringMode1);
+   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_in"    , "Ias_SP_in_noC", extraStringMode1);
+   CompareDeDx (InputFile, SaveDir, SaveName, "Ias_SO_in_noC", "Ias_SP_in_noC", extraStringMode1);
+   CompareDeDx (InputFile, SaveDir, SaveName, "hit_SP"       , "hit_SP_in_noC", extraStringMode1);
 
-   CompareMIPs (InputFile, SaveDir, SaveName, "Ias_SP");
-   CompareMIPs (InputFile, SaveDir, SaveName, "Ias_SO");
-   CompareMIPs (InputFile, SaveDir, SaveName, "harm2_SO");
-   CompareMIPs (InputFile, SaveDir, SaveName, "harm2_SP");
+   CompareMIPs (InputFile, SaveDir, SaveName, "Ias_SP", extraStringMode1);
+   CompareMIPs (InputFile, SaveDir, SaveName, "Ias_SO", extraStringMode1);
+   CompareMIPs (InputFile, SaveDir, SaveName, "harm2_SO", extraStringMode1);
+   CompareMIPs (InputFile, SaveDir, SaveName, "harm2_SP", extraStringMode1);
 
-   CompareMIPs2 (InputFile, SaveDir, SaveName, "Ias_SP");
-   CompareMIPs2 (InputFile, SaveDir, SaveName, "Ias_SO");
-   CompareMIPs2 (InputFile, SaveDir, SaveName, "harm2_SO");
-   CompareMIPs2 (InputFile, SaveDir, SaveName, "harm2_SP");
+   CompareMIPs2 (InputFile, SaveDir, SaveName, "Ias_SP", extraStringMode1);
+   CompareMIPs2 (InputFile, SaveDir, SaveName, "Ias_SO", extraStringMode1);
+   CompareMIPs2 (InputFile, SaveDir, SaveName, "harm2_SO", extraStringMode1);
+   CompareMIPs2 (InputFile, SaveDir, SaveName, "harm2_SP", extraStringMode1);
 
-   CompareMIPs2 (InputFile, SaveDir, SaveName, "hit_SP");
+   CompareMIPs2 (InputFile, SaveDir, SaveName, "hit_SP", extraStringMode1);
 
-   ShortMIPs (InputFile, SaveDir, SaveName, "harm2_SP");
-   ShortMIPs (InputFile, SaveDir, SaveName, "Ias_SP");
+   ShortMIPs (InputFile, SaveDir, SaveName, "harm2_SP", extraStringMode1);
+   ShortMIPs (InputFile, SaveDir, SaveName, "Ias_SP", extraStringMode1);
    ExtractConstantsReport.close();
 
    if (InputFile2) {
       ExtractConstantsReport2.close();
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_PO_raw" , "harm2_SO");
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_inc"   , "Ias_SO");
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO"       , "Ias_SO_in");
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_in"    , "Ias_SP_in_noC");
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_in_noC", "Ias_SP_in_noC");
-      CompareDeDx (InputFile2, SaveDir, SaveName2, "hit_SP"       , "hit_SP_in_noC");
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "harm2_PO_raw" , "harm2_SO", extraStringMode2);
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_inc"   , "Ias_SO", extraStringMode2);
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO"       , "Ias_SO_in", extraStringMode2);
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_in"    , "Ias_SP_in_noC", extraStringMode2);
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "Ias_SO_in_noC", "Ias_SP_in_noC", extraStringMode2);
+      CompareDeDx (InputFile2, SaveDir, SaveName2, "hit_SP"       , "hit_SP_in_noC", extraStringMode2);
 
-      CompareMIPs (InputFile2, SaveDir, SaveName2, "Ias_SP");
-      CompareMIPs (InputFile2, SaveDir, SaveName2, "Ias_SO");
-      CompareMIPs (InputFile2, SaveDir, SaveName2, "harm2_SO");
-      CompareMIPs (InputFile2, SaveDir, SaveName2, "harm2_SP");
+      CompareMIPs (InputFile2, SaveDir, SaveName2, "Ias_SP", extraStringMode2);
+      CompareMIPs (InputFile2, SaveDir, SaveName2, "Ias_SO", extraStringMode2);
+      CompareMIPs (InputFile2, SaveDir, SaveName2, "harm2_SO", extraStringMode2);
+      CompareMIPs (InputFile2, SaveDir, SaveName2, "harm2_SP", extraStringMode2);
 
-      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "Ias_SP");
-      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "Ias_SO");
-      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "harm2_SO");
-      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "harm2_SP");
+      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "Ias_SP", extraStringMode2);
+      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "Ias_SO", extraStringMode2);
+      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "harm2_SO", extraStringMode2);
+      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "harm2_SP", extraStringMode2);
 
-      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "hit_SP");
+      CompareMIPs2 (InputFile2, SaveDir, SaveName2, "hit_SP", extraStringMode2);
 
-      ShortMIPs (InputFile2, SaveDir, SaveName2, "harm2_SP");
-      ShortMIPs (InputFile2, SaveDir, SaveName2, "Ias_SP");
+      ShortMIPs (InputFile2, SaveDir, SaveName2, "harm2_SP", extraStringMode2);
+      ShortMIPs (InputFile2, SaveDir, SaveName2, "Ias_SP", extraStringMode2);
 
       // ROC curves for short tracks
       vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
@@ -791,10 +799,10 @@ void MakePlot(string INPUT, string INPUT2="EMPTY")
 
    std::cout << "TESTD\n";
 
-   getScaleFactor(InputFile, NULL, "harm2_SO", "harm2_PO_raw", SaveDir, SaveName); // shift PO_raw to SO for File1
+   getScaleFactor(InputFile, NULL, "harm2_SO_in_noC_CCC", "harm2_PO_raw", SaveDir, SaveName); // shift PO_raw to SO for File1
    if (InputFile2) {
-      getScaleFactor(InputFile, InputFile2, "harm2_SO", "", SaveDir, SaveName+SaveName2); // shift File2 to File1
-      getScaleFactor(InputFile2, NULL, "harm2_SO", "harm2_PO_raw", SaveDir, SaveName2);   // shift PO_raw to SO for File2
+      getScaleFactor(InputFile, InputFile2, "harm2_SO_in_noC_CCC", "", SaveDir, SaveName+SaveName2); // shift File2 to File1
+      getScaleFactor(InputFile2, NULL, "harm2_SO_in_noC_CCC", "harm2_PO_raw", SaveDir, SaveName2);   // shift PO_raw to SO for File2
    }
 }
 
@@ -886,7 +894,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    leg->AddEntry (HdedxMIP2, "unscaled MC", "L");
    leg->AddEntry (HdedxMIP4, "scaled   MC", "L");
    leg->Draw();
-   SaveCanvas(c1, SaveDir, "Rescale"+Prefix+"_"+ObjName1+ObjName2 + "_MIP");
+   SaveCanvas(c1, SaveDir, "Rescale_"+Prefix+"_"+ObjName1+ObjName2 + "_MIP");
    delete c1;
 
 
@@ -898,7 +906,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    Chi2Dist->Draw("");
    c1->SetLogy(true);
    c1->SetGridx(true); 
-   SaveCanvas(c1, SaveDir, "Rescale"+Prefix+"_"+ObjName1+ObjName2 + "_Dist");
+   SaveCanvas(c1, SaveDir, "Rescale_"+Prefix+"_"+ObjName1+ObjName2 + "_Dist");
    delete c1;
 
    c1 = new TCanvas("c1", "c1", 600,600);
@@ -931,7 +939,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    leg->Draw();
 
    DrawPreliminary();
-   SaveCanvas(c1, SaveDir, "Rescale"+Prefix+"_"+ObjName1+ObjName2 + "_Profile");
+   SaveCanvas(c1, SaveDir, "Rescale_"+Prefix+"_"+ObjName1+ObjName2 + "_Profile");
    delete c1;
 }
 
@@ -1083,7 +1091,397 @@ void ExtractConstants(TH2D* input, int FileIndex){
        }
 }
 
-void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjName1, string ObjName2){
+
+void SystStudy(TH2D* input, TH2D* input2, string SaveDir, string SaveName, string SaveName2, string ObjName, uint8_t extraStringMode){
+      double MinRange = 0.60;
+      double MaxRange = 1.30;
+      char buffer[2048];
+      bool hasConverged = false;
+
+      TH2D* inputnew = (TH2D*)input->Clone("tempTH2D");
+      TH2D* inputnew2 = NULL;
+
+      inputnew->Rebin2D(3,10);
+      bool isEstim = !(ObjName.find("Ias")!=string::npos);
+      for(int x=1;x<=inputnew->GetNbinsX();x++){
+      for(int y=1;y<=inputnew->GetNbinsY();y++){
+	      double Mass = GetMass(inputnew->GetXaxis()->GetBinCenter(x),inputnew->GetYaxis()->GetBinCenter(y));
+	      if (Mass < 0.938-0.15 || Mass > 0.938+0.15) inputnew->SetBinContent (x,y,0);
+//	      if(isnan(float(Mass)) || Mass<0.938-0.10 || Mass>0.938+0.10)inputnew->SetBinContent(x,y,0);
+      }}
+
+
+      double* means   = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+      double* sigmas  = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+      double* momenta = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+
+      double* means_err   = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+      double* sigmas_err  = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+      double* momenta_err = new double [inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange)];
+
+      double* means2   = NULL;
+      double* sigmas2  = NULL;
+      double* momenta2 = NULL;
+
+      double* means_err2   = NULL;
+      double* sigmas_err2  = NULL;
+
+      double* ratio_means     = NULL;
+      double* ratio_means_err = NULL;
+
+      double* ratio_sigmas     = NULL;
+      double* ratio_sigmas_err = NULL;
+
+//      inputnew->SetStats(kFALSE);
+//      inputnew->GetXaxis()->SetTitle("track momentum (GeV/c)");
+//      inputnew->GetYaxis()->SetTitle(isEstim?"dE/dx (MeV/cm)":"I_{as}");
+//      inputnew->SetAxisRange(0,5,"X");
+//      inputnew->SetAxisRange(0,isEstim?15:1.0,"Y");
+
+      for(int x=inputnew->GetXaxis()->FindBin(MinRange); x<inputnew->GetXaxis()->FindBin(MaxRange); x++){
+         double P       = inputnew->GetXaxis()->GetBinCenter(x);
+
+         TH1D* Projection = (TH1D*)(inputnew->ProjectionY("proj",x,x))->Clone();
+         if(Projection->Integral()<100)continue;
+         Projection->SetAxisRange(0.1,isEstim?25:2,"X");
+         Projection->Sumw2();
+         Projection->Scale(1.0/Projection->Integral());
+         
+         TF1* mygaus = new TF1("mygaus","gaus", isEstim?2.5:0, isEstim?15:1);
+         Projection->Fit("mygaus","Q0 RME");
+         double chiFromFit  = (mygaus->GetChisquare())/(mygaus->GetNDF());
+
+         means  [x - inputnew->GetXaxis()->FindBin(MinRange)] = mygaus->GetParameter(1);
+         sigmas [x - inputnew->GetXaxis()->FindBin(MinRange)] = mygaus->GetParameter(2);
+         momenta[x - inputnew->GetXaxis()->FindBin(MinRange)] = P;
+
+         means_err  [x - inputnew->GetXaxis()->FindBin(MinRange)] = mygaus->GetParError(1);
+         sigmas_err [x - inputnew->GetXaxis()->FindBin(MinRange)] = mygaus->GetParError(2);
+         momenta_err[x - inputnew->GetXaxis()->FindBin(MinRange)] = 0.06;
+         
+         cerr << "means      = " << means      [x - inputnew->GetXaxis()->FindBin(MinRange)] << endl;
+         cerr << "sigmas     = " << sigmas     [x - inputnew->GetXaxis()->FindBin(MinRange)] << endl;
+         cerr << "momenta    = " << momenta    [x - inputnew->GetXaxis()->FindBin(MinRange)] << endl;
+         cerr << "means_err  = " << means_err  [x - inputnew->GetXaxis()->FindBin(MinRange)] << endl;
+         cerr << "sigmas_err = " << sigmas_err [x - inputnew->GetXaxis()->FindBin(MinRange)] << endl;
+         cerr << "r-chi2     = " << chiFromFit << endl;
+         cerr << "---------------------------" << endl;
+
+         TCanvas* c1  = new TCanvas("canvas", "canvas", 600,600);
+         Projection->Draw();
+         Projection->SetTitle ("");
+         Projection->SetStats(0);
+         Projection->GetXaxis()->SetTitle(isEstim?"dE/dx estimator (MeV/cm)":"Ias discriminator");
+         Projection->GetYaxis()->SetTitle("#Entries");
+         Projection->GetYaxis()->SetTitleOffset(1.30);
+         Projection->SetAxisRange(1E-5,1.0, "Y");
+         mygaus->Draw("same");
+         char momentumP [20]; sprintf (momentumP, "%d", (int) (100*P));
+         SaveCanvas (c1, "systematics/", "Syst_"+SaveName+"_"+ObjName+"_"+string(momentumP));
+
+         delete c1;
+         delete Projection;
+         delete mygaus;
+      }
+
+
+      if (input2){
+         inputnew2 = (TH2D*)input2->Clone("temp2TH2D");
+
+         inputnew2->Rebin2D(3,10);
+         for(int x=1;x<=inputnew2->GetNbinsX();x++){
+         for(int y=1;y<=inputnew2->GetNbinsY();y++){
+   	      double Mass = GetMass(inputnew2->GetXaxis()->GetBinCenter(x),inputnew2->GetYaxis()->GetBinCenter(y));
+   	      if (Mass < 0.938-0.15 || Mass > 0.938+0.15) inputnew2->SetBinContent (x,y,0);
+         }}
+
+         means2   = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         sigmas2  = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         momenta2 = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+
+         means_err2   = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         sigmas_err2  = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+
+         ratio_means      = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         ratio_means_err  = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+
+         ratio_sigmas      = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         ratio_sigmas_err  = new double [inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange)];
+         for(int x=inputnew2->GetXaxis()->FindBin(MinRange); x<inputnew2->GetXaxis()->FindBin(MaxRange); x++){
+            double P       = inputnew2->GetXaxis()->GetBinCenter(x);
+
+            TH1D* Projection = (TH1D*)(inputnew2->ProjectionY("proj",x,x))->Clone();
+            if(Projection->Integral()<100)continue;
+            Projection->SetAxisRange(0.1,isEstim?25:2,"X");
+            Projection->Sumw2();
+            Projection->Scale(1.0/Projection->Integral());
+         
+            TF1* mygaus = new TF1("mygaus","gaus", isEstim?2.5:0, isEstim?15:1);
+            Projection->Fit("mygaus","Q0 RME");
+            double chiFromFit  = (mygaus->GetChisquare())/(mygaus->GetNDF());
+
+            means2  [x - inputnew2->GetXaxis()->FindBin(MinRange)] = mygaus->GetParameter(1);
+            sigmas2 [x - inputnew2->GetXaxis()->FindBin(MinRange)] = mygaus->GetParameter(2);
+            momenta2[x - inputnew2->GetXaxis()->FindBin(MinRange)] = P;
+
+            means_err2  [x - inputnew2->GetXaxis()->FindBin(MinRange)] = mygaus->GetParError(1);
+            sigmas_err2 [x - inputnew2->GetXaxis()->FindBin(MinRange)] = mygaus->GetParError(2);
+
+	    
+            ratio_means     [x - inputnew2->GetXaxis()->FindBin(MinRange)] =
+               mygaus->GetParameter(1) / means [x - inputnew2->GetXaxis()->FindBin(MinRange)];
+
+            ratio_means_err [x - inputnew2->GetXaxis()->FindBin(MinRange)] =
+               ratio_means [x - inputnew2->GetXaxis()->FindBin(MinRange)] *
+               sqrt(
+                     pow (means_err2[x - inputnew2->GetXaxis()->FindBin(MinRange)] / mygaus->GetParameter(1),2) +
+                     pow (means_err[x - inputnew2->GetXaxis()->FindBin(MinRange)] / means [x - inputnew2->GetXaxis()->FindBin(MinRange)], 2)
+                  );
+
+            ratio_sigmas     [x - inputnew2->GetXaxis()->FindBin(MinRange)] =
+               mygaus->GetParameter(2) / sigmas [x - inputnew2->GetXaxis()->FindBin(MinRange)];
+
+            ratio_sigmas_err [x - inputnew2->GetXaxis()->FindBin(MinRange)] =
+               ratio_sigmas [x - inputnew2->GetXaxis()->FindBin(MinRange)] *
+               sqrt(
+                     pow (sigmas_err2[x - inputnew2->GetXaxis()->FindBin(MinRange)] / mygaus->GetParameter(2),2) +
+                     pow (sigmas_err[x - inputnew2->GetXaxis()->FindBin(MinRange)] / sigmas [x - inputnew2->GetXaxis()->FindBin(MinRange)], 2)
+                  );
+/*
+            ratio_sigmas     [x - inputnew2->GetXaxis()->FindBin(MinRange)] = sigmas2 [x - inputnew2->GetXaxis()->FindBin(MinRange)] / sigmas [x - inputnew2->GetXaxis()->FindBin(MinRange)];
+            ratio_sigmas_err [x - inputnew2->GetXaxis()->FindBin(MinRange)] = ratio_sigmas [x - inputnew2->GetXaxis()->FindBin(MinRange)] / sqrt(pow(sigmas2[x - inputnew2->GetXaxis()->FindBin(MinRange)] / sigmas_err2[x - inputnew2->GetXaxis()->FindBin(MinRange)],2) + pow (sigmas[x - inputnew2->GetXaxis()->FindBin(MinRange)] / sigmas_err[x - inputnew2->GetXaxis()->FindBin(MinRange)], 2));
+*/
+            cerr << "means2     = " << means      [x - inputnew2->GetXaxis()->FindBin(MinRange)] << endl;
+            cerr << "sigmas2    = " << sigmas     [x - inputnew2->GetXaxis()->FindBin(MinRange)] << endl;
+            cerr << "momenta2   = " << momenta    [x - inputnew2->GetXaxis()->FindBin(MinRange)] << endl;
+            cerr << "means_err2 = " << means_err  [x - inputnew2->GetXaxis()->FindBin(MinRange)] << endl;
+            cerr << "sigmas_err2= " << sigmas_err [x - inputnew2->GetXaxis()->FindBin(MinRange)] << endl;
+            cerr << "r-chi22    = " << chiFromFit << endl;
+            cerr << "---------------------------" << endl;
+
+            TCanvas* c1  = new TCanvas("canvas", "canvas", 600,600);
+            Projection->Draw();
+            Projection->SetTitle ("");
+            Projection->SetStats(0);
+            Projection->GetXaxis()->SetTitle(isEstim?"dE/dx estimator (MeV/cm)":"Ias discriminator");
+            Projection->GetYaxis()->SetTitle("#Entries");
+            Projection->GetYaxis()->SetTitleOffset(1.30);
+            Projection->SetAxisRange(1E-5,1.0, "Y");
+            mygaus->Draw("same");
+            char momentumP [20]; sprintf (momentumP, "%d", (int) (100*P));
+            SaveCanvas (c1, "systematics/", "Syst_"+SaveName2+"_"+ObjName+"_"+string(momentumP));
+
+            delete c1;
+            delete Projection;
+            delete mygaus;
+         }
+
+         cerr << "Relative MC error report (%)" << endl;
+         cerr << "----------------------------" << endl;
+         for (int x=0; x<inputnew2->GetXaxis()->FindBin(MaxRange)-inputnew2->GetXaxis()->FindBin(MinRange); x++)
+           printf ("x = %d\tMC vs. Data error = %lf\n", x, (1.0 - means2[x]/means[x])*100);
+         cerr << "----------------------------" << endl;
+      }
+
+      TCanvas* c1  = new TCanvas("canvas", "canvas", 600,600);
+      TLegend* leg = new TLegend(0.50, 0.80, 0.80, 0.90);
+      TH1D h ("temp", "temp", 1, MinRange, MaxRange);
+      h.GetXaxis()->SetTitle("p [GeV/c]");
+      h.GetYaxis()->SetTitle(isEstim?"#mu (I_{h}) [MeV/cm]":"#mu (I_{as})");
+      h.GetXaxis()->SetRangeUser (0.6, 1.3);
+      h.SetAxisRange (0, isEstim?15:1.0, "Y");
+      h.GetYaxis()->SetTitleOffset(1.35);
+      h.SetStats(0);
+      h.Draw();
+      TGraphErrors* gMeans = new TGraphErrors (inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange), momenta, means, momenta_err, means_err);
+      TGraphErrors* gMeans2= NULL;
+      gMeans->SetMarkerColor (kBlack);
+      gMeans->SetLineColor (kBlack);
+      gMeans->SetMarkerStyle (20);
+      gMeans->Draw("same ELP");
+      leg->SetFillColor(0);
+      leg->SetFillStyle(0);
+      leg->SetBorderSize(0);
+      leg->AddEntry (gMeans, SaveName.c_str(), "LP");
+      if (input2){
+         gMeans2 = new TGraphErrors (inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange), momenta2, means2, momenta_err, means_err2);
+         gMeans2->SetMarkerColor (kBlue);
+         gMeans2->SetLineColor (kBlue);
+         gMeans2->SetMarkerStyle (20);
+         gMeans2->Draw("same ELP");
+         leg->AddEntry (gMeans2, SaveName2.c_str(), "LP");
+      }
+      leg->Draw();
+      DrawPreliminary(extraStringMode);
+      SaveCanvas (c1, SaveDir, "Syst_"+SaveName+"_"+SaveName2+"_"+ObjName+"_mean");
+      delete c1;
+      delete leg;
+
+      c1 = new TCanvas("canvas", "canvas", 600,600);
+      leg = new TLegend(0.50, 0.80, 0.80, 0.90);
+//      c1->SetRightMargin (1.0);
+//      c1->SetLeftMargin (1.0);
+      h.GetYaxis()->SetTitle (isEstim?"#sigma (I_{h}) [MeV/cm]":"#sigma (I_{as})");
+      h.SetAxisRange (0, isEstim?1.5:0.2, "Y");
+      h.GetXaxis()->SetRangeUser (0.6, 1.3);
+      h.Draw();
+      TGraphErrors* gSigmas = new TGraphErrors (inputnew->GetXaxis()->FindBin(MaxRange) - inputnew->GetXaxis()->FindBin(MinRange), momenta, sigmas, momenta_err, sigmas_err);
+      TGraphErrors* gSigmas2= NULL;
+      gSigmas->SetMarkerColor (kBlack);
+      gSigmas->SetMarkerStyle (20);
+      gSigmas->SetLineColor (kBlack);
+      gSigmas->Draw("same ELP");
+      leg->SetFillColor(0);
+      leg->SetFillStyle(0);
+      leg->SetBorderSize(0);
+      leg->AddEntry (gSigmas, SaveName.c_str(), "LP");
+      if (input2){
+         gSigmas2 = new TGraphErrors (inputnew2->GetXaxis()->FindBin(MaxRange) - inputnew2->GetXaxis()->FindBin(MinRange), momenta2, sigmas2, momenta_err, sigmas_err2);
+         gSigmas2->SetMarkerColor (kBlue);
+         gSigmas2->SetLineColor (kBlue);
+         gSigmas2->SetMarkerStyle (20);
+         gSigmas2->Draw("same ELP");
+         leg->AddEntry(gSigmas2, SaveName2.c_str(), "LP");
+      }
+      leg->Draw();
+      DrawPreliminary(extraStringMode);
+      SaveCanvas (c1, SaveDir, "Syst_"+SaveName+"_"+SaveName2+"_"+ObjName+"_sigma");
+
+      delete c1;
+      delete leg;
+
+      TPad* t1 = NULL;
+      TPad* t2 = NULL;
+      if (input2){ // create another 2 plots with ratio
+         // first pad
+         double upEstim, upNoEstim;
+         string labelEstim, labelNoEstim;
+         for (uint8_t plot = 0; plot < 2; plot++){
+            c1  = new TCanvas ("canvas", "canvas", 600, 600);
+            leg = new TLegend (0.50, 0.80, 0.80, 0.90);
+           leg->SetFillColor(0);
+           leg->SetFillStyle(0);
+           leg->SetBorderSize(0);
+            t1 = new TPad ("t1", "t1", 0.0, 0.20, 1.0, 1.0);
+            t1->Draw();
+            t1->cd();
+            t1->SetTopMargin(0.06);
+            h.Reset();
+            h.SetTitle("");
+            h.SetStats(0);
+            h.GetXaxis()->SetRangeUser (0.6, 1.3);
+            h.GetXaxis()->SetTitle ("p [GeV/c]");
+            if (plot == 0){
+               upEstim = 15;
+               upNoEstim = 1.0;
+               labelEstim = "#mu (I_{h}) [MeV/cm]";
+               labelNoEstim = "#mu (I_{as})";
+            } else {
+               upEstim = 1.0;
+               upNoEstim = 0.2;
+               labelEstim = "#sigma (I_{h}) [MeV/cm]";
+               labelNoEstim = "#sigma (I_{as})";
+            }
+            h.GetYaxis()->SetRangeUser (0.0, isEstim?upEstim:upNoEstim);
+            h.GetYaxis()->SetTitle (isEstim?labelEstim.c_str():labelNoEstim.c_str());
+            h.Draw();
+
+            if (plot == 0){
+               gMeans->Draw("same ELP");
+               gMeans2->Draw("same ELP");
+
+               leg->AddEntry (gMeans,  SaveName .c_str(), "LP");
+               leg->AddEntry (gMeans2, SaveName2.c_str(), "LP");
+            } else {
+               gSigmas->Draw("same ELP");
+               gSigmas2->Draw("same ELP");
+
+               leg->AddEntry (gSigmas,  SaveName .c_str(), "LP");
+               leg->AddEntry (gSigmas2, SaveName2.c_str(), "LP");
+            }
+            leg->Draw();
+            DrawPreliminary();
+
+            // now the 2nd pad
+	    c1->cd();
+            t2 = new TPad ("t2", "t2", 0.0, 0.0, 1.0, 0.2);
+            t2->Draw();
+            t2->cd();
+            t2->SetGridy(true);
+            t2->SetPad(0.0, 0.0, 1.0, 0.2);
+            t2->SetTopMargin(0);
+            t2->SetBottomMargin(0.5);
+
+            TH1D h2 ("temp2", "temp2", 1, MinRange, MaxRange);
+            h2.SetTitle("");
+            h2.SetStats(0);
+            h2.GetXaxis()->SetRangeUser (0.6, 1.3);
+            h2.GetXaxis()->SetTitle ("");
+            h2.GetXaxis()->SetLabelFont (43);
+            h2.GetXaxis()->SetLabelSize (15);
+            h2.GetXaxis()->SetTitleFont (43);
+            h2.GetXaxis()->SetTitleSize (15);
+            h2.GetYaxis()->SetRangeUser (0.85, 1.15);
+            h2.GetYaxis()->SetTitle ("");
+            h2.GetYaxis()->SetLabelFont (43);
+            h2.GetYaxis()->SetLabelSize (15);
+            h2.GetYaxis()->SetTitleFont (43);
+            h2.GetYaxis()->SetTitleSize (15);
+            h2.Draw("same");
+            TLine LineAtOne (0.6, 1, 1.3, 1);
+            LineAtOne.SetLineStyle (3);
+            LineAtOne.SetLineWidth (1);
+            LineAtOne.SetLineColor (kBlack);
+            LineAtOne.Draw("same");
+
+            // finally the ratio graph
+            TGraphErrors* gRatio = NULL;
+            if (plot == 0)
+               gRatio = new TGraphErrors (inputnew->GetXaxis()->FindBin(MaxRange)-inputnew->GetXaxis()->FindBin(MinRange), momenta, ratio_means, momenta_err, ratio_means_err);
+            else
+               gRatio = new TGraphErrors (inputnew->GetXaxis()->FindBin(MaxRange)-inputnew->GetXaxis()->FindBin(MinRange), momenta, ratio_sigmas, momenta_err, ratio_sigmas_err);
+
+            gRatio->SetMarkerColor (kBlue);
+            gRatio->SetLineColor (kBlue);
+            gRatio->SetMarkerStyle (23);
+
+            gRatio->Draw("same EP");
+            SaveCanvas (c1, SaveDir, "Syst_"+SaveName+"_"+SaveName2+"_"+ObjName+(!plot?"_means_WRatio":"_sigmaWRatio"));
+
+            delete c1;
+            delete leg;
+            /*delete t1;
+            delete t2;*/
+            delete gRatio;
+         }
+      }
+
+      delete gMeans;
+      delete gSigmas;
+      delete inputnew;
+      delete [] means;
+      delete [] sigmas;
+      delete [] momenta;
+      delete [] means_err;
+      delete [] sigmas_err;
+      delete [] momenta_err;
+      if (input2){
+         delete gMeans2;
+         delete gSigmas2;
+         delete [] means2;
+         delete [] sigmas2;
+         delete [] means_err2;
+         delete [] sigmas_err2;
+         delete [] momenta2;
+         delete [] ratio_means;
+         delete [] ratio_means_err;
+         delete [] ratio_sigmas;
+         delete [] ratio_sigmas_err;
+      }
+}
+
+
+void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjName1, string ObjName2, uint8_t extraStringMode){
    if (ObjName1.find("hit")==string::npos && ObjName2.find("hit")==string::npos){
       TProfile*   HdedxVsEtaProfile1  = (TProfile*)  GetObjectFromPath(InputFile, (ObjName1 + "_Eta" ).c_str() );
       TProfile*   HdedxVsEtaProfile2  = (TProfile*)  GetObjectFromPath(InputFile, (ObjName2 + "_Eta" ).c_str() );
@@ -1107,6 +1505,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    	HdedxVsEtaProfile1->Draw("");
    	HdedxVsEtaProfile2->Draw("same");
    	leg->Draw();
+      DrawPreliminary(extraStringMode);
    	SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_HdedxVsEtaProfile");
    	delete leg;
    	delete c1;
@@ -1133,7 +1532,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    	HdedxMIP1->Draw("");
    	HdedxMIP2->Draw("same");
    	leg->Draw();
-      DrawPreliminary();
+      DrawPreliminary(extraStringMode);
       SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_MIP", true);
       delete leg;
       delete c1;
@@ -1166,6 +1565,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
          ProjX2->Draw("same");
          leg->AddEntry(ProjX1, ObjName1.c_str(), "L");
          leg->AddEntry(ProjX2, ObjName2.c_str(), "L");
+         DrawPreliminary(extraStringMode);
          SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_ProjX"+string(Id), true);
          delete leg;
          delete c1;
@@ -1188,6 +1588,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
          ProjY2->Draw("same");
          leg->AddEntry(ProjY1, ObjName1.c_str(), "L");
          leg->AddEntry(ProjY2, ObjName2.c_str(), "L");
+         DrawPreliminary(extraStringMode);
          SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_ProjY"+string(Id), true);
          delete leg;
          delete c1;
@@ -1199,7 +1600,7 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    }
 }
 
-void CompareMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString)
+void CompareMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode)
 {
    TH1D** MIPs = new TH1D* [dEdxString.find("Ias")!=string::npos?4:3]; vector <string> legend;
    MIPs[0] = (TH1D*) GetObjectFromPath (InputFile, (dEdxString + "_MIP"       ).c_str());
@@ -1219,12 +1620,12 @@ void CompareMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxSt
    c1->SetLogy(true);
    DrawSuperposedHistos ((TH1**) MIPs, legend, "", dEdxString.find("Ias")!=string::npos?"I_{as}":"dE/dx (MeV/cm)", "fraction of tracks", 0,dEdxString.find("Ias")!=string::npos?1:8,1e-6,1);
    DrawLegend ((TObject**) MIPs, legend, "Stages", "L");
-   DrawPreliminary();
-   SaveCanvas (c1, SaveDir, "Comparison"+Prefix+"_"+dEdxString+"_MIPs", true);
+   DrawPreliminary(extraStringMode);
+   SaveCanvas (c1, SaveDir, "Comparison_"+Prefix+"_"+dEdxString+"_MIPs", true);
    delete c1;
 }
 
-void CompareMIPs2 (TFile* InputFile, string SaveDir, string Prefix, string dEdxString)
+void CompareMIPs2 (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode)
 {
    TH1D** MIPs = new TH1D* [4]; vector <string> legend;
    if (dEdxString.find("hit")==string::npos){
@@ -1253,14 +1654,14 @@ void CompareMIPs2 (TFile* InputFile, string SaveDir, string Prefix, string dEdxS
    c1->SetLogy(true);
    DrawSuperposedHistos ((TH1**) MIPs, legend, "", dEdxString.find("Ias")!=string::npos?"I_{as}":"dE/dx (MeV/cm)", "fraction of tracks", 0,dEdxString.find("Ias")!=string::npos?1:(dEdxString.find("hit")!=string::npos?20:8),1e-6,1);
    DrawLegend ((TObject**) MIPs, legend, "Stages", "L");
-   DrawPreliminary();
-   SaveCanvas (c1, SaveDir, "Comparison"+Prefix+"_"+dEdxString+"_MIPs2", true);
+   DrawPreliminary(extraStringMode);
+   SaveCanvas (c1, SaveDir, "Comparison_"+Prefix+"_"+dEdxString+"_MIPs2", true);
    delete c1;
 }
 
 
 
-void ShortMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString){
+void ShortMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxString, uint8_t extraStringMode){
    TH1D** MIPs = new TH1D* [5]; vector <string> legend;
    MIPs[0] = (TH1D*) GetObjectFromPath (InputFile, (dEdxString.find("Ias")!=string::npos?"Ias_PO_MIP":"harm2_PO_raw_MIP"));
    MIPs[1] = (TH1D*) GetObjectFromPath (InputFile, (dEdxString + "_MIP4" ).c_str());
@@ -1277,8 +1678,8 @@ void ShortMIPs (TFile* InputFile, string SaveDir, string Prefix, string dEdxStri
    c1->SetLogy(true);
    DrawSuperposedHistos ((TH1**) MIPs, legend, "", dEdxString.find("Ias")!=string::npos?"I_{as}":"dE/dx (MeV/cm)", "number of tracks", 0,dEdxString.find("Ias")!=string::npos?1:8,1e-6,1);
    DrawLegend ((TObject**) MIPs, legend, "No. of strip dE/dx measurements", "L");
-   DrawPreliminary();
-   SaveCanvas (c1, SaveDir, "Comparison"+Prefix+"_"+dEdxString+"_ShortMIPs", true);
+   DrawPreliminary(extraStringMode);
+   SaveCanvas (c1, SaveDir, "Comparison_"+Prefix+"_"+dEdxString+"_ShortMIPs", true);
    delete c1;
 }
 
@@ -1534,7 +1935,7 @@ void MakeROCGeneral (TFile* InputFile1, TFile* InputFile2, vector<string> HistoN
       delete c1;
 }
 
-void DrawPreliminary (void){
+void DrawPreliminary (uint8_t extraStringMode){
    TPaveText* T = new TPaveText(0.05, 0.995, 0.95, 0.945, "NDC");
    T->SetTextFont(43);  //give the font size in pixel (instead of fraction)
    T->SetTextSize(21);  //font size
@@ -1542,6 +1943,12 @@ void DrawPreliminary (void){
    T->SetFillColor(0);
    T->SetFillStyle(0);
    T->SetTextAlign(22);
-   T->AddText("#bf{CMS} Preliminary   -   2.74 pb^{-1}   -    #sqrt{s} = 13 TeV");
+   string middlePart;
+   switch (extraStringMode){
+      case 0: middlePart = ""             ; break;
+      case 1: middlePart = " Data -"      ; break;
+      case 2: middlePart = " Simulation -"; break;
+   }
+   T->AddText(("#bf{CMS} Preliminary   -"+middlePart+"   #sqrt{s} = 13 TeV").c_str());
    T->Draw("same");
 }
