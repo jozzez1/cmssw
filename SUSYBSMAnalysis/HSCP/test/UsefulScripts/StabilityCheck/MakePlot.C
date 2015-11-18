@@ -384,9 +384,9 @@ void MakePlot()
 
    system("mkdir -p pictures");
 
-   vector <unsigned int> ChangeGains = get_ChangeGains();
-   vector <unsigned int> PromptGains = get_PromptGains();
-   vector <unsigned int> NormalGains = get_NormalGains();
+//   vector <unsigned int> ChangeGains = get_ChangeGains();
+//   vector <unsigned int> PromptGains = get_PromptGains();
+//   vector <unsigned int> NormalGains = get_NormalGains();
 
    TCanvas* c1;
    TObject** Histos = new TObject*[10];
@@ -575,9 +575,9 @@ void MakePlot()
    //for(unsigned int i=0;i<legend.size();i++){((TProfile*)Histos[i])->SetMarkerSize(0.5);           ((TProfile*)Histos[i])->GetYaxis()->SetTitleOffset(0.9);}
    //DrawLegend(Histos,legend,"","P");
    DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
-   DrawLines (SingleMu_dEdx, runList, ChangeGains);
-   DrawLines (SingleMu_dEdx, runList, PromptGains, -0.1, kBlue);
-   DrawLines (SingleMu_dEdx, runList, NormalGains, -0.2, kRed);
+//   DrawLines (SingleMu_dEdx, runList, ChangeGains);
+//   DrawLines (SingleMu_dEdx, runList, PromptGains, -0.1, kBlue);
+//   DrawLines (SingleMu_dEdx, runList, NormalGains, -0.2, kRed);
    SaveCanvas(c1,"pictures/","Summary_Profile_dEdx");
    delete c1;
 
@@ -593,9 +593,9 @@ void MakePlot()
    //for(unsigned int i=0;i<legend.size();i++){((TProfile*)Histos[i])->SetMarkerSize(0.5);           ((TProfile*)Histos[i])->GetYaxis()->SetTitleOffset(0.9);}
    //DrawLegend(Histos,legend,"","P");
    DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
-   DrawLines (SingleMu_dEdxM, runList, ChangeGains);
-   DrawLines (SingleMu_dEdxM, runList, PromptGains, -0.1, kBlue);
-   DrawLines (SingleMu_dEdxM, runList, NormalGains, -0.2, kRed);
+//   DrawLines (SingleMu_dEdxM, runList, ChangeGains);
+//   DrawLines (SingleMu_dEdxM, runList, PromptGains, -0.1, kBlue);
+//   DrawLines (SingleMu_dEdxM, runList, NormalGains, -0.2, kRed);
    SaveCanvas(c1,"pictures/","Summary_Profile_dEdxM");
    delete c1;
 
