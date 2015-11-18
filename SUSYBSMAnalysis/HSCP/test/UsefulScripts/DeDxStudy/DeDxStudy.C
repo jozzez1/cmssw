@@ -82,6 +82,8 @@ struct dEdxStudyObj
    bool correctFEDSat;
    bool useClusterCleaning;
 
+   double dropLowerDeDxValue;
+
    int crossTalkInvAlgo; // 0  -- do not use crossTalkInversion
                          // 1  -- use existing algorithm developed by Claude
 
@@ -119,7 +121,7 @@ struct dEdxStudyObj
    TH3F* dEdxTemplates = NULL;
    std::unordered_map<unsigned int,double>* TrackerGains = NULL;
 
-   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false, bool removeCosmics_=false, bool correctFEDSat_=false, bool useClusterCleaning_=false, int crossTalkInvAlgo_=0){
+   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false, bool removeCosmics_=false, bool correctFEDSat_=false, bool useClusterCleaning_=false, int crossTalkInvAlgo_=0, double dropLowerDeDxValue = 0){
       Name = Name_;
 
       if     (type_==0){ isHit=true;  isEstim= false; isDiscrim = false; useTrunc = false;} // hit level only
@@ -239,8 +241,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    if(isData){   
          dEdxSF [0] = 1.00000;
          dEdxSF [1] = 1.29298;
-//       dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
-//       dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false);
+//         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
+//         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false);
          dEdxTemplates      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Data.root"           , true);
          dEdxTemplatesIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_noC_Data.root"    , true);
          dEdxTemplatesInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Data.root"           , false);
@@ -251,8 +253,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    }else{
          dEdxSF [0] = 1.07834;
          dEdxSF [1] = 1.06162;
-//       dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
-//       dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false); 
+//         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
+//         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false); 
          dEdxTemplates      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"           , true);
          dEdxTemplatesIn    = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_in_noC_MCMinBias.root"    , true);
          dEdxTemplatesInc   = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"           , false);
@@ -289,6 +291,10 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CI"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
    results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CC"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1) );
+   results.push_back(new dEdxStudyObj("hybr201_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.1) );
+   results.push_back(new dEdxStudyObj("hybr202_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2) );
+   results.push_back(new dEdxStudyObj("hybr203_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.3) );
+   results.push_back(new dEdxStudyObj("hybr204_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.4) );
    results.push_back(new dEdxStudyObj("trunc40_PO_raw", 3, 1, NULL            , NULL) );
    results.push_back(new dEdxStudyObj("trunc40_SO"    , 3, 2, NULL            , trackerCorrector.TrackerGains) );
    results.push_back(new dEdxStudyObj("trunc40_SO_FS" , 3, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
@@ -450,8 +456,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                 if(!results[R]->isEstim and !results[R]->isDiscrim) continue; //only consider results related to estimator/discriminator variables here
                 if(results[R]->removeCosmics && isCosmic)continue; //don't consider cosmic tracks
 
-                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
-                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
+                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
 
                 results[R]->HdedxVsP    ->Fill(track->p(), dedxObj.dEdx() );
    //             results[R]->HdedxVsQP   ->Fill(track->p()*track->charge(), dedxObj.dEdx() );
@@ -476,9 +482,9 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxMIP  ->Fill(dedxObj.dEdx());
                    results[R]->HP->Fill(track->p());
 
-                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
-                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
-                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
+                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
 
                    results[R]->HdedxMIP_U->Fill(dedxObj_U.dEdx());
                    results[R]->HdedxMIP4 ->Fill(dedxObj4 .dEdx());
@@ -490,7 +496,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxVsPProfile_U->Fill(track->p(), dedxObj_U.dEdx() );
                 }
 
-                DeDxData dedxObjEstim   = computedEdx(dedxHits, dEdxSF, NULL, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo);
+                DeDxData dedxObjEstim   = computedEdx(dedxHits, dEdxSF, NULL, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
                 double Mass = GetMass(track->p(),dedxObjEstim.dEdx(), false);
                 if (Mass > 0.938-0.15 && Mass < 0.938+0.15 && dedxObjEstim.dEdx() > 4){// proton candidates
                    results[R]->HdedxVsPSyst->Fill(track->p(), dedxObj.dEdx() );
