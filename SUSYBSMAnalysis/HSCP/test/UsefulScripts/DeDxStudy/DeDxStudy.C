@@ -81,8 +81,13 @@ struct dEdxStudyObj
    bool removeCosmics;
    bool correctFEDSat;
    bool useClusterCleaning;
+   bool fakeHIP;
 
    double dropLowerDeDxValue;
+   bool trimPixel;
+
+   double Kconst;
+   double Cconst;
 
    int crossTalkInvAlgo; // 0  -- do not use crossTalkInversion
                          // 1  -- use existing algorithm developed by Claude
@@ -111,6 +116,8 @@ struct dEdxStudyObj
    TH1D* HMassHSCP;
    TH1D* HP;
    TH1D* HHit; 
+   TH1D* HProtonHitSO; 
+   TH1D* HProtonHitPO; 
    TProfile* Charge_Vs_FS[16];
    TH2D* Charge_Vs_XYH[16];
    TH2D* Charge_Vs_XYL[16];
@@ -121,7 +128,7 @@ struct dEdxStudyObj
    TH3F* dEdxTemplates = NULL;
    std::unordered_map<unsigned int,double>* TrackerGains = NULL;
 
-   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false, bool removeCosmics_=false, bool correctFEDSat_=false, bool useClusterCleaning_=false, int crossTalkInvAlgo_=0, double dropLowerDeDxValue = 0){
+   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* dEdxTemplates_=NULL, std::unordered_map<unsigned int,double>* TrackerGains_=NULL, bool mustBeInside_=false, bool removeCosmics_=false, bool correctFEDSat_=false, bool useClusterCleaning_=false, int crossTalkInvAlgo_=0, double dropLowerDeDxValue_ = 0, bool trimPixel_ = false, bool fakeHIP_=true){
       Name = Name_;
 
       if     (type_==0){ isHit=true;  isEstim= false; isDiscrim = false; useTrunc = false;} // hit level only
@@ -141,6 +148,10 @@ struct dEdxStudyObj
       correctFEDSat      = correctFEDSat_;
       useClusterCleaning = useClusterCleaning_;
       crossTalkInvAlgo   = crossTalkInvAlgo_;
+      dropLowerDeDxValue = dropLowerDeDxValue_;
+      trimPixel          = trimPixel_;
+      fakeHIP            = fakeHIP_;
+     
 
       string HistoName;
       //HitLevel plot      
@@ -187,6 +198,9 @@ struct dEdxStudyObj
       if(isEstim){
          HistoName = Name + "_Mass";              HMass                 = new TH1D(      HistoName.c_str(), HistoName.c_str(),  250, 0, 10);
          HistoName = Name + "_MassHSCP";          HMassHSCP             = new TH1D(      HistoName.c_str(), HistoName.c_str(),  300, 0, 3000);
+//         HistoName = Name + "_ProtonHit";         HProtonHit            = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20);
+         HistoName = Name + "_ProtonHitPO";       HProtonHitPO          = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20);
+         HistoName = Name + "_ProtonHitSO";       HProtonHitSO          = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20);
       }
 
    }
@@ -237,10 +251,12 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    TH3F* dEdxTemplatesCC    = NULL;
    TH3F* dEdxTemplatesCI    = NULL;
    double dEdx_U [2] = {1.0, 1.0};
+   bool SuppressFakeHIP = false;
 
-   if(isData){   
+   if(isData){
+         SuppressFakeHIP = true; // never fake HIPs for Data -- they are already present as it is
          dEdxSF [0] = 1.00000;
-         dEdxSF [1] = 1.29298;
+         dEdxSF [1] = 1.21836;
 //         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
 //         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false);
          dEdxTemplates      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_Data.root"           , true);
@@ -251,8 +267,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
          dEdxTemplatesCCC   = loadDeDxTemplate (DIRNAME+"/../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
          trackerCorrector.LoadDeDxCalibration  (DIRNAME+"/../../../data/Data13TeVGains_v2.root");
    }else{
-         dEdxSF [0] = 1.07834;
-         dEdxSF [1] = 1.06162;
+         dEdxSF [0] = 1.09708;
+         dEdxSF [1] = 1.01875;
 //         dEdxTemplates    = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", true);
 //         dEdxTemplatesInc = loadDeDxTemplate(DIRNAME + "/../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd.root", false); 
          dEdxTemplates      = loadDeDxTemplate (DIRNAME+"/Templates/dEdxTemplate_hit_SP_MCMinBias.root"           , true);
@@ -269,33 +285,47 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
    std::vector<dEdxStudyObj*> results;
    results.push_back(new dEdxStudyObj("hit_PO"      , 0, 1, NULL            , NULL) );
-   results.push_back(new dEdxStudyObj("hit_SO_raw"  , 0, 2, NULL            , NULL) );
+//   results.push_back(new dEdxStudyObj("hit_SO_raw"  , 0, 2, NULL            , NULL) );
    results.push_back(new dEdxStudyObj("hit_SO"      , 0, 2, NULL            , trackerCorrector.TrackerGains) );
-   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL            , trackerCorrector.TrackerGains) );
-   results.push_back(new dEdxStudyObj("hit_SO_in"   , 0, 2, NULL            , trackerCorrector.TrackerGains, true) );
-   results.push_back(new dEdxStudyObj("hit_SP_in_noC", 0, 3, NULL           , trackerCorrector.TrackerGains, true) );
-   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CI" , 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CC" , 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, true,  0) );
+//   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL            , trackerCorrector.TrackerGains) );
+//   results.push_back(new dEdxStudyObj("hit_SO_in"   , 0, 2, NULL            , trackerCorrector.TrackerGains, true) );
+//   results.push_back(new dEdxStudyObj("hit_SP_in_noC", 0, 3, NULL           , trackerCorrector.TrackerGains, true) );
+//   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CI" , 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, false, 1) );
+//   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CC" , 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("hit_SP_in_noC_CCC", 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, true,  1) );
    results.push_back(new dEdxStudyObj("harm2_PO_raw", 1, 1, NULL            , NULL) );
-   results.push_back(new dEdxStudyObj("harm2_SO"    , 1, 2, NULL            , trackerCorrector.TrackerGains) );
-   results.push_back(new dEdxStudyObj("harm2_SO_FS" , 1, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
-   results.push_back(new dEdxStudyObj("harm2_SO_in" , 1, 2, NULL            , trackerCorrector.TrackerGains, true) );
-   results.push_back(new dEdxStudyObj("harm2_SO_in_noC"       , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true) );
-   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CI"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CC"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
+//   results.push_back(new dEdxStudyObj("harm2_SO"    , 1, 2, NULL            , trackerCorrector.TrackerGains) );
+//   results.push_back(new dEdxStudyObj("harm2_SO_FS" , 1, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
+//   results.push_back(new dEdxStudyObj("harm2_SO_in" , 1, 2, NULL            , trackerCorrector.TrackerGains, true) );
+//   results.push_back(new dEdxStudyObj("harm2_SO_in_noC"       , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true) );
+//   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CI"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
+//   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CC"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CCC"   , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1) );
-   results.push_back(new dEdxStudyObj("harm2_SP"    , 1, 3, NULL            , trackerCorrector.TrackerGains) );
-   results.push_back(new dEdxStudyObj("harm2_SP_in" , 1, 3, NULL            , trackerCorrector.TrackerGains, true) );
-   results.push_back(new dEdxStudyObj("harm2_SP_in_noC"       , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true) );
-   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CI"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CC"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
-   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1) );
+   results.push_back(new dEdxStudyObj("hybr201_SO_in_noC_CCC"   , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.1) );
+   results.push_back(new dEdxStudyObj("hybr202_SO_in_noC_CCC"   , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2) );
+   results.push_back(new dEdxStudyObj("hybr203_SO_in_noC_CCC"   , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.3) );
+   results.push_back(new dEdxStudyObj("hybr204_SO_in_noC_CCC"   , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.4) );
+//   results.push_back(new dEdxStudyObj("harm2_SP"    , 1, 3, NULL            , trackerCorrector.TrackerGains) );
+//   results.push_back(new dEdxStudyObj("harm2_SP_in" , 1, 3, NULL            , trackerCorrector.TrackerGains, true) );
+//   results.push_back(new dEdxStudyObj("harm2_SP_in_noC"       , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true) );
+//   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CI"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
+//   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CC"    , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
+   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CCC"     , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1) );
    results.push_back(new dEdxStudyObj("hybr201_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.1) );
+   results.push_back(new dEdxStudyObj("hybr2015_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.15) );
    results.push_back(new dEdxStudyObj("hybr202_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2) );
+   results.push_back(new dEdxStudyObj("hybr2025_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.25) );
    results.push_back(new dEdxStudyObj("hybr203_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.3) );
+   results.push_back(new dEdxStudyObj("hybr2035_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.35) );
    results.push_back(new dEdxStudyObj("hybr204_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.4) );
-   results.push_back(new dEdxStudyObj("trunc40_PO_raw", 3, 1, NULL            , NULL) );
+   results.push_back(new dEdxStudyObj("Hybr201_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.1, true) );
+   results.push_back(new dEdxStudyObj("Hybr2015_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.15, true) );
+   results.push_back(new dEdxStudyObj("Hybr202_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2, true) );
+   results.push_back(new dEdxStudyObj("Hybr2025_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.25, true) );
+   results.push_back(new dEdxStudyObj("Hybr203_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.3, true) );
+   results.push_back(new dEdxStudyObj("Hybr2035_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.35, true) );
+   results.push_back(new dEdxStudyObj("Hybr204_SP_in_noC_CCC"   , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.4, true) );
+   /*results.push_back(new dEdxStudyObj("trunc40_PO_raw", 3, 1, NULL            , NULL) );
    results.push_back(new dEdxStudyObj("trunc40_SO"    , 3, 2, NULL            , trackerCorrector.TrackerGains) );
    results.push_back(new dEdxStudyObj("trunc40_SO_FS" , 3, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
    results.push_back(new dEdxStudyObj("trunc40_SO_in" , 3, 2, NULL            , trackerCorrector.TrackerGains, true) );
@@ -307,23 +337,23 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("trunc40_SP_in" , 3, 3, NULL            , trackerCorrector.TrackerGains, true) );
    results.push_back(new dEdxStudyObj("trunc40_SP_in_noC"       , 3, 3, NULL  , trackerCorrector.TrackerGains, true, true) );
    results.push_back(new dEdxStudyObj("trunc40_SP_in_noC_CI"    , 3, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("trunc40_SP_in_noC_CC"    , 3, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
+   results.push_back(new dEdxStudyObj("trunc40_SP_in_noC_CC"    , 3, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );*/
    results.push_back(new dEdxStudyObj("trunc40_SP_in_noC_CCC"   , 3, 3, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  1) );
 
    results.push_back(new dEdxStudyObj("Ias_PO"      , 2, 1, dEdxTemplates   , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO_inc"  , 2, 2, dEdxTemplatesInc, NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO"      , 2, 2, dEdxTemplates   , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in"   , 2, 2, dEdxTemplatesIn , NULL, true) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in_noC"         , 2, 2, dEdxTemplatesIn , NULL, true, true) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in_noC_CI"      , 2, 2, dEdxTemplatesCI , NULL, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("Ias_SO_in_noC_CC"      , 2, 2, dEdxTemplatesCC , NULL, true, true, false, true,  0) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_inc"  , 2, 2, dEdxTemplatesInc, NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SO"      , 2, 2, dEdxTemplates   , NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in"   , 2, 2, dEdxTemplatesIn , NULL, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in_noC"         , 2, 2, dEdxTemplatesIn , NULL, true, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in_noC_CI"      , 2, 2, dEdxTemplatesCI , NULL, true, true, false, false, 1) );
+//   results.push_back(new dEdxStudyObj("Ias_SO_in_noC_CC"      , 2, 2, dEdxTemplatesCC , NULL, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("Ias_SO_in_noC_CCC"     , 2, 2, dEdxTemplatesCCC, NULL, true, true, false, true,  1) );
-   results.push_back(new dEdxStudyObj("Ias_SP_inc"  , 2, 3, dEdxTemplatesInc, NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SP"      , 2, 3, dEdxTemplates   , NULL) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in"   , 2, 3, dEdxTemplatesIn , NULL, true) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in_noC"         , 2, 3, dEdxTemplatesIn , NULL, true, true) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in_noC_CI"      , 2, 3, dEdxTemplatesCI , NULL, true, true, false, false, 1) );
-   results.push_back(new dEdxStudyObj("Ias_SP_in_noC_CC"      , 2, 3, dEdxTemplatesCC , NULL, true, true, false, true,  0) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_inc"  , 2, 3, dEdxTemplatesInc, NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SP"      , 2, 3, dEdxTemplates   , NULL) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in"   , 2, 3, dEdxTemplatesIn , NULL, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in_noC"         , 2, 3, dEdxTemplatesIn , NULL, true, true) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in_noC_CI"      , 2, 3, dEdxTemplatesCI , NULL, true, true, false, false, 1) );
+//   results.push_back(new dEdxStudyObj("Ias_SP_in_noC_CC"      , 2, 3, dEdxTemplatesCC , NULL, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("Ias_SP_in_noC_CCC"     , 2, 3, dEdxTemplatesCCC, NULL, true, true, false, true,  1) );
 
    printf("Progressing Bar           :0%%       20%%       40%%       60%%       80%%       100%%\n");
@@ -456,9 +486,10 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                 if(!results[R]->isEstim and !results[R]->isDiscrim) continue; //only consider results related to estimator/discriminator variables here
                 if(results[R]->removeCosmics && isCosmic)continue; //don't consider cosmic tracks
 
-                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
-                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
 
+		if (isSignal) results[R]->HdedxVsP->SetBins(500, 0, 1200, 1000, 0, results[R]->isDiscrim?1.0:15); // if it's signal sample increase axis range
                 results[R]->HdedxVsP    ->Fill(track->p(), dedxObj.dEdx() );
    //             results[R]->HdedxVsQP   ->Fill(track->p()*track->charge(), dedxObj.dEdx() );
    //             results[R]->HdedxVsP_NS ->Fill(track->p(), dedxObj.dEdx(), dedxObj.numberOfSaturatedMeasurements() );
@@ -482,9 +513,9 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxMIP  ->Fill(dedxObj.dEdx());
                    results[R]->HP->Fill(track->p());
 
-                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
-                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
-                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
 
                    results[R]->HdedxMIP_U->Fill(dedxObj_U.dEdx());
                    results[R]->HdedxMIP4 ->Fill(dedxObj4 .dEdx());
@@ -496,13 +527,42 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxVsPProfile_U->Fill(track->p(), dedxObj_U.dEdx() );
                 }
 
-                DeDxData dedxObjEstim   = computedEdx(dedxHits, dEdxSF, NULL, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue);
+                DeDxData dedxObjEstim   = computedEdx(dedxHits, dEdxSF, NULL, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
                 double Mass = GetMass(track->p(),dedxObjEstim.dEdx(), false);
-                if (Mass > 0.938-0.15 && Mass < 0.938+0.15 && dedxObjEstim.dEdx() > 4){// proton candidates
+                if (Mass > 0.938-0.20 && Mass < 0.938+0.20 && dedxObjEstim.dEdx() > 4){// proton candidates
                    results[R]->HdedxVsPSyst->Fill(track->p(), dedxObj.dEdx() );
+		   
+                   if (results[R]->isEstim && dedxObj.dEdx() > 7){
+                      for(unsigned int h=0;h<dedxHits->size();h++){
+                         DetId detid(dedxHits->detId(h));
+                         double scaleFactor = dEdxSF[0];
+                         if (detid.subdetId()<3) scaleFactor *= dEdxSF[1];
+                         double Norm = (detid.subdetId()<3)?3.61e-06:3.61e-06*265;
+                       
+                         int moduleGeometry = 0; // underflow bin -- debug purposes
+                         if(detid.subdetId()>=3){ SiStripDetId SSdetId(detid); moduleGeometry = SSdetId.moduleGeometry(); if (moduleGeometry==15) {cerr << "ERROR! There is no SiStrip geometry 15!" << endl; exit (EXIT_FAILURE);}}
+                         else if(detid.subdetId()<3){moduleGeometry = 15;} // 15 is for pixel
+                         if(!results[R]->usePixel && detid.subdetId() <3)continue; // skip pixels
+                         if(!results[R]->useStrip && detid.subdetId()>=3)continue; // skip strips
+                         if(results[R]->mustBeInside && !isHitInsideTkModule(dedxHits->pos(h), detid, detid.subdetId()>=3?dedxHits->stripCluster(h):NULL) )continue;
+                         if(results[R]->removeCosmics){ if (isCompatibleWithCosmic(track, vertexColl))continue;} //don't consider hits, which belong to cosmic tracks
+                         if(results[R]->useClusterCleaning && detid.subdetId()>=3 && !clusterCleaning(dedxHits->stripCluster(h), results[R]->crossTalkInvAlgo)) continue; //if it fails clusterCleaning, skip it!
+                       
+                         int charge = dedxHits->charge(h);
+                         if (detid.subdetId()>=3 && results[R]->crossTalkInvAlgo!=0){
+                            vector <int> amps = CrossTalkInv(convert(dedxHits->stripCluster(h)->amplitudes()), 0.10, 0.04, true);
+                            charge = std::accumulate(amps.begin(), amps.end(), 0);
+                         }
+                         double ChargeOverPathlength = scaleFactor*Norm*charge/dedxHits->pathlength(h);
+
+//                         results[R]->HProtonHit->Fill(ChargeOverPathlength);
+			 if (detid.subdetId()<3) results[R]->HProtonHitPO->Fill(ChargeOverPathlength);
+			 else                    results[R]->HProtonHitSO->Fill(ChargeOverPathlength);
+                      }
+                   }
                 }
 
-                if(results[R]->isEstim && dedxObj.dEdx()>4.0){  //mass can only be computed for dEdx estimators
+                if(results[R]->isEstim && dedxObj.dEdx()>5.0){  //mass can only be computed for dEdx estimators
                    if(track->p()<3.0){      results[R]->HMass->Fill(Mass);
                    }else{                   results[R]->HMassHSCP->Fill(Mass);
                    }

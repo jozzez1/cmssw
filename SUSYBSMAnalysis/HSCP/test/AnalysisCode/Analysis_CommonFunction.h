@@ -836,11 +836,24 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* tem
      }
 
      if(dropLowerDeDxValue>0){
-         vect.clear();
-         for(unsigned int p=0;p<vectPixel.size();p++){vect.push_back(vectPixel[p]);}
-         std::sort(vectStrip.begin(), vectStrip.end(), std::greater<double>() );
-         int nTrunc = vectStrip.size()*dropLowerDeDxValue;
-         for(unsigned int s=0;s+nTrunc<vectStrip.size();s++){vect.push_back(vectStrip[s]);}
+         if (!trimPixel){
+            vect.clear();
+            for(unsigned int p=0;p<vectPixel.size();p++){vect.push_back(vectPixel[p]);}
+            std::sort(vectStrip.begin(), vectStrip.end(), std::greater<double>() );
+            int nTrunc = vectStrip.size()*dropLowerDeDxValue;
+            for(unsigned int s=0;s+nTrunc<vectStrip.size();s++){vect.push_back(vectStrip[s]);}
+         } else {
+            std::vector <double> tmp (vect.size());
+            std::copy (vect.begin(), vect.end(), tmp.begin());
+            std::sort(tmp.begin(), tmp.end(), std::greater<double>() );
+            int nTrunc = tmp.size()*dropLowerDeDxValue;
+            vect.clear();
+            for(unsigned int t=0;t+nTrunc<tmp.size();t++){vect.push_back(tmp[t]);}
+         }
+     }
+
+     if(histoToFill){
+         for(unsigned int h=0;h<vect.size();h++){histoToFill->Fill(vect[h]);}
      }
 
      double result;
