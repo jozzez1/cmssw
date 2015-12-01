@@ -287,7 +287,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("hit_PO"      , 0, 1, NULL            , NULL) );
 //   results.push_back(new dEdxStudyObj("hit_SO_raw"  , 0, 2, NULL            , NULL) );
    results.push_back(new dEdxStudyObj("hit_SO"      , 0, 2, NULL            , trackerCorrector.TrackerGains) );
-//   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL            , trackerCorrector.TrackerGains) );
+   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL            , trackerCorrector.TrackerGains) );
 //   results.push_back(new dEdxStudyObj("hit_SO_in"   , 0, 2, NULL            , trackerCorrector.TrackerGains, true) );
 //   results.push_back(new dEdxStudyObj("hit_SP_in_noC", 0, 3, NULL           , trackerCorrector.TrackerGains, true) );
 //   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CI" , 0, 3, NULL       , trackerCorrector.TrackerGains, true, true, false, false, 1) );
