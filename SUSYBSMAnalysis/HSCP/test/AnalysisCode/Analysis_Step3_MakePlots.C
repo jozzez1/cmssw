@@ -68,7 +68,7 @@ void Analysis_Step3_MakePlots()
 //   CutFlow(InputPattern, CutIndex);
 //   CutFlow(InputPattern, CutIndexTight);
 //   CutFlowPlot(InputPattern, 0);
- ///  CutFlowPlot(InputPattern, CutIndex);
+//   CutFlowPlot(InputPattern, CutIndex);
 //   CutFlowPlot(InputPattern, CutIndexTight);
 //   SelectionPlot(InputPattern, CutIndex, CutIndexTight);
 //   PredictionAndControlPlot(InputPattern, "Data13TeV", CutIndex, 0);
@@ -2957,7 +2957,11 @@ void CheckPrediction(string InputPattern, string HistoSuffix, string DataType){
       DrawSuperposedHistos((TH1**)Histos, legend, "E1",  "1/#beta Cut", "Tracks", 0, 0, 1, 2200000);
     }
     Histos[1]->Draw("E1 same");
-    DrawLegend((TObject**)Histos,legend,LegendTitle,"P", 0.93, 0.88, 0.45, 0.045);
+    char LegendWithCuts[1024];
+    if(ICut>-1 && PtCut>-1) sprintf(LegendWithCuts, "I_{as} > %.2f, p_{T} > %.0f GeV", ICut, PtCut);
+    else if(PtCut>-1)       sprintf(LegendWithCuts, "p_{T} > %.0f GeV", PtCut);
+    else if(ICut>-1)        sprintf(LegendWithCuts, "I_{as} > %.2f", ICut);
+    DrawLegend((TObject**)Histos,legend,LegendWithCuts,"P", 0.93, 0.88, 0.45, 0.045);
     c1->SetLogy(true);
     DrawPreliminary(LegendTitle, SQRTS, IntegratedLuminosityFromE(SQRTS));
 
