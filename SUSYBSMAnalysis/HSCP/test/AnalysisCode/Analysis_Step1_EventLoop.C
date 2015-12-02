@@ -107,7 +107,7 @@ TH3F* dEdxTemplates = NULL;
 dedxGainCorrector trackerCorrector;
 double dEdxSF [2] = {
    1.00000,   // [0]  unchanged
-   1.30875    // [1]  Pixel data to SiStrip data
+   1.21836    // [1]  Pixel data to SiStrip data
 };
 
 
@@ -994,11 +994,11 @@ std::cout<<"D\n";
 
       if(isData){ 
          dEdxSF [0] = 1.00000;
-         dEdxSF [1] = 1.29298;
+         dEdxSF [1] = 1.21836;
          dEdxTemplates = loadDeDxTemplate("../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
       }else{  
-         dEdxSF [0] = 1.07834;
-         dEdxSF [1] = 1.06162;
+         dEdxSF [0] = 1.09708;
+         dEdxSF [1] = 1.01875;
          dEdxTemplates = loadDeDxTemplate("../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
       }
 
@@ -1270,9 +1270,9 @@ std::cout<<"G\n";
 
                //Compute dE/dx on the fly
                //computedEdx(dedxHits, Data/MC scaleFactor, templateHistoForDiscriminator, usePixel, useClusterCleaning, reverseProb)
-               DeDxData dedxSObjTmp = computedEdx(dedxHits, dEdxSF, dEdxTemplates, true, useClusterCleaning, TypeMode==5, false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.0, false);
-               DeDxData dedxMObjTmp = computedEdx(dedxHits, dEdxSF, NULL,          true, useClusterCleaning, false      , false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.0, false);
-               DeDxData dedxMUObjTmp = computedEdx(dedxHits, dEdxSF, NULL,          true, useClusterCleaning, false      , false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.0, !isData);
+               DeDxData dedxSObjTmp = computedEdx(dedxHits, dEdxSF, dEdxTemplates, true, useClusterCleaning, TypeMode==5, false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.0, false, false);
+               DeDxData dedxMObjTmp = computedEdx(dedxHits, dEdxSF, NULL,          true, useClusterCleaning, false      , false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.15, true, !isData);
+               DeDxData dedxMUObjTmp = computedEdx(dedxHits, dEdxSF, NULL,          true, useClusterCleaning, false      , false, trackerCorrector.TrackerGains, true, true, 99, false, 1, 0.15, true, !isData);
                DeDxData* dedxSObj = dedxSObjTmp.numberOfMeasurements()>0?&dedxSObjTmp:NULL;
                DeDxData* dedxMObj = dedxMObjTmp.numberOfMeasurements()>0?&dedxMObjTmp:NULL;
                DeDxData* dedxMUObj = dedxMUObjTmp.numberOfMeasurements()>0?&dedxMUObjTmp:NULL;
