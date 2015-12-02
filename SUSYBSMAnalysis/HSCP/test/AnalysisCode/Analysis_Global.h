@@ -109,10 +109,10 @@ std::string        dEdxM_Legend    = "I_{h} (MeV/cm)";
 //double             dEdxK_MC        = 2.683;
 //double             dEdxC_MC        = 2.453;
 // below are the new constants computed with harm2_SP_in for both MC and Data
-double             dEdxK_Data      = 2.684;
-double             dEdxC_Data      = 3.375;
-double             dEdxK_MC        = 2.938;
-double             dEdxC_MC        = 3.119;
+double             dEdxK_Data      = 2.535;
+double             dEdxC_Data      = 3.339;
+double             dEdxK_MC        = 2.535;
+double             dEdxC_MC        = 3.339;
 
 //below is for harm2_SP where 20% of the lower dEdx hits are drop
 //double             dEdxK_Data      = 2.40;
