@@ -1356,8 +1356,7 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       ObjNames.push_back("hybr201_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-10"); Colors.push_back(kBlue);
       ObjNames.push_back("hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("hybrid2-15");Colors.push_back(kOrange);
       ObjNames.push_back("hybr202_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-20"); Colors.push_back(kGreen);
-      ObjNames.push_back("hybr203_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-30"); Colors.push_back(kMagenta);
-      ObjNames.push_back("hybr204_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-40"); Colors.push_back(kBlack);
+      ObjNames.push_back("hybr2025_SP_in_noC_CCC_MIP"); LegendLabels.push_back("hybrid2-25"); Colors.push_back(kMagenta);
       MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_hybrid-"+plotObj[i]->SavePrefix);
    }
 
@@ -1368,8 +1367,7 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       ObjNames.push_back("Hybr201_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-10"); Colors.push_back(kBlue);
       ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-15");Colors.push_back(kOrange);
       ObjNames.push_back("Hybr202_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-20"); Colors.push_back(kGreen);
-      ObjNames.push_back("Hybr203_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-30"); Colors.push_back(kMagenta);
-      ObjNames.push_back("Hybr204_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-40"); Colors.push_back(kBlack);
+      ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-25"); Colors.push_back(kMagenta);
       MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_Hybrid"+plotObj[i]->SavePrefix);
    }
 
@@ -1635,7 +1633,7 @@ void SuperposeFilesOnDeDxObj (string SaveDir, vector<dEdxPlotObj*> plotObj){
             for (int x = 1; x <= plotObj[i]->HdedxVsP[j]->GetNbinsX(); x++){
                if (plotObj[i]->HdedxVsP[j]->GetXaxis()->GetBinCenter(x) > 3.0) continue;
                for (int y = 1; y <= plotObj[i]->HdedxVsP[j]->GetNbinsY(); y++){
-                  if(plotObj[i]->HdedxVsP[j]->GetYaxis()->GetBinCenter(y)<5.0)continue;
+                  if(plotObj[i]->HdedxVsP[j]->GetYaxis()->GetBinCenter(y)<plotObj[i]->C[plotObj[i]->StdObjName[j]]+3.0)continue;
                   histos[histos.size()-1]->Fill(GetMass (plotObj[i]->HdedxVsP[j]->GetXaxis()->GetBinCenter(x),
                                            plotObj[i]->HdedxVsP[j]->GetYaxis()->GetBinCenter(y),
                                            plotObj[i], plotObj[i]->StdObjName[j]),

@@ -247,6 +247,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
    unsigned int CurrentRun = 1;
    dedxGainCorrector trackerCorrector;
+   dedxHIPEmulator   HIPEmulator;
    TH3F* dEdxTemplates      = NULL;
    TH3F* dEdxTemplatesIn    = NULL;
    TH3F* dEdxTemplatesInc   = NULL;
@@ -254,8 +255,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    TH3F* dEdxTemplatesCC    = NULL;
    TH3F* dEdxTemplatesCI    = NULL;
    double dEdx_U [2] = {1.0, 1.0};
-   bool SuppressFakeHIP = false;
 
+   bool SuppressFakeHIP = false;
    if(isData){
          SuppressFakeHIP = true; // never fake HIPs for Data -- they are already present as it is
          dEdxSF [0] = 1.00000;
@@ -360,6 +361,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
      int treeStep(ev.size()/50), iev=0;
      for(ev.toBegin(); !ev.atEnd(); ++ev){ iev++;
          if(iev%treeStep==0){printf(".");fflush(stdout);}
+
+	 HIPEmulator.setEventRate();
 
          if(CurrentRun != ev.eventAuxiliary().run()){
             CurrentRun = ev.eventAuxiliary().run();
@@ -482,8 +485,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                 if(!results[R]->isEstim and !results[R]->isDiscrim) continue; //only consider results related to estimator/discriminator variables here
                 if(results[R]->removeCosmics && isCosmic)continue; //don't consider cosmic tracks
 
-                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
-                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
+                DeDxData dedxObj_U = computedEdx(dedxHits, dEdx_U, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
 
 		if (isSignal) results[R]->HdedxVsP->SetBins(500, 0, 1200, 1000, 0, results[R]->isDiscrim?1.0:15); // if it's signal sample increase axis range
                 results[R]->HdedxVsP    ->Fill(track->p(), dedxObj.dEdx() );
@@ -509,9 +512,9 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxMIP  ->Fill(dedxObj.dEdx());
                    results[R]->HP->Fill(track->p());
 
-                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
-                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
-                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                   DeDxData dedxObj4  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 4, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
+                   DeDxData dedxObj8  = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 8, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
+                   DeDxData dedxObj12 = computedEdx(dedxHits, dEdxSF, results[R]->dEdxTemplates, results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside,12, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
 
                    results[R]->HdedxMIP_U->Fill(dedxObj_U.dEdx());
                    results[R]->HdedxMIP4 ->Fill(dedxObj4 .dEdx());
@@ -523,9 +526,9 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    results[R]->HdedxVsPProfile_U->Fill(track->p(), dedxObj_U.dEdx() );
                 }
 
-                DeDxData dedxObjEstim   = computedEdx(dedxHits, dEdxSF, NULL                     , results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, results[R]->fakeHIP && !(SuppressFakeHIP));
+                DeDxData dedxObjEstim   = results[R]->isEstim?dedxObj:computedEdx(dedxHits, dEdxSF, NULL                     , results[R]->usePixel, results[R]->useClusterCleaning, false, results[R]->useTrunc, results[R]->TrackerGains, results[R]->useStrip, results[R]->mustBeInside, 99, results[R]->correctFEDSat, results[R]->crossTalkInvAlgo, results[R]->dropLowerDeDxValue, results[R]->trimPixel, (results[R]->fakeHIP && !(SuppressFakeHIP))?&HIPEmulator:NULL);
                 double Mass = GetMass(track->p(),dedxObjEstim.dEdx(), results[R]->Kconst, results[R]->Cconst);
-                if (Mass > 0.938-0.20 && Mass < 0.938+0.20 && dedxObjEstim.dEdx() > 4){// proton candidates
+                if (Mass > 0.938-0.20 && Mass < 0.938+0.20 && dedxObjEstim.dEdx() > 5){// proton candidates
                    results[R]->HdedxVsPSyst->Fill(track->p(), dedxObj.dEdx() );
 		   
                    if (results[R]->isEstim && dedxObj.dEdx() > 7){
