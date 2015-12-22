@@ -154,7 +154,7 @@ typedef struct dEdxPlotObj
    } // end of constructor
 } dEdxPlotObj;
 
-void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix);
+void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix, double* SFMip=NULL, double* SFProfile=NULL);
 double GetMass(double P, double I, dEdxPlotObj* plotObj, string ObjName);
 void MakeMapPlots(TH3F* Charge_Vs_Path3D, string ObjName, string SaveDir, string Prefix);
 void MakeROCGeneral (TFile* InputFile1, TFile* InputFile2, vector<string> HistoNames, vector<string> LegendLabels, vector<Color_t> Colors, string SaveDir, string suffix, bool WithErrorBarse=false, bool Every2ndIsDashed=false);
@@ -211,12 +211,11 @@ void MakePlot()
 
 
    vector<string> HitObjName;                         vector<string> HitObjLegend;
-   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel charges, untrimmed");
+//   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel charges, untrimmed");
 //   HitObjName.push_back("hit_SP_in_noC");
 //   HitObjName.push_back("hit_SP_in_noC_CI");
 //   HitObjName.push_back("hit_SP_in_noC_CC");
    HitObjName.push_back("hit_SP_in_noC_CCC");         HitObjLegend.push_back("Strip+Pixel charges, trimmed");
-
 
    vector<string> StdObjName;                         vector<string> StdObjLegend;
 //   StdObjName.push_back("harm2_SO");
@@ -228,6 +227,7 @@ void MakePlot()
 //   StdObjName.push_back("harm2_SP_in_noC_CI");
 //   StdObjName.push_back("harm2_SP_in_noC_CC");
    StdObjName.push_back("harm2_SP_in_noC_CCC");       StdObjLegend.push_back("harm-2, SP");
+/*
 //   StdObjName.push_back("harm2_SO_in_noC_CCC");
    StdObjName.push_back("hybr201_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-10, SP");
    StdObjName.push_back("hybr2015_SP_in_noC_CCC");    StdObjLegend.push_back("hybrid2-15, SP");
@@ -264,7 +264,7 @@ void MakePlot()
 //   StdObjName.push_back("Ias_SP_in_noC_CI");
 //   StdObjName.push_back("Ias_SP_in_noC_CC");
    StdObjName.push_back("Ias_SP_in_noC_CCC");         StdObjLegend.push_back("Ias, SP");
-
+*/
 
    vector <dEdxPlotObj*> plotObj;
    plotObj.push_back(new dEdxPlotObj("Histos_MCMinBias.root", "MC (MinBias)", "MCMinBias", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
@@ -294,17 +294,41 @@ void MakePlot()
    }
 
    cerr << "====== TESTA :: 2D Histograms ======" << endl;
-   Draw2D (SaveDir, plotObj);
+//   Draw2D (SaveDir, plotObj);
 
    cerr << "====== TESTB :: Standard Histos ======" << endl;
-   SuperposeFilesOnDeDxObj (SaveDir, plotObj);
+//   SuperposeFilesOnDeDxObj (SaveDir, plotObj);
 
    cerr << "====== TESTC :: Cross-compare estimators ======" << endl;
-   CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "hybr");
-   CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "Hybr");
+//   CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "hybr");
+//   CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "Hybr");
    
    cerr << "====== TESTD :: Systematics study ======" << endl;
-   SystStudy (SaveDir, plotObj);
+//   SystStudy (SaveDir, plotObj);
+
+   cerr << "====== TESTE :: Scale Factors ======" << endl;
+   double SFMip, SFProfile;
+   FILE* fout = fopen ((SaveDir+"ScaleFactors.txt").c_str(), "w");
+   for (size_t i = 0; i < plotObj.size(); i++){
+      if(plotObj[i]->type==2) continue;
+      getScaleFactor(plotObj[i]->InputFile, NULL, "hit_PO", "hit_SO_in_noC_CCC", SaveDir, plotObj[i]->SavePrefix, &SFMip, &SFProfile);
+      fprintf (fout, (plotObj[i]->LegEntry + "\tPO to SO :: MIP:%.7lf\tProfile:%.7lf\n").c_str(), SFMip, SFProfile);
+      if(i == MCIndex) continue;
+      getScaleFactor (plotObj[i]->InputFile, plotObj[MCIndex]->InputFile, "hit_SO_in_noC_CCC", "", SaveDir, plotObj[i]->SavePrefix+"hit_SO", &SFMip, &SFProfile);
+      fprintf (fout, (plotObj[i]->LegEntry + "\tSO MC to Data :: MIP:%.7lf\tProfile:%.7lf\n").c_str(), SFMip, SFProfile);
+   }
+
+   vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
+   ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("I_{h}");  Colors.push_back(kRed);
+   ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");      LegendLabels.push_back("I_{as}"); Colors.push_back(kBlue);
+   MakeROCGeneral (plotObj[2]->InputFile, plotObj[5]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_LOIC");
+
+   ObjNames.clear(); LegendLabels.clear(); Colors.clear();
+   ObjNames.push_back("harm2_SP_in_noC_CCC_noF_MIP");     LegendLabels.push_back("harmonic-2");  Colors.push_back(kRed);
+   ObjNames.push_back("Hybr201_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-10"); Colors.push_back(kRed);
+   ObjNames.push_back("Hybr2015_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-15"); Colors.push_back(kRed);
+   ObjNames.push_back("Hybr202_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-20"); Colors.push_back(kRed);
+   ObjNames.push_back("Hybr2025_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-25"); Colors.push_back(kRed);
 }
 
    /* 
@@ -318,24 +342,25 @@ void MakePlot()
 }
 */
 
-void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix){
+void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix,
+      double* SFMip, double* SFProfile){
    TProfile*   HdedxVsPProfile1;
    TProfile*   HdedxVsPProfile2;
    TH1D*       HdedxMIP1;
    TH1D*       HdedxMIP2;
 
    if (InputFile2!=NULL){
-      HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_Profile"  ).c_str() );
-      HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile2, (ObjName1 + "_Profile"  ).c_str() );
+      HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_HitProfile"  ).c_str() );
+      HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile2, (ObjName1 + "_HitProfile"  ).c_str() );
 
-      HdedxMIP1        = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_MIP"  ).c_str() );
-      HdedxMIP2        = (TProfile*)GetObjectFromPath(InputFile2, (ObjName1 + "_MIP"  ).c_str() );
+      HdedxMIP1        = (TH1D*)    GetObjectFromPath(InputFile1, (ObjName1 + "_Hit"  ).c_str() );
+      HdedxMIP2        = (TH1D*)    GetObjectFromPath(InputFile2, (ObjName1 + "_Hit"  ).c_str() );
    } else if (ObjName2!=""){
-      HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_Profile"  ).c_str() );
-      HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName2 + "_Profile"  ).c_str() );
+      HdedxVsPProfile1 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_HitProfile"  ).c_str() );
+      HdedxVsPProfile2 = (TProfile*)GetObjectFromPath(InputFile1, (ObjName2 + "_HitProfile"  ).c_str() );
 
-      HdedxMIP1        = (TProfile*)GetObjectFromPath(InputFile1, (ObjName1 + "_MIP"  ).c_str() );
-      HdedxMIP2        = (TProfile*)GetObjectFromPath(InputFile1, (ObjName2 + "_MIP"  ).c_str() );
+      HdedxMIP1        = (TH1D*)    GetObjectFromPath(InputFile1, (ObjName1 + "_Hit"  ).c_str() );
+      HdedxMIP2        = (TH1D*)    GetObjectFromPath(InputFile1, (ObjName2 + "_Hit"  ).c_str() );
    } else return;
 
    TF1* mygausMIP = new TF1("mygausMIP","gaus", 1, 5);
@@ -345,6 +370,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    double peakMIP2  = mygausMIP->GetParameter(1);
 
    std::cout << "SCALE FACTOR WITH MIP     = " << peakMIP1/peakMIP2 << endl;
+   *SFMip = peakMIP1/peakMIP2;
 
    TH1D* Chi2Dist = new TH1D("Chi2Dist","Chi2Dist",300, 0.9 ,1.15);
 
@@ -374,6 +400,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    }
 
    std::cout << "SCALE FACTOR WITH PROFILE = " << AbsGain << endl;
+   *SFProfile = AbsGain;
 
    TCanvas* c1 = new TCanvas("c1", "c1", 600,600);
    TLegend* leg = new TLegend (0.50, 0.75, 0.80, 0.90);
@@ -385,7 +412,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    HdedxMIP2->SetAxisRange(0,10,"X");
    HdedxMIP2->GetXaxis()->SetNdivisions(516);
    HdedxMIP2->GetXaxis()->SetTitle("dE/dx (MeV/cm)");
-   HdedxMIP2->GetYaxis()->SetTitle("Tracks");
+   HdedxMIP2->GetYaxis()->SetTitle("Tracker hits");
    HdedxMIP2->SetLineColor(1);
    HdedxMIP2->Draw("");
    TH1D* HdedxMIP3 = (TH1D*)HdedxMIP2->Clone("aaa");
@@ -404,7 +431,7 @@ void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, strin
    leg->AddEntry (HdedxMIP2, "unscaled MC", "L");
    leg->AddEntry (HdedxMIP4, "scaled   MC", "L");
    leg->Draw();
-   SaveCanvas(c1, SaveDir, "Rescale_"+Prefix+"_"+ObjName1+ObjName2 + "_MIP");
+   SaveCanvas(c1, SaveDir, "Rescale_"+Prefix+"_"+ObjName1+ObjName2 + "_Hit");
    delete c1;
 
 
@@ -561,10 +588,10 @@ void ExtractConstants(TH2D* input, double* K, double* C, double* Kerr, double* C
 	       TF1* myfit = new TF1("myfit","[0]*pow(0.93827/x,2) + [1]", MinRange, MaxRange);
 	       myfit->SetParName  (0,"K");
 	       myfit->SetParName  (1,"C");
-	       myfit->SetParameter(0, 3.2);
+	       myfit->SetParameter(0, 4.2);
 	       myfit->SetParameter(1, 3.2);
-	       myfit->SetParLimits(0, 2.00,4.0);
-	       myfit->SetParLimits(1, 2.00,4.0);
+	       myfit->SetParLimits(0, 2.00,6.0);
+	       myfit->SetParLimits(1, 2.00,6.0);
 	       myfit->SetLineWidth(2);
 	       myfit->SetLineColor(2);
 	       FitResult->Fit("myfit", "M R E I 0");
@@ -1354,7 +1381,7 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
       ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("harmonic2");  Colors.push_back(kRed);
       ObjNames.push_back("hybr201_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-10"); Colors.push_back(kBlue);
-      ObjNames.push_back("hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("hybrid2-15");Colors.push_back(kOrange);
+      ObjNames.push_back("hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("hybrid2-15"); Colors.push_back(kOrange);
       ObjNames.push_back("hybr202_SP_in_noC_CCC_MIP");  LegendLabels.push_back("hybrid2-20"); Colors.push_back(kGreen);
       ObjNames.push_back("hybr2025_SP_in_noC_CCC_MIP"); LegendLabels.push_back("hybrid2-25"); Colors.push_back(kMagenta);
       MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_hybrid-"+plotObj[i]->SavePrefix);
@@ -1365,10 +1392,21 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
       ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("harmonic2");  Colors.push_back(kRed);
       ObjNames.push_back("Hybr201_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-10"); Colors.push_back(kBlue);
-      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-15");Colors.push_back(kOrange);
+      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-15"); Colors.push_back(kOrange);
       ObjNames.push_back("Hybr202_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-20"); Colors.push_back(kGreen);
       ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-25"); Colors.push_back(kMagenta);
       MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_Hybrid"+plotObj[i]->SavePrefix);
+   }
+
+   for (size_t i = 0; i < plotObj.size(); i++){
+      if (plotObj[i]->type != 2) continue;
+      vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
+      ObjNames.push_back("harm2_SP_in_noC_CCC_noF_MIP");     LegendLabels.push_back("harmonic2");  Colors.push_back(kRed);
+      ObjNames.push_back("Hybr201_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("Hybrid2-10"); Colors.push_back(kBlue);
+      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("Hybrid2-15"); Colors.push_back(kOrange);
+      ObjNames.push_back("Hybr202_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("Hybrid2-20"); Colors.push_back(kGreen);
+      ObjNames.push_back("Hybr2025_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("Hybrid2-25"); Colors.push_back(kMagenta);
+      MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_Hybrid_noF"+plotObj[i]->SavePrefix);
    }
 
    for (size_t i = 0; i < plotObj.size(); i++){
@@ -1593,17 +1631,33 @@ void SuperposeFilesOnDeDxObj (string SaveDir, vector<dEdxPlotObj*> plotObj){
       legend.clear();
       c1->SetLogy(true);
       for (size_t i=0; i < plotObj.size(); i++){
+	 if (plotObj[i]->type == 2) continue;
          histos.push_back(plotObj[i]->HdedxMIP[j]);
          legend.push_back (plotObj[i]->LegEntry);
       }
       DrawSuperposedHistos((TH1**) &(histos[0]), legend, "L", isEstim?"dE/dx (MeV/cm)":"I_{as}", "arbitrary units",
-            0, isEstim?7:1, 5e-7, 6e-1, true);
+            0, isEstim?7:1, 5e-7, 6, true);
       DrawLegend ((TObject**) &(histos[0]), legend, plotObj[0]->StdObjLegend[j], "LP", 0.80, 0.90, 0.40, 0.05);
       DrawPreliminary("", 13.0, "");
       SaveCanvas(c1, SaveDir, plotObj[0]->StdObjName[j] + "_Comp_MIP");
       histos.clear();
       delete c1;
 
+      c1 = new TCanvas("c1", "c1", 600,600);
+      legend.clear();
+      c1->SetLogy(true);
+      for (size_t i=0; i < plotObj.size(); i++){
+	 if (plotObj[i]->type != 2) continue;
+         histos.push_back(plotObj[i]->HdedxMIP[j]);
+         legend.push_back (plotObj[i]->LegEntry);
+      }
+      DrawSuperposedHistos((TH1**) &(histos[0]), legend, "L", isEstim?"dE/dx (MeV/cm)":"I_{as}", "arbitrary units",
+            0, isEstim?7:1, 5e-7, 6, true);
+      DrawLegend ((TObject**) &(histos[0]), legend, plotObj[0]->StdObjLegend[j], "LP", 0.80, 0.90, 0.40, 0.05);
+      DrawPreliminary("", 13.0, "");
+      SaveCanvas(c1, SaveDir, plotObj[0]->StdObjName[j] + "_Comp_HSCPMIP");
+      histos.clear();
+      delete c1;
 
       c1 = new TCanvas("c1", "c1", 600,600);
       legend.clear();

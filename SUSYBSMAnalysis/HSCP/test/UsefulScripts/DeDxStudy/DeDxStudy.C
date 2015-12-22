@@ -116,7 +116,8 @@ struct dEdxStudyObj
    TH1D* HMass;
    TH1D* HMassHSCP;
    TH1D* HP;
-   TH1D* HHit; 
+   TH1D* HHit;
+   TProfile* HHitProfile; 
    TH1D* HProtonHitSO; 
    TH1D* HProtonHitPO; 
    TProfile* Charge_Vs_FS[16];
@@ -160,6 +161,7 @@ struct dEdxStudyObj
       //HitLevel plot      
       if(isHit){ 
          HistoName = Name + "_Hit";               HHit                  = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20); 
+         HistoName = Name + "_HitProfile";        HHitProfile           = new TProfile(  HistoName.c_str(), HistoName.c_str(),  50, 0, 100); 
          if(usePixel && useStrip){ 
             HistoName = Name + "_ChargeVsPath";      Charge_Vs_Path        = new TH3D(      HistoName.c_str(), HistoName.c_str(), P_NBins, P_Min, P_Max, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
             for(unsigned int g=0;g<16;g++){
@@ -290,14 +292,15 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    std::vector<dEdxStudyObj*> results;
    results.push_back(new dEdxStudyObj("hit_PO"      , 0, 1, NULL, 2.7, 3.2, NULL) );
 //   results.push_back(new dEdxStudyObj("hit_SO_raw"  , 0, 2, NULL, 2.7, 3.2, NULL) );
-   results.push_back(new dEdxStudyObj("hit_SO"      , 0, 2, NULL, 2.7, 3.2  , trackerCorrector.TrackerGains) );
-   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL, 2.7, 3.2  , trackerCorrector.TrackerGains) );
+   results.push_back(new dEdxStudyObj("hit_SO_in_noC_CCC", 0, 2, NULL, 2.7, 3.2  , trackerCorrector.TrackerGains, true, true, false, true, 1) );
+//   results.push_back(new dEdxStudyObj("hit_SP"      , 0, 3, NULL, 2.7, 3.2  , trackerCorrector.TrackerGains) );
 //   results.push_back(new dEdxStudyObj("hit_SO_in"   , 0, 2, NULL, 2.7, 3.2  , trackerCorrector.TrackerGains, true) );
 //   results.push_back(new dEdxStudyObj("hit_SP_in_noC", 0, 3, NULL, 2.7, 3.2 , trackerCorrector.TrackerGains, true) );
 //   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CI" , 0, 3, NULL,2.7,3.2, trackerCorrector.TrackerGains, true, true, false, false, 1) );
 //   results.push_back(new dEdxStudyObj("hit_SP_in_noC_CC" , 0, 3, NULL,2.7,3.2, trackerCorrector.TrackerGains, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("hit_SP_in_noC_CCC", 0, 3, NULL, 2.7, 3.2, trackerCorrector.TrackerGains, true, true, false, true,  1) );
    results.push_back(new dEdxStudyObj("harm2_PO_raw", 1, 1, NULL, 2.7, 3.2 , NULL) );
+   results.push_back(new dEdxStudyObj("Hybr2015_PO_raw", 1, 1, NULL, 2.7, 3.2 , NULL, false, false, false, true, 1, 0.15, true) );
 //   results.push_back(new dEdxStudyObj("harm2_SO"    , 1, 2, NULL            , trackerCorrector.TrackerGains) );
 //   results.push_back(new dEdxStudyObj("harm2_SO_FS" , 1, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
 //   results.push_back(new dEdxStudyObj("harm2_SO_in" , 1, 2, NULL            , trackerCorrector.TrackerGains, true) );
@@ -305,6 +308,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 //   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CI"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, false, 1) );
 //   results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CC"    , 1, 2, NULL  , trackerCorrector.TrackerGains, true, true, false, true,  0) );
    results.push_back(new dEdxStudyObj("harm2_SO_in_noC_CCC"   , 1, 2, NULL, isData?3.249:3.371, isData?2.600:2.655, trackerCorrector.TrackerGains, true, true, false, true,  1) );
+   results.push_back(new dEdxStudyObj("Hybr2015_SO_in_noC_CCC"   , 1, 2, NULL, isData?2.687:2.938, isData?2.600:2.655, trackerCorrector.TrackerGains, true, true, false, true,  1, 0.15, true) );
 //   results.push_back(new dEdxStudyObj("harm2_SP"    , 1, 3, NULL            , trackerCorrector.TrackerGains) );
 //   results.push_back(new dEdxStudyObj("harm2_SP_in" , 1, 3, NULL            , trackerCorrector.TrackerGains, true) );
 //   results.push_back(new dEdxStudyObj("harm2_SP_in_noC"       , 1, 3, NULL  , trackerCorrector.TrackerGains, true, true) );
@@ -322,6 +326,11 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    results.push_back(new dEdxStudyObj("Hybr2015_SP_in_noC_CCC"   , 1, 3, NULL, isData?2.687:2.938, isData?3.383:3.199  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.15, true) );
    results.push_back(new dEdxStudyObj("Hybr202_SP_in_noC_CCC"   , 1, 3, NULL, isData?2.739:2.969, isData?3.472:3.305  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2, true) );
    results.push_back(new dEdxStudyObj("Hybr2025_SP_in_noC_CCC"   , 1, 3, NULL, isData?2.869:3.075, isData?3.486:3.333  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.25, true) );
+   results.push_back(new dEdxStudyObj("harm2_SP_in_noC_CCC_noF"     , 1, 3, NULL, isData?2.448:2.866, isData?3.218:2.963  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.0, true, false) );
+   results.push_back(new dEdxStudyObj("Hybr201_SP_in_noC_CCC_noF"   , 1, 3, NULL, isData?2.525:2.883, isData?3.389:3.114  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.1, true, false) );
+   results.push_back(new dEdxStudyObj("Hybr2015_SP_in_noC_CCC_noF"   , 1, 3, NULL, isData?2.687:2.938, isData?3.383:3.199  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.15, true, false) );
+   results.push_back(new dEdxStudyObj("Hybr202_SP_in_noC_CCC_noF"   , 1, 3, NULL, isData?2.739:2.969, isData?3.472:3.305  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.2, true, false) );
+   results.push_back(new dEdxStudyObj("Hybr2025_SP_in_noC_CCC_noF"   , 1, 3, NULL, isData?2.869:3.075, isData?3.486:3.333  , trackerCorrector.TrackerGains, true, true, false, true,  1, 0.25, true, false) );
    /*results.push_back(new dEdxStudyObj("trunc40_PO_raw", 3, 1, NULL            , NULL) );
    results.push_back(new dEdxStudyObj("trunc40_SO"    , 3, 2, NULL            , trackerCorrector.TrackerGains) );
    results.push_back(new dEdxStudyObj("trunc40_SO_FS" , 3, 2, NULL            , trackerCorrector.TrackerGains, false, false, true) );
@@ -444,13 +453,13 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
                       int charge = dedxHits->charge(h);
                       if (detid.subdetId()>=3 && results[R]->crossTalkInvAlgo!=0){ //in case of crossTalkInv, give the corrected cluster charge
-                         if (results[R]->Name=="hit_SP_in_noC_CC") std::cout<<"But I said NO crossTalkInversion!"<<std::endl;
                          vector <int> amps = CrossTalkInv(convert(dedxHits->stripCluster(h)->amplitudes()), 0.10, 0.04, true);
                          charge = std::accumulate(amps.begin(), amps.end(), 0);
                       }
                       double ChargeOverPathlength = scaleFactor*Norm*charge/dedxHits->pathlength(h);
 
                       results[R]->HHit->Fill(ChargeOverPathlength);
+		      results[R]->HHitProfile->Fill(track->p(), ChargeOverPathlength);
                       if(results[R]->usePixel && results[R]->useStrip){
                          
                          results[R]->Charge_Vs_Path->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * charge/(dedxHits->pathlength(h)*10*(detid.subdetId()<3?265:1))); 
