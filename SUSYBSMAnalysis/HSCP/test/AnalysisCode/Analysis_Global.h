@@ -36,8 +36,9 @@
 //double IntegratedLuminosity13TeV               = 72.63; //pb
 //double IntegratedLuminosity13TeV               = 84.557; //pb
 double IntegratedLuminosity13TeV15             = 2490.518; //2439.264; //pb
-//double IntegratedLuminosity13TeV16             = 4002.946; // pb
-double IntegratedLuminosity13TeV16             = 7696.76;  // pb
+double IntegratedLuminosity13TeV16             = 4002.946; // pb
+double preTrackingChangeL1IntLumi              = 631.9090; // pb
+//double IntegratedLuminosity13TeV16             = 7696.76;  // pb
 
 double               SQRTS                     = 13;
 double               SQRTS15                   = 1315;
