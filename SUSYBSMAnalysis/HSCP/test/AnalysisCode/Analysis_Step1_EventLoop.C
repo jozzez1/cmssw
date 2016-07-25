@@ -62,7 +62,7 @@ using namespace reweight;
 void InitHistos(stPlots* st=NULL);
 void Analysis_Step1_EventLoop(char* SavePath);
 
-bool PassTrigger(const fwlite::ChainEvent& ev, bool isData, bool isCosmic=false);
+bool PassTrigger(const fwlite::ChainEvent& ev, bool isData, bool isCosmic=false, L1BugEmulator* emul=NULL);
 bool   PassPreselection(const susybsm::HSCParticle& hscp, const DeDxHitInfo* dedxHits, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, const reco::MuonTimeExtra* dttof, const reco::MuonTimeExtra* csctof, const fwlite::ChainEvent& ev, stPlots* st=NULL, const double& GenBeta=-1, bool RescaleP=false, const double& RescaleI=0.0, const double& RescaleT=0.0);
 bool PassSelection(const susybsm::HSCParticle& hscp,  const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, const fwlite::ChainEvent& ev, const int& CutIndex=0, stPlots* st=NULL, const bool isFlip=false, const double& GenBeta=-1, bool RescaleP=false, const double& RescaleI=0.0, const double& RescaleT=0.0);
 void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, stPlots* st=NULL);
@@ -114,6 +114,8 @@ double dEdxSF [2] = {
 dedxHIPEmulator HIPemulator;
 dedxHIPEmulator HIPemulatorUp ("ratePdfPixel_Up", "ratePdfStrip_Up");
 dedxHIPEmulator HIPemulatorDown ("ratePdfPixel_Down", "ratePdfStrip_Down");
+L1BugEmulator        L1Emul;
+HIPTrackLossEmulator HIPTrackLossEmul;
 
 bool useClusterCleaning = true;
 /////////////////////////// CODE PARAMETERS /////////////////////////////
@@ -294,17 +296,35 @@ TVector3 getOuterHitPos(const DeDxHitInfo* dedxHits){
 } 
 
 // check if the event is passing trigger or not --> note that the function has two part (one for 2011 analysis and the other one for 2012)
-bool PassTrigger(const fwlite::ChainEvent& ev, bool isData, bool isCosmic)
+bool PassTrigger(const fwlite::ChainEvent& ev, bool isData, bool isCosmic, L1BugEmulator* emul)
 {
    edm::TriggerResultsByName tr = ev.triggerResultsByName("HLT");
    if(!tr.isValid())         tr = ev.triggerResultsByName("MergeHLT");
    if(!tr.isValid())return false;
 
-
-
-   if(passTriggerPatterns(tr, "HLT_PFMET170_NoiseCleaned_v*"))return true;
-   if(passTriggerPatterns(tr, "HLT_Mu45_eta2p1_v*"))return true;
-   if(passTriggerPatterns(tr, "HLT_Mu50_v*"))return true;
+   if(passTriggerPatterns(tr, "HLT_PFMET170_NoiseCleaned_v*") || passTriggerPatterns(tr, "HLT_PFMET170_HBHECleaned_v*"))return true;
+   if(passTriggerPatterns(tr, "HLT_Mu45_eta2p1_v*") || passTriggerPatterns(tr, "HLT_Mu50_v*")){
+      if (!isData && emul){
+         fwlite::Handle < std::vector<reco::Muon> > muonCollHandle;
+         muonCollHandle.getByLabel(ev, "muons");
+         if (!muonCollHandle.isValid()) return false;
+         else{
+            bool KeepEvent=false;
+            for (unsigned int c=0;c<muonCollHandle->size();c++){
+               reco::MuonRef muon = reco::MuonRef(muonCollHandle.product(), c);
+               if (muon.isNull()) continue;
+               if (muon->track().isNull()) continue;
+               if (emul->PassesL1Inefficiency(muon->track()->pt(), std::fabs(muon->track()->eta()))){
+                  KeepEvent=true;
+                  break;
+               }
+            }
+            return KeepEvent;
+         }
+      }
+      else return true;
+   }
+//   if(passTriggerPatterns(tr, "HLT_Mu50_v*"))return true;
 
    return false; //FIXME triggers bellow will need to be adapted based on Run2 trigger menu
 
@@ -1207,11 +1227,11 @@ std::cout<<"G\n";
             SamplePlots      ->TotalEPU->Fill(0.0,Event_Weight*PUSystFactor);
             if(isMC)MCTrPlots->TotalEPU->Fill(0.0,Event_Weight*PUSystFactor);
 	    //See if event passed signal triggers
-            if(!PassTrigger(ev, isData) ) {
+            if(!PassTrigger(ev, isData, false, is2016?&L1Emul:NULL) ) {
 	      //For TOF only analysis if the event doesn't pass the signal triggers check if it was triggered by the no BPTX cosmic trigger
 	      //If not TOF only then move to next event
 	      if(TypeMode!=3) continue;
-	      if(!PassTrigger(ev, isData, true)) continue;
+	      if(!PassTrigger(ev, isData, true, is2016?&L1Emul:NULL)) continue;
 
 	      //If is cosmic event then switch plots to use to the ones for cosmics
 	      SamplePlots=&plotsMap[CosmicName];
@@ -1279,6 +1299,7 @@ std::cout<<"G\n";
             HIPemulatorUp.setEventRate(HIPemulator.getEventRatePixel()*1.25, HIPemulator.getEventRateStrip()*1.80);  // deltaPixel = 3.653981e+02, basePixel = 1.332625e+03; deltaStrip = 4.662832e+02, baseStrip = 5.958308e+02, from Run257805
             HIPemulatorDown.setEventRate(HIPemulator.getEventRatePixel()*0.75, HIPemulator.getEventRateStrip()*0.20); 
 
+	    HIPTrackLossEmul.SetHIPTrackLossRate(ev);
 //           if (HIPemulator.getEventRatePixel()>0 && HIPemulator.getEventRateStrip()>0)
 //              fprintf(stderr, "HIPs: %lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", HIPemulator.getEventRatePixel(), HIPemulatorUp.getEventRatePixel(), HIPemulatorDown.getEventRatePixel(), HIPemulator.getEventRateStrip(), HIPemulatorUp.getEventRateStrip(), HIPemulatorDown.getEventRateStrip());
 
@@ -1309,6 +1330,9 @@ std::cout<<"G\n";
                //for signal only, make sure that the candidate is associated to a true HSCP
                int ClosestGen;
                if(isSignal && DistToHSCP(hscp, genColl, ClosestGen)>0.03)continue;
+
+	       // we are losing some tracks due to HIP
+	       if(!isData && is2016 && !HIPTrackLossEmul.TrackSurvivesHIPInefficiency()) continue;
 
                //load quantity associated to this track (TOF and dEdx)
                const DeDxHitInfo* dedxHits = NULL;

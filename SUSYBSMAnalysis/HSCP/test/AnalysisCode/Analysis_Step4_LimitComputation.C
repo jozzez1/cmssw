@@ -2356,7 +2356,7 @@ void makeDataCard(string outpath, string rootPath, string ChannelName, string Si
    if(SQRTS==8   ) LumiUnc=1.044;
    if(SQRTS==13  ) LumiUnc=1.027;
    if(SQRTS==1315) LumiUnc=1.027;
-   if(SQRTS==1316) LumiUnc=1.027; // to be determined, for now set as in 2015
+   if(SQRTS==1316) LumiUnc=1.062; // noted from the experts, 6.2%
 
    if(isnan(float(PredRelErr)))PredRelErr= 1.2;
 
