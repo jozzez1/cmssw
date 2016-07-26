@@ -110,7 +110,7 @@ class stPlot{
 };
 
 
-void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector<string> FileName);
+void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector<string> FileName, L1BugEmulator* emul=NULL);
 bool IncreasedTreshold(const trigger::TriggerEvent& trEv, const edm::InputTag& InputPath, double NewThreshold, double etaCut,int NObjectAboveThreshold, bool averageThreshold=false);
 void layout(vector<stPlot*>& plots, vector<string>& sigs, string name);
 void SetWeight(const double& IntegratedLuminosityInPb=-1, const double& IntegratedLuminosityInPbBeforeTriggerChange=-1, const double& CrossSection=0, const double& MCEvents=0, int period=0);
@@ -149,10 +149,11 @@ void TriggerStudy(string sampleName="", string filePath="")
    GetSampleDefinition(samples , "../../AnalysisCode/Analysis_Samples.txt");
    keepOnlyValidSamples(samples);
 
-   MaxEntry = 5000;
+//   MaxEntry = 5000;
 
    ///////////////////////////////////////////////////////
-   JetMetSD_triggers.push_back("HLT_PFMET170_NoiseCleaned_v*");   JetMetSD_triggersL.push_back("MET170");
+   JetMetSD_triggers.push_back("HLT_PFMET170_NoiseCleaned_v*");   JetMetSD_triggersL.push_back("MET170 Old");
+   JetMetSD_triggers.push_back("HLT_PFMET170_HEHBCleaned_v*");    JetMetSD_triggersL.push_back("MET170 New");
 
    MuSD_triggers.push_back("HLT_Mu50_v*");			  MuSD_triggersL.push_back("Mu50");
    MuSD_triggers.push_back("HLT_Mu45_eta2p1_v*");		  MuSD_triggersL.push_back("Mu45 |#eta|<2.1");
@@ -169,10 +170,46 @@ void TriggerStudy(string sampleName="", string filePath="")
    ///////////////////////////////////////////////////////
 
    if(sampleName!="" && filePath!=""){
+      bool checkL1Inefficiency=true;
       FILE* pFile = fopen((string("Results_") + sampleName + ".txt").c_str(),"w");
       vector<string> FileName;  FileName.push_back(filePath);
-      stPlot* plot = new stPlot(sampleName);
-      TriggerStudy_Core(sampleName, pFile, plot, FileName);
+      stPlot* plot1 = new stPlot(sampleName + "_noL1Bug_");
+      TriggerStudy_Core(sampleName + (checkL1Inefficiency?"_noL1Bug_":""), pFile, plot1, FileName);
+
+      if (sampleName.find("Data")==string::npos && sampleName.find("13TeV16")!=string::npos && checkL1Inefficiency){
+         stPlot* plot2 = new stPlot(sampleName + "_wL1Bug_");
+         TriggerStudy_Core(sampleName+"_wL1Bug_", pFile, plot2, FileName, &L1Emul);
+
+         vector<string>       legend;
+         vector<TH1D*>        histos;
+        
+         vector<Color_t>      colors;
+         vector<unsigned int> lineStyle;
+        
+         lineStyle.push_back(1); colors.push_back(kBlue);
+         lineStyle.push_back(1); colors.push_back(kBlack);
+         lineStyle.push_back(1); colors.push_back(kGreen);
+         lineStyle.push_back(1); colors.push_back(kRed);
+        
+         TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
+         c1->SetBottomMargin(0.15);
+         histos.push_back(plot1->BetaTotal); legend.push_back("Overall, no L1 ineff.");
+         histos.push_back(plot2->BetaTotal); legend.push_back("Overall, L1 ineff.");
+         histos.push_back(plot1->BetaMuon);  legend.push_back("Muon, no L1 ineff.");
+         histos.push_back(plot2->BetaMuon);  legend.push_back("Muon, L1 ineff.");
+         for (size_t i=0; i<histos.size(); i++){
+            histos[i]->SetLineStyle(lineStyle[i]);
+            histos[i]->SetLineColor(colors[i]);
+            histos[i]->SetMarkerColor(colors[i]);
+         }
+
+         DrawSuperposedHistos((TH1**)(&histos[0]), legend, "HIST E1", "#beta of the fastest HSCP", "Trigger Efficiency (%)", 0,1, 0,120);
+         DrawLegend((TObject**)(&histos[0]),legend,"Trigger:","LP",0.35, 0.80, 0.20, 0.06);
+         c1->Modified();
+         DrawPreliminary("", 13.0, "(13 TeV)", "Simulation");
+         SaveCanvas(c1, "pictures/", sampleName+"L1InefficiencyOverlay");
+         delete c1;
+      }
       fflush(pFile);
       fclose(pFile);
    }else{
@@ -181,10 +218,10 @@ void TriggerStudy(string sampleName="", string filePath="")
 	   for(unsigned int i=0;i<samples.size();i++){
 	      if(samples[i].Type!=2)continue;
 	      plots[i] = new stPlot(samples[i].Name);
-	      if(! (samples[i].Name=="Gluino_13TeV_M600_f10" || samples[i].Name=="Gluino_13TeV_M1600_f10" || samples[i].Name=="Gluino_13TeV_M2600_f10"  
-	      || samples[i].Name=="Gluino_13TeV_M600N_f10" || samples[i].Name=="Gluino_13TeV_M1600N_f10" || samples[i].Name=="Gluino_13TeV_M2600N_f10"  
-	      || samples[i].Name=="GMStau_13TeV_M308" || samples[i].Name=="GMStau_13TeV_M871" || samples[i].Name=="GMStau_13TeV_M1218" 
-	      || samples[i].Name=="PPStau_13TeV_M308" || samples[i].Name=="PPStau_13TeV_M871" || samples[i].Name=="PPStau_13TeV_M1218"  
+	      if(! (samples[i].Name=="Gluino_13TeV16_M600_f10" || samples[i].Name=="Gluino_13TeV16_M1600_f10" || samples[i].Name=="Gluino_13TeV16_M2600_f10"  
+	      || samples[i].Name=="Gluino_13TeV16_M600N_f10" || samples[i].Name=="Gluino_13TeV16_M1600N_f10" || samples[i].Name=="Gluino_13TeV16_M2600N_f10"  
+	      || samples[i].Name=="GMStau_13TeV16_M308" || samples[i].Name=="GMStau_13TeV16_M871" || samples[i].Name=="GMStau_13TeV16_M1218" 
+	      || samples[i].Name=="PPStau_13TeV16_M308" || samples[i].Name=="PPStau_13TeV16_M871" || samples[i].Name=="PPStau_13TeV16_M1218"  
 	      ))continue;
 	      printf("Process %20s sample\n", samples[i].Name.c_str());
 
@@ -197,30 +234,30 @@ void TriggerStudy(string sampleName="", string filePath="")
 	   int Id;                              vector<stPlot*> objs;        vector<string> leg;
 
 						objs.clear();                leg.clear();
-	   Id = JobIdToIndex("Gluino_13TeV_M600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("Gluino_13TeV_M1600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("Gluino_13TeV_M2600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M1600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M2600_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
 	   layout(objs, leg, "summary_Gluino");
 
 						objs.clear();                leg.clear();
-	   Id = JobIdToIndex("Gluino_13TeV_M600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("Gluino_13TeV_M1600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("Gluino_13TeV_M2600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M1600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("Gluino_13TeV16_M2600N_f10",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
 	   layout(objs, leg, "summary_GluinoN");
 
 
 
 						objs.clear();                leg.clear();
 						objs.clear();                leg.clear();
-	   Id = JobIdToIndex("GMStau_13TeV_M308",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("GMStau_13TeV_M871",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("GMStau_13TeV_M1218",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("GMStau_13TeV16_M308",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("GMStau_13TeV16_M871",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("GMStau_13TeV16_M1218",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
 	   layout(objs, leg, "summary_GMStau");
 
 						objs.clear();                leg.clear();
-	   Id = JobIdToIndex("PPStau_13TeV_M308",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("PPStau_13TeV_M871",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
-	   Id = JobIdToIndex("PPStau_13TeV_M1218",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("PPStau_13TeV16_M308",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("PPStau_13TeV16_M871",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
+	   Id = JobIdToIndex("PPStau_13TeV16_M1218",samples);      objs.push_back(plots[Id]);   leg.push_back(samples[Id].Legend);
 	   layout(objs, leg, "summary_PPStau");
 
            fflush(pFile);
@@ -230,7 +267,7 @@ void TriggerStudy(string sampleName="", string filePath="")
 
 }
 
-void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector<string> FileName)
+void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector<string> FileName, L1BugEmulator* emul)
 {
    double Total       = 0;
    double SDJetMET    = 0;
@@ -270,9 +307,9 @@ void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector
       if(!tr.isValid()){printf("Trigger is invalid\n"); continue;}
 
       ////USE THIS TO DUMP AVAILABLE TRIGGER PATHS
-      for(unsigned int i=0;i<tr.size();i++){
-         printf("Path %3i %50s --> %1i\n",i, tr.triggerName(i).c_str(),tr.accept(i));
-      }fflush(stdout);exit(0);
+//      for(unsigned int i=0;i<tr.size();i++){
+//         printf("Path %3i %50s --> %1i\n",i, tr.triggerName(i).c_str(),tr.accept(i));
+//      }fflush(stdout);exit(0);
 
 //      fwlite::Handle< trigger::TriggerEvent > trEvHandle;
 //      trEvHandle.getByLabel(ev,"hltTriggerSummaryAOD");
@@ -305,6 +342,23 @@ void TriggerStudy_Core(string sampleName, FILE* pFile, stPlot* plot, std::vector
          bool Accept2 = false;
 
          Accept = passTriggerPatterns(tr, All_triggers[i]);
+         if (Accept && emul && All_triggers[i].find("Mu")!=std::string::npos){
+            fwlite::Handle < std::vector<reco::Muon> > muonCollHandle;
+            muonCollHandle.getByLabel(ev, "muons");
+            if (!muonCollHandle.isValid()) Accept = false;
+            else{
+               Accept=false;
+               for (unsigned int c=0;c<muonCollHandle->size();c++){
+                  reco::MuonRef muon = reco::MuonRef(muonCollHandle.product(), c);
+                  if (muon.isNull()) continue;
+		  if (muon->track().isNull()) continue;
+                  if (emul->PassesL1Inefficiency(muon->track()->pt(), std::fabs(muon->track()->eta()))){
+                     Accept=true;
+                     break;
+                  }
+               }
+            }
+         }
          Accept2 = Accept;
 //         if(whereJetMetSD!=JetMetSD_triggers.end()){
 //            Accept2 = IncreasedTreshold(trEv, InputTag("hltPFMET170Filter","","HLT"),190 , 99, 1, false);
