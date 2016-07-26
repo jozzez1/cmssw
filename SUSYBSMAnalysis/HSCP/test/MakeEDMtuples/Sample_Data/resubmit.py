@@ -2,10 +2,12 @@
 
 import os, sys, string, json
 
-resubmit          = False
-checkFileSize     = True
-checkLumiContent  = False
-EmptyFileSize     = 2321123
+resubmit              = False
+resubmitOnTheFly      = True
+checkFileSize         = True
+checkLumiContent      = False
+EmptyFileSize         = 2321123
+resubmitScriptName    = "resubmit.cmd" if not resubmitOnTheFly else "resubmitOnTheFly.cmd"
 
 def initProxy():
    print "You are going to run on a sample over grid using either CRAB or the AAA protocol, it is therefore needed to initialize your grid certificate"
@@ -26,7 +28,7 @@ if len(sys.argv)==1 or sys.argv[1]=="1":
       listOfFiles = os.listdir("out/%s" % run)
       for file in listOfFiles:
          fileStats=os.stat("out/%s/%s" % (run, file))
-         if int(fileStats.st_size) < 1024L:
+         if int(fileStats.st_size) < EmpyFileSize:
            print "File", file, "has to be reprocessed!"
            continue
          if file.find("SingleMuon")!=-1:
@@ -80,9 +82,19 @@ if sys.argv[1]=="2":
       if not fileIsGood:
          jobsToRerun.append(file)
 
+   if resubmitOnTheFly:
+      runningJobs = os.popen('condor_q %s -long | grep Cmd' % os.environ['USER']).read()
+      runningJobs = runningJobs.split('\n')
+      runningJobs.pop()
+      for job in runningJobs:
+         runningScript = job.split('/')[len(job.split('/'))-1]
+         runningScript = runningScript.replace('"', '')
+         if runningScript in jobsToRerun:
+            jobsToRerun.remove(runningScript)
+
    if len(jobsToRerun) > 0:
       print "creating resubmit command script:"
-      f = open("resubmit.cmd", "w")
+      f = open(resubmitScriptName, "w")
       f.write('Universe                = vanilla\n')
       f.write('Environment             = CONDORJOBID=$(Process)\n')
       f.write('notification            = Error\n')
@@ -98,9 +110,9 @@ if sys.argv[1]=="2":
          f.write('log                     = FARM/logs/%s.log\n'  % job)
          f.write('Queue 1\n')
       f.close()
-      print "resubmit.cmd written"
+      print "%s written" % resubmitScriptName
 
       if resubmit:
          initProxy()
-         os.system('condor_submit resubmit.cmd')
+         os.system('condor_submit %s' % resubmitScriptName)
 
