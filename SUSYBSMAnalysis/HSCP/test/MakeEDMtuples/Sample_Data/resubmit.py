@@ -10,11 +10,11 @@ import SUSYBSMAnalysis.HSCP.LaunchOnCondor as LaunchOnCondor
 #
 # modes for 1st option
 #################################
-printOnlySuccess      = False   # list only runs ready for merging
+printOnlySuccess      = True    # list only runs ready for merging
 printNumberOfFiles    = True    # list number of good MET/SingleMuon/DoubleMuon files vs number of expected files
 mergeAvailableRuns    = True    # if we print only success, merge the available runs
 mergeOnTheFly         = True    # make sure not to resubmit runs that are already being merged
-overwriteMerged       = False   # proceed with merging, even if the file exists
+overwriteMerged       = True    # proceed with merging, even if the file exists
 # modes for 2nd option
 #################################
 resubmit              = True    # resubmit on the cluster at the end
@@ -85,14 +85,14 @@ if len(sys.argv)==1 or sys.argv[1]=="1":
             script=script.split('=')[1]
             script=script.replace('"', '')
             script=script.split('/')[len(script.split('/'))-1]
-	    script=script.split('_')[2]
-	    script=script.split('.')[0]
+            script=script.split('_')[2]
+            script=script.split('.')[0]
             AlreadyMergingRuns.append(int(script))
 
       for entry in runsToPrint:
          RUN = int(entry[0])
          if mergeOnTheFly and RUN in AlreadyMergingRuns: continue
-	 if not overwriteMerged and os.path.isfile('out/Run2016_%i.root' % RUN): continue
+         if not overwriteMerged and os.path.isfile('out/Run2016_%i.root' % RUN): continue
          LaunchOnCondor.Jobs_InitCmds   = ['export HOME=%s' % os.environ['HOME']]
          LaunchOnCondor.Jobs_FinalCmds  = ["edmLumisInFiles.py Run2016_%i.root --output=%s/out/Run2016_%i.json" % (RUN, os.getcwd(), RUN)]
          LaunchOnCondor.Jobs_FinalCmds += ["mv Run2016_%i.root %s/out/Run2016_%i.root" % (RUN, os.getcwd(), RUN)]
