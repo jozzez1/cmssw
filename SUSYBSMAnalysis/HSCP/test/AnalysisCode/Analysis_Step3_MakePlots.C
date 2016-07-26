@@ -360,7 +360,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
    if(Signal){Signal->Rebin(4);  Max=std::max(Max, Signal->GetMaximum());}
    if(MC)    {MC    ->Rebin(4);  Max=std::max(Max, MC    ->GetMaximum());}
    if(MCPred){MCPred->Rebin(4);  Max=std::max(Max, MCPred->GetMaximum());}
-   Max*=10.0;
+   Max*=50.0;
 
 
 
@@ -490,7 +490,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
      }
      c1->SetLogy(true);
 
-       TH1D* frame = new TH1D("frame", "frame", 1,0,1400);
+       TH1D* frame = new TH1D("frame", "frame", 1,0,1600);
        frame->GetXaxis()->SetNdivisions(505);
        frame->SetTitle("");
        frame->SetStats(kFALSE);
@@ -509,6 +509,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
        frame->GetXaxis()->SetLabelSize(20); //font size
        frame->GetXaxis()->SetTitleFont(43); //give the font size in pixel (instead of fraction)
        frame->GetXaxis()->SetTitleSize(20); //font size
+       frame->GetXaxis()->SetRangeUser(0,1600); //x-axis range
 //       frame->GetXaxis()->SetTitleOffset(3.75);
        if(r==0)frame->GetXaxis()->SetTitle("Mass (GeV)");
 
@@ -517,6 +518,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
        if(Signal){
 	 Signal->SetMarkerStyle(21);
 	 Signal->SetMarkerColor(8);
+	 Signal->GetXaxis()->SetRangeUser(0,1600);
 	 Signal->SetMarkerSize(1.5);
 	 Signal->SetLineColor(1);
 	 Signal->SetFillColor(8);
@@ -639,10 +641,11 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
 
    if(Data13TeV15){
       Data13TeV15->SetBinContent(Data13TeV15->GetNbinsX(), Data13TeV15->GetBinContent(Data13TeV15->GetNbinsX()) + Data13TeV15->GetBinContent(Data13TeV15->GetNbinsX()+1));
-      Data13TeV15->SetMarkerStyle(21);
-      Data13TeV15->SetMarkerColor(kBlack);
+      Data13TeV15->SetMarkerStyle(25);
+      Data13TeV15->SetMarkerColor(kBlue);
       Data13TeV15->SetMarkerSize(1.0);
-      Data13TeV15->SetLineColor(kBlack);
+      Data13TeV15->SetLineColor(kBlue);
+      Data13TeV15->SetLineWidth(1.5);
       Data13TeV15->SetFillColor(0);
 //      Data13TeV15->Draw("P same");
       getGarwoodErrorBars(Data13TeV15)->Draw("P E1 same");
@@ -717,7 +720,8 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
    c1->cd();
 
    t2->cd();
-   TH1D* frameR = new TH1D("frameR", "frameR", 1,0, 2800);
+//   TH1D* frameR = new TH1D("frameR", "frameR", 1,0, 2800);
+   TH1D* frameR = new TH1D("frameR", "frameR", 1,0, 1600);
    frameR->GetXaxis()->SetNdivisions(505);
    frameR->SetTitle("");
    frameR->SetStats(kFALSE);
