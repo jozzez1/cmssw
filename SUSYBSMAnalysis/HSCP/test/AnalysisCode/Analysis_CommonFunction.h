@@ -1350,7 +1350,7 @@ class HIPTrackLossEmulator{
      bool TrackSurvivesHIPInefficiency(){
         return (((rand()%999999)*1.0/1000000) > lossRate);
      }
-}
+};
 
 void printClusterCleaningMessage (uint8_t exitCode){
    switch (exitCode){

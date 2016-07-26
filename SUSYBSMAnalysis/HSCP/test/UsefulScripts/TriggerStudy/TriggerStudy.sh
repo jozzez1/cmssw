@@ -16,18 +16,15 @@ root -l -b << EOF
   gInterpreter->SetClassAutoparsing(false);
 
 
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_274998.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_274999.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275000.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275001.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275059.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275066.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275067.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275068.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275073.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275074.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275124.root")
-  .x TriggerStudy.C+("Run2016_274240WiTS", "/storage/data/cms/store/user/jozobec/HSCP2016/Run2016_275125.root")
+  .x TriggerStudy.C+("Gluino1000_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1000.root")
+  .x TriggerStudy.C+("Gluino1600_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1600.root")
+  .x TriggerStudy.C+("Gluino600_13TeV16_f10",  "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M600.root")
+  .x TriggerStudy.C+("Gluino1000N_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1000N.root")
+  .x TriggerStudy.C+("Gluino1600N_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1600N.root")
+  .x TriggerStudy.C+("Gluino600N_13TeV16_f10",  "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M600N.root")
+  .x TriggerStudy.C+("GMStauM308_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M308.root")
+  .x TriggerStudy.C+("GMStauM494_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M494.root")
+  .x TriggerStudy.C+("GMStauM871_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M871.root")
 EOF
 
 # FIRST BATCH
