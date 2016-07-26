@@ -10,7 +10,7 @@ import SUSYBSMAnalysis.HSCP.LaunchOnCondor as LaunchOnCondor
 #
 # modes for 1st option
 #################################
-printOnlySuccess      = True    # list only runs ready for merging
+printOnlySuccess      = False   # list only runs ready for merging
 printNumberOfFiles    = True    # list number of good MET/SingleMuon/DoubleMuon files vs number of expected files
 mergeAvailableRuns    = True    # if we print only success, merge the available runs
 mergeOnTheFly         = True    # make sure not to resubmit runs that are already being merged
@@ -163,9 +163,10 @@ if sys.argv[1]=="2":
       runningJobs = runningJobs.split('\n')
       runningJobs.pop()
       for job in runningJobs:
+         if job.find(os.getcwd())==-1: continue
          runningScript = job.split('/')[len(job.split('/'))-1]
          runningScript = runningScript.replace('"', '')
-         if runningScript in jobsToRerun or job.find(os.getcwd())==-1:
+         if runningScript in jobsToRerun:
             jobsToRerun.remove(runningScript)
 
    print "%i jobs to rerun" % len(jobsToRerun)
