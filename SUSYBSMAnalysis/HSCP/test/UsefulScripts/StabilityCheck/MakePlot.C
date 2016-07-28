@@ -742,14 +742,14 @@ void MakePlot()
       for(unsigned int S=0;S<sizeof(dEdxVariables)/sizeof(string);S++){
          if(dEdxLegends[S].find("I_{as}")!=std::string::npos){
             //overlay(runList     , InputFile,  trigger+dEdxVariables[S]+version, 0.0, 0.5, "overlay_"+dEdxVariables[S]+version+"All", 1E-5, dEdxLegends[S].c_str()); 
-            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 0.5, "overlay_"+dEdxVariables[S]+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs, &selectedRuns);
+            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 0.5, "overlay_"+dEdxVariables[S]+"_"+trigger+"_"+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs, &selectedRuns);
 
-            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 0.5, "275001overlay_"+dEdxVariables[S]+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs275001, &selectedRuns275001);
+            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 0.5, "275001overlay_"+dEdxVariables[S]+"_"+trigger+"_"+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs275001, &selectedRuns275001);
          }else{
             //overlay(runList     , InputFile,  trigger+dEdxVariables[S]+version, 0.0, 10.0, "overlay_"+dEdxVariables[S]+version+"All", 1E-5, dEdxLegends[S].c_str());
-            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 10.0, "overlay_"+dEdxVariables[S]+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs, &selectedRuns);
+            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 10.0, "overlay_"+dEdxVariables[S]+"_"+trigger+"_"+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs, &selectedRuns);
 
-            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 10.0, "275001overlay_"+dEdxVariables[S]+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs275001, &selectedRuns275001);
+            overlay(runList, InputFile,  trigger+dEdxVariables[S]+version, 0.0, 10.0, "275001overlay_"+dEdxVariables[S]+"_"+trigger+"_"+version      , 1E-5, dEdxLegends[S].c_str(), &selectedLegs275001, &selectedRuns275001);
 
 
 
@@ -758,12 +758,12 @@ void MakePlot()
      }
 
 //      overlay(runList, InputFile,  trigger+"dEdxHitPixel"+version, 0.0, 10, "overlay_dEdxHitPixel"+version+"All", 1E-4, "Pixel Hit dEdx (MeV/cm)");
-      overlay(runList, InputFile,  trigger+"dEdxHitPixel"+version, 0.0, 6, "overlay_dEdxHitPixel"+version, 1E-4, "Pixel Hit dEdx (MeV/cm)", &selectedLegs, &selectedRuns);
+      overlay(runList, InputFile,  trigger+"dEdxHitPixel"+version, 0.0, 6, string("overlay_dEdxHitPixel")+"_"+trigger+"_"+version, 1E-4, "Pixel Hit dEdx (MeV/cm)", &selectedLegs, &selectedRuns);
 
 //      overlay(runList, InputFile,  trigger+"dEdxHitStrip"+version, 0.0, 10, "overlay_dEdxHitStrip"+version+"All", 1E-4, "Strip Hit dEdx (MeV/cm)");
-      overlay(runList, InputFile,  trigger+"dEdxHitStrip"+version, 0.0, 6, "overlay_dEdxHitStrip"+version, 1E-4, "Strip Hit dEdx (MeV/cm)", &selectedLegs, &selectedRuns);
+      overlay(runList, InputFile,  trigger+"dEdxHitStrip"+version, 0.0, 6, string("overlay_dEdxHitStrip")+"_"+trigger+"_"+version, 1E-4, "Strip Hit dEdx (MeV/cm)", &selectedLegs, &selectedRuns);
 
-      overlay(runList, InputFile,  trigger+"dEdxHitStrip"+version, 0.0, 6, "275001overlay_dEdxHitStrip"+version, 1E-4, "Strip Hit dEdx (MeV/cm)", &selectedLegs275001, &selectedRuns275001);
+      overlay(runList, InputFile,  trigger+"dEdxHitStrip"+version, 0.0, 6, string("275001overlay_dEdxHitStrip")+"_"+trigger+"_"+version, 1E-4, "Strip Hit dEdx (MeV/cm)", &selectedLegs275001, &selectedRuns275001);
 
 
       for(unsigned int S=0;S<sizeof(dEdxVariables)/sizeof(string);S++){
