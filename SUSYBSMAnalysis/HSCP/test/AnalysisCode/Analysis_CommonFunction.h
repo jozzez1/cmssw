@@ -1298,8 +1298,8 @@ class L1BugEmulator{
       }
 
       ~L1BugEmulator(){
-         delete h1;
-         delete h2;
+//         delete h1;
+//         delete h2;
       }
 
       bool PassesL1Inefficiency(double pT, double Eta){
@@ -1326,7 +1326,7 @@ class HIPTrackLossEmulator{
         h->SetBinContent(h->FindBin( 2.5), 1.000);
         h->SetBinContent(h->FindBin( 7.5), 0.998);
         h->SetBinContent(h->FindBin(12.5), 0.995);
-        h->SetBinContent(h->FindBin(12.5), 0.992);
+        h->SetBinContent(h->FindBin(17.5), 0.992);
         h->SetBinContent(h->FindBin(24.5), 0.985);
         h->SetBinContent(h->FindBin(30.0), 0.980);
         h->SetBinContent(h->FindBin(37.0), 0.970);
@@ -1335,7 +1335,7 @@ class HIPTrackLossEmulator{
      }
 
      ~HIPTrackLossEmulator(){
-        delete h;
+//        delete h;
      }
 
      void SetHIPTrackLossRate(fwlite::ChainEvent& ev){
