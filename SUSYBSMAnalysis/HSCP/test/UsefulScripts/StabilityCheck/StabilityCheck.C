@@ -61,9 +61,12 @@ using namespace trigger;
 
 struct plotSt{
    TH1D* NVert;
-   TH1D* PtBPS;
+   TH1D* PreselEff;
+   TH1D* TPsVNEvts;
+//   TH1D* PtBPS;
    TH1D* Pt;
-   TH1D* PtErr;
+   TH2D* PtEta;
+//   TH1D* PtErr;
    TH1D* dEdxHitStrip;
    TH1D* dEdxHitPixel;
    TH1D* dEdxMin1;
@@ -90,10 +93,14 @@ struct plotSt{
 
    plotSt(string prefix, string sufix){
       string histoName;              
+      histoName=prefix + "PreselEff"    + sufix ; PreselEff    = new TH1D(histoName.c_str(), histoName.c_str(),    1, 0.0, 1.0);
+      histoName=prefix + "TPsVNEvts"    + sufix ; TPsVNEvts    = new TH1D(histoName.c_str(), histoName.c_str(),    1, 0.0, 1.0);
       histoName=prefix + "NVert"        + sufix ; NVert        = new TH1D(histoName.c_str(), histoName.c_str(),  100, 0.0, 100);
-      histoName=prefix + "PtBPS"        + sufix ; PtBPS        = new TH1D(histoName.c_str(), histoName.c_str(), 1000, 0.0,1000);
+//      histoName=prefix + "PtBPS"        + sufix ; PtBPS        = new TH1D(histoName.c_str(), histoName.c_str(), 1000, 0.0,1000);
       histoName=prefix + "Pt"           + sufix ; Pt           = new TH1D(histoName.c_str(), histoName.c_str(), 1000, 0.0,1000);
-      histoName=prefix + "PtErr"        + sufix ; PtErr        = new TH1D(histoName.c_str(), histoName.c_str(), 1000, 0.0,32.0);
+      double EtaBins[] = {0.0, 0.9, 1.2, 2.1, 2.4};
+      histoName=prefix + "PtEta"        + sufix ; PtEta        = new TH2D(histoName.c_str(), histoName.c_str(), sizeof(EtaBins)/sizeof(double)-1, EtaBins, 1000, 0.0, 1000);
+//      histoName=prefix + "PtErr"        + sufix ; PtErr        = new TH1D(histoName.c_str(), histoName.c_str(), 1000, 0.0,32.0);
       histoName=prefix + "dEdxHitStrip" + sufix ; dEdxHitStrip = new TH1D(histoName.c_str(), histoName.c_str(),  400, 0.0,20.0);
       histoName=prefix + "dEdxHitPixel" + sufix ; dEdxHitPixel = new TH1D(histoName.c_str(), histoName.c_str(),  400, 0.0,20.0);
       histoName=prefix + "dEdxMin1"     + sufix ; dEdxMin1     = new TH1D(histoName.c_str(), histoName.c_str(),  200, 0.0,10.0);
@@ -219,15 +226,15 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
 
    std::vector<string> triggers;
    triggers.push_back("Any");
-   triggers.push_back("HLT_Mu45_eta2p1");
-   triggers.push_back("HLT_Mu50");
-   triggers.push_back("HLT_PFMET170_NoiseCleaned");
-   triggers.push_back("HLT_PFMET170_HBECleaned");
+//   triggers.push_back("HLT_Mu45_eta2p1");
+//   triggers.push_back("HLT_Mu50");
+//   triggers.push_back("HLT_PFMET170_NoiseCleaned");
+//   triggers.push_back("HLT_PFMET170_HBECleaned");
 
    std::vector<string> versions;
    versions.push_back("");
-   versions.push_back("AOD");
-   versions.push_back("FAKE");
+//   versions.push_back("AOD");
+//   versions.push_back("FAKE");
 
 
 
@@ -313,12 +320,18 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
    int NEvents = ev.size();// / NJobs;
    int FirstEvent = 0;//JobIndex * NEvents;
    int TreeStep = NEvents/50;if(TreeStep==0)TreeStep=1;
+   double totalNEvents      = 0.0;
+   double totalPreselEvents = 0.0;
+   double totalPreselTracks = 0.0;
    for(Long64_t e=FirstEvent;e<FirstEvent+NEvents;e++){
       ev.to(e); 
       if(e%TreeStep==0){printf(".");fflush(stdout);}
 
       //if run change, update conditions
       if(CurrentRun != ev.eventAuxiliary().run()){
+         totalNEvents     =0;
+         totalPreselEvents=0;
+	 totalPreselTracks=0;
          CurrentRun = ev.eventAuxiliary().run();
          tofCalculator.setRun(CurrentRun);
          trackerCorrector.setRun(CurrentRun);
@@ -350,6 +363,7 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
       if(!PassingTrigger(ev,"Any")){continue;} //need to pass at least one of the trigger, otherwise save time
 
 
+      totalNEvents += 1;
 
 
       fwlite::Handle<susybsm::HSCParticleCollection> hscpCollHandle;
@@ -391,6 +405,7 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
       HIPemulator.setEventRate(); //take it from a pdf
 
       bool plotPerEvent=true;
+      bool alreadyPassed=false;
       for(unsigned int c=0;c<hscpColl.size();c++){
          susybsm::HSCParticle hscp  = hscpColl[c];
          reco::TrackRef track = hscp.trackRef();
@@ -422,15 +437,17 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
             }
          }
          
-         for(unsigned int i=0;i<triggers.size();i++){ //PtDistribution before preselection - i.e. out of the box
-            if(!PassingTrigger(ev,triggers[i])){continue;}
-            for(unsigned int v=0;v<versions.size();v++){
-               plotSt* plots = (*MapTriggerPlots)[triggers[i]+versions[v]];
-               plots->PtBPS->Fill(hscp.trackRef()->ptError());
-            }
-         }
+//         for(unsigned int i=0;i<triggers.size();i++){ //PtDistribution before preselection - i.e. out of the box
+//            if(!PassingTrigger(ev,triggers[i])){continue;}
+//            for(unsigned int v=0;v<versions.size();v++){
+//               plotSt* plots = (*MapTriggerPlots)[triggers[i]+versions[v]];
+//               plots->PtBPS->Fill(hscp.trackRef()->ptError());
+//            }
+//         }
 
          if(!PassPreselection(hscp, PSdedxSObj, PSdedxMObj, PStof, PSdttof, PScsctof, ev)){continue;}
+         if(!alreadyPassed) {totalPreselEvents += 1; alreadyPassed=true;}
+	 totalPreselTracks += 1;
          for(unsigned int i=0;i<triggers.size();i++){
             if(!PassingTrigger(ev,triggers[i])){continue;}
             for(unsigned int v=0;v<versions.size();v++){
@@ -497,7 +514,8 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
 
             if(plotPerEvent){plots->NVert->Fill(vertexColl.size()); (dEdxHitPerLumiIt->second)[0]->Fill(vertexColl.size());}
             plots->Pt   ->Fill(hscp.trackRef()->pt());
-            plots->PtErr->Fill(hscp.trackRef()->ptError());
+            plots->PtEta->Fill(std::fabs(hscp.trackRef()->eta()), hscp.trackRef()->pt());
+//            plots->PtErr->Fill(hscp.trackRef()->ptError());
 
             plots->dEdxMin1->Fill(dedxMin1Obj.dEdx());
             plots->dEdxMin2->Fill(dedxMin2Obj.dEdx());
@@ -526,6 +544,8 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
                if(dttof->nDof()>=GlobalMinNDOFDT) plots->VertexDT->Fill(dttof->timeAtIpInOut());
                if(csctof->nDof()>=GlobalMinNDOFCSC) plots->VertexCSC->Fill(csctof->timeAtIpInOut());
             } 
+           plots->PreselEff->SetBinContent(1, totalPreselEvents/totalNEvents);
+	   plots->TPsVNEvts->SetBinContent(1, totalPreselTracks/totalNEvents);
            } 
          }
          plotPerEvent = false;
