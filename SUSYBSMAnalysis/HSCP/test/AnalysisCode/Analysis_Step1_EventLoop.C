@@ -112,8 +112,8 @@ double dEdxSF [2] = {
    1.21836    // [1]  Pixel data to SiStrip data
 };
 dedxHIPEmulator HIPemulator;
-dedxHIPEmulator HIPemulatorUp ("ratePdfPixel_Up", "ratePdfStrip_Up");
-dedxHIPEmulator HIPemulatorDown ("ratePdfPixel_Down", "ratePdfStrip_Down");
+dedxHIPEmulator HIPemulatorUp (false, "ratePdfPixel_Up", "ratePdfStrip_Up");
+dedxHIPEmulator HIPemulatorDown (false, "ratePdfPixel_Down", "ratePdfStrip_Down");
 L1BugEmulator        L1Emul;
 HIPTrackLossEmulator HIPTrackLossEmul;
 
@@ -244,6 +244,9 @@ std::cout<<"A\n";
    //initialize LumiReWeighting
    //FIXME  pileup scenario must be updated based on data/mc
    bool is2016 = (samples[0].Name.find("13TeV16")!=std::string::npos)?true:false;
+   HIPemulator.    setPeriodHIPRate(is2016);
+   HIPemulatorUp.  setPeriodHIPRate(is2016);
+   HIPemulatorDown.setPeriodHIPRate(is2016);
    if(samples[0].Pileup=="S15"){        for(int i=0; i<100; ++i) BgLumiMC.push_back(Pileup_MC_Startup2015_25ns[i]);
    }else if(samples[0].Pileup=="NoPU" && !is2016){ for(int i=0; i<100; ++i) BgLumiMC.push_back(TrueDist2015_f[i]); //Push same as 2015 data to garantee no PU reweighting
    }else if(samples[0].Pileup=="NoPU" && is2016) { for(int i=0; i<100; ++i) BgLumiMC.push_back(TrueDist2016_f[i]); //Push same as 2016 data to garantee no PU reweighting
