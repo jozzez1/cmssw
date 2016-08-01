@@ -65,8 +65,8 @@ void Analysis_Step3_MakePlots()
    Make2DPlot_Special("Results/Type0/", "Results/Type0/");
 
    InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 29;
-   MassPrediction(InputPattern, CutIndex,      "Mass", false, "13TeV_Loose");
-   MassPrediction(InputPattern, CutIndexTight, "Mass", false, "13TeV_Tight");
+   MassPrediction(InputPattern, CutIndex,      "Mass", false, "13TeV16_Loose");
+   MassPrediction(InputPattern, CutIndexTight, "Mass", false, "13TeV16_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
    CutFlowPlot(InputPattern, 0);
@@ -79,10 +79,10 @@ void Analysis_Step3_MakePlots()
 
    InputPattern = "Results/Type2/";   CutIndex = 16; CutIndexTight = 299; CutIndex_Flip=12;
 
-   MassPrediction(InputPattern, CutIndex,      "Mass"     , false, "13TeV_Loose");
-   MassPrediction(InputPattern, CutIndexTight, "Mass"     , false, "13TeV_Tight");
-   MassPrediction(InputPattern, 1,             "Mass_Flip", false, "13TeV_Loose");
-   MassPrediction(InputPattern, CutIndex_Flip, "Mass_Flip", false, "13TeV_Tight");
+   MassPrediction(InputPattern, CutIndex,      "Mass"     , false, "13TeV16_Loose");
+   MassPrediction(InputPattern, CutIndexTight, "Mass"     , false, "13TeV16_Tight");
+   MassPrediction(InputPattern, 1,             "Mass_Flip", false, "13TeV16_Loose");
+   MassPrediction(InputPattern, CutIndex_Flip, "Mass_Flip", false, "13TeV16_Tight");
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
    CutFlowPlot(InputPattern, 0);
@@ -235,9 +235,10 @@ void Analysis_Step3_MakePlots()
 void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuffix, bool showMC, string DataName){
    SQRTS=13.0;
    if(DataName.find("7TeV")!=string::npos){SQRTS=7.0;}
-   if(DataName.find("8TeV")!=string::npos){SQRTS=8.0;}
-   if(DataName.find("13TeV16")!=string::npos){SQRTS=1316.0;}
-   if(DataName.find("13TeV15")!=string::npos){SQRTS=1315.0;}
+   else if(DataName.find("8TeV")!=string::npos){SQRTS=8.0;}
+   else if(DataName.find("13TeV16")!=string::npos){SQRTS=1316.0;}
+   else if(DataName.find("13TeV15")!=string::npos){SQRTS=1315.0;}
+   else if(DataName.find("13TeV")!=string::npos){SQRTS=1315.0;}
 
    bool IsTkOnly = (InputPattern.find("Type0",0)<std::string::npos);
    double SystError     = 0.20;
@@ -249,18 +250,29 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
    string SName,SLeg;
 
    //README: Comments or uncomment lines below in order to decide what you want to see on your plot
-   if(DataName.find("13TeV")!=string::npos){
+   if(DataName.find("13TeV16")!=string::npos){
+                    SName="Gluino_13TeV16_M1000_f10";     SLeg="Gluino (M = 1000 GeV)";
+      if(!IsTkOnly){SName="GMStau_13TeV16_M494";         SLeg="Stau (M = 494 GeV)";}
+
+//      Pred13TeV15  = GetProjectionFromPath(InputFile, string("Data13TeV/Pred_"  ) + HistoSuffix, CutIndex, "TmpPredMass15");
+//      Data13TeV15  = GetProjectionFromPath(InputFile, string("Data13TeV/"       ) + HistoSuffix, CutIndex, "TmpDataMass15");
+      Pred13TeV16  = GetProjectionFromPath(InputFile, string("Data13TeV16/Pred_") + HistoSuffix, CutIndex, "TmpPredMass16");
+      Data13TeV16  = GetProjectionFromPath(InputFile, string("Data13TeV16/"     ) + HistoSuffix, CutIndex, "TmpDataMass16");
+
+      if(showMC)MCPred    = GetProjectionFromPath(InputFile, string("MCTr_13TeV16/Pred_"  ) + HistoSuffix,  CutIndex, "TmpMCPred");
+      if(showMC)MC        = GetProjectionFromPath(InputFile, string("MCTr_13TeV16/"       ) + HistoSuffix,  CutIndex, "TmpMCMass");
+      Signal    = GetProjectionFromPath(InputFile, string(SName+"/"     ) + HistoSuffix, CutIndex, "TmpSignalMass");
+   } else if(DataName.find("13TeV")!=string::npos){
                     SName="Gluino_13TeV_M1000_f10";     SLeg="Gluino (M = 1000 GeV)";
       if(!IsTkOnly){SName="GMStau_13TeV_M494";         SLeg="Stau (M = 494 GeV)";}
 
-      Pred13TeV15  = GetProjectionFromPath(InputFile, string("Data13TeV/Pred_"  ) + HistoSuffix, CutIndex, "TmpPredMass15");
-      Data13TeV15  = GetProjectionFromPath(InputFile, string("Data13TeV/"       ) + HistoSuffix, CutIndex, "TmpDataMass15");
       Pred13TeV16  = GetProjectionFromPath(InputFile, string("Data13TeV16/Pred_") + HistoSuffix, CutIndex, "TmpPredMass16");
       Data13TeV16  = GetProjectionFromPath(InputFile, string("Data13TeV16/"     ) + HistoSuffix, CutIndex, "TmpDataMass16");
 
       if(showMC)MCPred    = GetProjectionFromPath(InputFile, string("MCTr_13TeV/Pred_"  ) + HistoSuffix,  CutIndex, "TmpMCPred");
       if(showMC)MC        = GetProjectionFromPath(InputFile, string("MCTr_13TeV/"       ) + HistoSuffix,  CutIndex, "TmpMCMass");
       Signal    = GetProjectionFromPath(InputFile, string(SName+"/"     ) + HistoSuffix, CutIndex, "TmpSignalMass");
+ 
    }else if(DataName.find("8TeV")!=string::npos){
                     SName="Gluino_8TeV_M1000_f10";     SLeg="Gluino (M = 1000 GeV)";
       if(!IsTkOnly){SName="GMStau_8TeV_M308";         SLeg="Stau (M = 308 GeV)";}
@@ -289,6 +301,11 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
 
 
    //rescale MC samples to prediction
+   if(Data13TeV16 && Pred13TeV16){
+      if(MC)              MC    ->Scale(Pred13TeV16->Integral()/MCPred->Integral());
+      if(MCPred)          MCPred->Scale(Pred13TeV16->Integral()/MCPred->Integral());
+   }   
+
    if(Data13TeV15 && Pred13TeV15){
       if(MC)              MC    ->Scale(Pred13TeV15->Integral()/MCPred->Integral());
       if(MCPred)          MCPred->Scale(Pred13TeV15->Integral()/MCPred->Integral());
@@ -645,7 +662,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
       Data13TeV15->SetMarkerColor(kBlue);
       Data13TeV15->SetMarkerSize(1.0);
       Data13TeV15->SetLineColor(kBlue);
-      Data13TeV15->SetLineWidth(1.5);
+      Data13TeV15->SetLineWidth(1);
       Data13TeV15->SetFillColor(0);
 //      Data13TeV15->Draw("P same");
       getGarwoodErrorBars(Data13TeV15)->Draw("P E1 same");
@@ -660,31 +677,32 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
       Data13TeV16->SetFillColor(0);
 //      Data13TeV16->Draw("P same");
       getGarwoodErrorBars(Data13TeV16)->Draw("P E1 same");
+      getGarwoodErrorBarsNewROOT(Data13TeV16)->Draw("P E0 same");
    }
 
 
 
    //Fill the legend
-   leg = new TLegend(0.57,0.85,0.47,showMC?0.69:0.68);
+   leg = new TLegend(0.82,0.85,0.47,showMC?0.69:0.68);
 //   leg->SetHeader(LegendFromType(InputPattern).c_str());
    leg->SetFillStyle(0);
    leg->SetBorderSize(0);
    leg->SetTextFont(43);
    leg->SetTextSize(20);
 
-   if(Data13TeV15){leg->AddEntry(Data13TeV15, "Observed 2015"        ,"PE");}
-   if(Data13TeV16){leg->AddEntry(Data13TeV16, "Observed 2016"        ,"PE");}
+   if(Data13TeV15){leg->AddEntry(Data13TeV15, "Observed"             ,"PE");}
+   if(Data13TeV16){leg->AddEntry(Data13TeV16, "Observed"             ,"PE1");}
 
    if(Pred13TeV15){TH1D* PredLeg13TeV15 = (TH1D*)Pred13TeV15->Clone("RescLeg1315");
       PredLeg13TeV15->SetFillColor(Pred13TeV15Err->GetFillColor());
       PredLeg13TeV15->SetFillStyle(Pred13TeV15Err->GetFillStyle());
-      leg->AddEntry(PredLeg13TeV15, "2015 Data-based SM prediction"  ,"PF");
+      leg->AddEntry(PredLeg13TeV15, "Data-based SM prediction"  ,"PF");
    }
 
    if(Pred13TeV16){TH1D* PredLeg13TeV16 = (TH1D*)Pred13TeV16->Clone("RescLeg1316");
       PredLeg13TeV16->SetFillColor(Pred13TeV16Err->GetFillColor());
       PredLeg13TeV16->SetFillStyle(Pred13TeV16Err->GetFillStyle());
-      leg->AddEntry(PredLeg13TeV16, "2016 Data-based SM prediction"  ,"PF");
+      leg->AddEntry(PredLeg13TeV16, "Data-based SM prediction"  ,"PF");
    }
 
    if(Data8TeV){leg->AddEntry(Data8TeV, "Observed"        ,"P");}
@@ -1518,8 +1536,9 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex, double ylow, double
     char TOFCutStr[1024]; sprintf (TOFCutStr,"1/#beta>%.3f", HCuts_TOF->GetBinContent(CutIndex+1));
 
     vector < pair<stSample, Color_t> > SamplesToDraw;
-    SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Data13TeV"             , samples)], kBlack      ));
-    SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Data13TeV16"           , samples)], kGray   + 1 ));
+//    SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Data13TeV"             , samples)], kBlack      ));
+//    SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Data13TeV16"           , samples)], kGray   + 1 ));
+    SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Data13TeV16"             , samples)], kBlack      ));
     SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("MC_13TeV16_DYToMuMu"     , samples)], kBlue   - 3 ));
     SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Gluino_13TeV16_M1000_f10", samples)], kRed    + 1 ));
     SamplesToDraw.push_back (make_pair(samples [JobIdToIndex("Stop_13TeV16_M1000"      , samples)], kSpring - 9 ));
@@ -1750,10 +1769,10 @@ void SelectionPlot(string InputPattern, unsigned int CutIndex, unsigned int CutI
        stPlots_Draw(SignPlots[s], InputPattern + "/Selection_" +  samples[s].Name, LegendTitle, CutIndex);       
     } 
 
-    SQRTS=1315; stPlots_Draw(Data13TeV15Plots, InputPattern + "/Selection_Data13TeV15", LegendTitle, CutIndex);
+//    SQRTS=1315; stPlots_Draw(Data13TeV15Plots, InputPattern + "/Selection_Data13TeV15", LegendTitle, CutIndex);
     SQRTS=1316; stPlots_Draw(Data13TeV16Plots, InputPattern + "/Selection_Data13TeV16", LegendTitle, CutIndex);
-    SQRTS=1315; stPlots_Draw(MCTr13TeVPlots, InputPattern + "/Selection_MCTr_13TeV", LegendTitle, CutIndex);
-    SQRTS=131615; stPlots_DrawComparison(InputPattern + "/Selection_Comp_13TeV16", LegendTitle, CutIndex, CutIndexTight, &Data13TeV15Plots, &Data13TeV16Plots, &MCTr13TeVPlots,&SignPlots[JobIdToIndex("Gluino_13TeV16_M1000_f10",samples)], &SignPlots[JobIdToIndex("Gluino_13TeV16_M1400_f10",samples)], &SignPlots[JobIdToIndex("Stop_13TeV16_M1000",samples)], &SignPlots[JobIdToIndex("GMStau_13TeV16_M494",samples)]);
+    SQRTS=1316; stPlots_Draw(MCTr13TeV16Plots, InputPattern + "/Selection_MCTr_13TeV16", LegendTitle, CutIndex);
+    SQRTS=1316; stPlots_DrawComparison(InputPattern + "/Selection_Comp_13TeV16", LegendTitle, CutIndex, CutIndexTight, /*&Data13TeV15Plots, */&Data13TeV16Plots, &MCTr13TeV16Plots,&SignPlots[JobIdToIndex("Gluino_13TeV16_M1000_f10",samples)], &SignPlots[JobIdToIndex("Gluino_13TeV16_M1400_f10",samples)], &SignPlots[JobIdToIndex("Stop_13TeV16_M1000",samples)], &SignPlots[JobIdToIndex("GMStau_13TeV16_M494",samples)]);
 //    SQRTS=131615; stPlots_DrawComparison(InputPattern + "/Selection_CompAMSB_13TeV16", LegendTitle, CutIndex, CutIndexTight, &Data13TeV15Plots, &Data13TeV16Plots, &MCTr13TeVPlots,&SignPlots[JobIdToIndex("AMSB_13TeV_500_10cm",samples)], &SignPlots[JobIdToIndex("AMSB_13TeV_500_100cm",samples)], &SignPlots[JobIdToIndex("AMSB_13TeV_500_1000cm",samples)]);
 
 
