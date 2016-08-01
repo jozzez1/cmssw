@@ -422,4 +422,16 @@ TGraphAsymmErrors* getGarwoodErrorBars(TH1D* h1)
    return g;
 }
 
+TH1D* getGarwoodErrorBarsNewROOT(TH1D* h1){
+   TH1D* grassCorrector = (TH1D*)h1->Clone((string(h1->GetName())+"SomeHist").c_str());
+   grassCorrector->SetBinErrorOption(TH1::kPoisson);
+   int lastPoint=-1;
+   for (int i=1; i<= grassCorrector->GetNbinsX(); i++){ if(grassCorrector->GetBinContent(i)>0) lastPoint=i; }
+   for (int i=1; i<= lastPoint; i++){
+      if (grassCorrector->GetBinContent(i)==0) grassCorrector->SetBinError(i, 0.5);
+      else grassCorrector->SetBinError(i,0.0);
+   }
+   return grassCorrector;
+}
+
 #endif

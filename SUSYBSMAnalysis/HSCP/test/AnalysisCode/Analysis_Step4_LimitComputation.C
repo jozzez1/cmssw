@@ -148,9 +148,9 @@ std::map<std::string, std::vector<stSample> > modelMap;
 
 string SHAPESTRING="";
 
-void Analysis_Step4_LimitComputation(){
-   return;
-}
+//void Analysis_Step4_LimitComputation(){
+//   return;
+//}
 
 void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern="", string signal=""){
   setTDRStyle();
@@ -2242,7 +2242,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
 
    //normalise the signal samples to XSection * IntLuminosity
    double LInt  = H_Lumi->GetBinContent(1);
-//   LInt = Data.find("13TeV16")!=string::npos?IntegratedLuminosity13TeV16:IntegratedLuminosity13TeV15; // from before, but a neat trick
+   LInt = Data.find("13TeV16")!=string::npos?IntegratedLuminosity13TeV16:IntegratedLuminosity13TeV15; // from before, but a neat trick
    double norm  = samples[CurrentSampleIndex].XSec*LInt/TotalE  ->Integral(); //normalize the samples to the actual lumi used for limits
    double normPU= samples[CurrentSampleIndex].XSec*LInt/(TotalEPU->Integral()>0?TotalEPU->Integral():TotalE->Integral());
 
@@ -2308,6 +2308,12 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
       result.MassSigma = Width;
       result.MassCut   = TypeMode<=2?MinRange:0;
       result.Mass      = samples[JobIdToIndex(signal,samples)].Mass;
+      if (signal.find("Q2")!=string::npos && SQRTS==1316.0 && result.Mass > 1000 && TypeMode==0){
+         if      (result.Mass == 1400) result.MassCut = 300;
+         else if (result.Mass == 1800) result.MassCut = 190;
+         else if (result.Mass == 2200) result.MassCut =  70;
+         else if (result.Mass == 2600) result.MassCut =  50;
+      }
       result.XSec_Th   = samples[JobIdToIndex(signal,samples)].XSec;
       result.XSec_Err  = samples[JobIdToIndex(signal,samples)].XSec * 0.15;
       toReturn = result;
