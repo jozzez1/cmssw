@@ -14,6 +14,7 @@ LaunchOnCondor.Jobs_Queue = '8nh'
 
 UseRemoteSamples          = True
 RemoteStorageDir          = '/storage/data/cms/store/user/jozobec/HSCP2016/'
+#RemoteStorageDir          = '/store/group/phys_exotica/hscp/'
 
 #the vector below contains the "TypeMode" of the analyses that should be run
 AnalysesToRun = [0,2]#,4]#,3,5]
@@ -80,12 +81,13 @@ if sys.argv[1]=='1':
            if((vals[0].replace('"','')) in CMSSW_VERSION):
               for Type in AnalysesToRun:
                  if(UseRemoteSamples and int(vals[1])==0 and vals[3].find('2016') != -1):
-                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export X509_USER_PROXY=~/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
+                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
                  else: LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0']
                  if(int(vals[1])>=2 and skipSamples(Type, vals[2])==True):continue
+#                 if(int(vals[1])==0):continue
                  LaunchOnCondor.SendCluster_Push(["FWLITE", os.getcwd()+"/Analysis_Step1_EventLoop.C", '"ANALYSE_'+str(index)+'_to_'+str(index)+'"'  , Type, vals[2].rstrip() ])
         f.close()
-        LaunchOnCondor.SendCluster_Submit()
+#        LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='2':
         print 'MERGING FILE AND PREDICTING BACKGROUNDS'  
@@ -171,7 +173,7 @@ elif sys.argv[1]=='4':
 #              #print vals[2] + "   " + str(skip)
 
               Path = "Results/Type"+str(Type)+"/"
-              LaunchOnCondor.SendCluster_Push(["ROOT", os.getcwd()+"/Analysis_Step4_LimitComputation.C", '"COMBINE_Run2"', '"'+Path+'"', vals[2] ]) #compute 2015, 2016 and 2015+2016 in the same job
+              LaunchOnCondor.SendCluster_Push(["ROOT", os.getcwd()+"/Analysis_Step4_LimitComputation.C", '"COMPUTELIMIT2016"', '"'+Path+'"', vals[2] ]) #compute 2015, 2016 and 2015+2016 in the same job
         f.close()
         LaunchOnCondor.SendCluster_Submit()
 
