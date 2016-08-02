@@ -172,7 +172,7 @@ printf("Test %s\n", MODE.c_str());
    string Data;
    if(MODE.find("SHAPE")!=string::npos){SHAPESTRING="SHAPE";}else{SHAPESTRING="";}
 
-   if(MODE.find("COMPUTELIMIT")!=string::npos || MODE.find("OPTIMIZE")!=string::npos){
+/*   if(MODE.find("COMPUTELIMIT")!=string::npos || MODE.find("OPTIMIZE")!=string::npos){
       if(signal.find("7TeV")!=string::npos){ Data = "Data7TeV";  SQRTS= 7.0; EXCLUSIONDIR+= "7TeV"; }
       if(signal.find("8TeV")!=string::npos){ Data = "Data8TeV";  SQRTS= 8.0; EXCLUSIONDIR+= "8TeV"; }
       if(signal.find("13TeV")!=string::npos){Data = "Data13TeV"; SQRTS=13.0; EXCLUSIONDIR+="13TeV"; }
@@ -181,7 +181,7 @@ printf("Test %s\n", MODE.c_str());
       if(MODE.find("COMPUTELIMIT")!=string::npos){Optimize(InputPattern, Data, signal, SHAPESTRING!="", true);      return;}
       if(MODE.find("OPTIMIZE")!=string::npos){    Optimize(InputPattern, Data, signal, SHAPESTRING!="", false);     return;} //testShapeBasedAnalysis(InputPattern,signal);  //use the second part if you want to run shape based analyssi on optimal point form c&c      
    }
-
+*/
    if(MODE.find("COMPUTELIMIT2015")!=string::npos || MODE.find("OPTIMIZE2015")!=string::npos){
       if(signal.find("13TeV")!=string::npos){Data = "Data13TeV"; SQRTS=1315.0; EXCLUSIONDIR+="13TeV15"; }
       printf("EXCLUSIONDIR = %s\nData = %s\n",EXCLUSIONDIR.c_str(), Data.c_str());  
@@ -191,7 +191,8 @@ printf("Test %s\n", MODE.c_str());
    }
 
    if(MODE.find("COMPUTELIMIT2016")!=string::npos || MODE.find("OPTIMIZE2016")!=string::npos){
-      if(signal.find("13TeV16")!=string::npos){Data = "Data13TeV16"; SQRTS=1316.0; EXCLUSIONDIR+="13TeV16"; }
+      if(signal.find("13TeV16")==string::npos) return;
+      Data = "Data13TeV16"; SQRTS=1316.0; EXCLUSIONDIR+="13TeV16";
       printf("EXCLUSIONDIR = %s\nData = %s\n",EXCLUSIONDIR.c_str(), Data.c_str());  
 
       if(MODE.find("COMPUTELIMIT")!=string::npos){Optimize(InputPattern, Data, signal, SHAPESTRING!="", true);      return;}
@@ -888,6 +889,11 @@ std::cout<<"TESTC\n";
    TkGraphMap["Gluino_f10"   ]->SetLineColor(4);  TkGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   TkGraphMap["Gluino_f10"   ]->SetLineWidth(2);   TkGraphMap["Gluino_f10"   ]->SetLineStyle(1);  TkGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
    TkGraphMap["Gluino_f50"   ]->SetLineColor(4);  TkGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   TkGraphMap["Gluino_f50"   ]->SetLineWidth(2);   TkGraphMap["Gluino_f50"   ]->SetLineStyle(1);  TkGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
    TkGraphMap["GluinoN_f10"  ]->SetLineColor(4);  TkGraphMap["GluinoN_f10"  ]->SetMarkerColor(4);   TkGraphMap["GluinoN_f10"  ]->SetLineWidth(2);   TkGraphMap["GluinoN_f10"  ]->SetLineStyle(1);  TkGraphMap["GluinoN_f10"  ]->SetMarkerStyle(26);
+   MuGraphMap["Gluino16_f10"   ]->SetLineColor(4);  MuGraphMap["Gluino16_f10"   ]->SetMarkerColor(4);   MuGraphMap["Gluino16_f10"   ]->SetLineWidth(2);   MuGraphMap["Gluino16_f10"   ]->SetLineStyle(1);  MuGraphMap["Gluino16_f10"   ]->SetMarkerStyle(22);
+   MuGraphMap["Gluino16_f50"   ]->SetLineColor(4);  MuGraphMap["Gluino16_f50"   ]->SetMarkerColor(4);   MuGraphMap["Gluino16_f50"   ]->SetLineWidth(2);   MuGraphMap["Gluino16_f50"   ]->SetLineStyle(1);  MuGraphMap["Gluino16_f50"   ]->SetMarkerStyle(23);
+   TkGraphMap["Gluino16_f10"   ]->SetLineColor(4);  TkGraphMap["Gluino16_f10"   ]->SetMarkerColor(4);   TkGraphMap["Gluino16_f10"   ]->SetLineWidth(2);   TkGraphMap["Gluino16_f10"   ]->SetLineStyle(1);  TkGraphMap["Gluino16_f10"   ]->SetMarkerStyle(22);
+   TkGraphMap["Gluino16_f50"   ]->SetLineColor(4);  TkGraphMap["Gluino16_f50"   ]->SetMarkerColor(4);   TkGraphMap["Gluino16_f50"   ]->SetLineWidth(2);   TkGraphMap["Gluino16_f50"   ]->SetLineStyle(1);  TkGraphMap["Gluino16_f50"   ]->SetMarkerStyle(23);
+   TkGraphMap["Gluino16N_f10"  ]->SetLineColor(4);  TkGraphMap["Gluino16N_f10"  ]->SetMarkerColor(4);   TkGraphMap["Gluino16N_f10"  ]->SetLineWidth(2);   TkGraphMap["Gluino16N_f10"  ]->SetLineStyle(1);  TkGraphMap["Gluino16N_f10"  ]->SetMarkerStyle(26);
    //MOGraphMap["Gluino_f10"   ]->SetLineColor(4);  MOGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   MOGraphMap["Gluino_f10"   ]->SetLineWidth(2);   MOGraphMap["Gluino_f10"   ]->SetLineStyle(1);  MOGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
    //MOGraphMap["Gluino_f50"   ]->SetLineColor(4);  MOGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   MOGraphMap["Gluino_f50"   ]->SetLineWidth(2);   MOGraphMap["Gluino_f50"   ]->SetLineStyle(1);  MOGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
    //MOGraphMap["Gluino_f100"  ]->SetLineColor(4);  MOGraphMap["Gluino_f100"  ]->SetMarkerColor(4);   MOGraphMap["Gluino_f100"  ]->SetLineWidth(2);   MOGraphMap["Gluino_f100"  ]->SetLineStyle(1);  MOGraphMap["Gluino_f100"  ]->SetMarkerStyle(26);
@@ -895,6 +901,9 @@ std::cout<<"TESTC\n";
    MuGraphMap["Stop"         ]->SetLineColor(2);  MuGraphMap["Stop"         ]->SetMarkerColor(2);   MuGraphMap["Stop"         ]->SetLineWidth(2);   MuGraphMap["Stop"         ]->SetLineStyle(1);  MuGraphMap["Stop"         ]->SetMarkerStyle(21);
    TkGraphMap["Stop"         ]->SetLineColor(2);  TkGraphMap["Stop"         ]->SetMarkerColor(2);   TkGraphMap["Stop"         ]->SetLineWidth(2);   TkGraphMap["Stop"         ]->SetLineStyle(1);  TkGraphMap["Stop"         ]->SetMarkerStyle(21);
    TkGraphMap["StopN"        ]->SetLineColor(2);  TkGraphMap["StopN"        ]->SetMarkerColor(2);   TkGraphMap["StopN"        ]->SetLineWidth(2);   TkGraphMap["StopN"        ]->SetLineStyle(1);  TkGraphMap["StopN"        ]->SetMarkerStyle(25);
+   MuGraphMap["Stop16"         ]->SetLineColor(2);  MuGraphMap["Stop16"         ]->SetMarkerColor(2);   MuGraphMap["Stop16"         ]->SetLineWidth(2);   MuGraphMap["Stop16"         ]->SetLineStyle(1);  MuGraphMap["Stop16"         ]->SetMarkerStyle(21);
+   TkGraphMap["Stop16"         ]->SetLineColor(2);  TkGraphMap["Stop16"         ]->SetMarkerColor(2);   TkGraphMap["Stop16"         ]->SetLineWidth(2);   TkGraphMap["Stop16"         ]->SetLineStyle(1);  TkGraphMap["Stop16"         ]->SetMarkerStyle(21);
+   TkGraphMap["Stop16N"        ]->SetLineColor(2);  TkGraphMap["Stop16N"        ]->SetMarkerColor(2);   TkGraphMap["Stop16N"        ]->SetLineWidth(2);   TkGraphMap["Stop16N"        ]->SetLineStyle(1);  TkGraphMap["Stop16N"        ]->SetMarkerStyle(25);
    //MOGraphMap["Stop"         ]->SetLineColor(2);  MOGraphMap["Stop"         ]->SetMarkerColor(2);   MOGraphMap["Stop"         ]->SetLineWidth(2);   MOGraphMap["Stop"         ]->SetLineStyle(1);  MOGraphMap["Stop"         ]->SetMarkerStyle(21);
    ThGraphMap["GMStau"       ]->SetLineColor(1);  ThGraphMap["GMStau"       ]->SetMarkerColor(1);   ThGraphMap["GMStau"       ]->SetLineWidth(1);   ThGraphMap["GMStau"       ]->SetLineStyle(3);  ThGraphMap["GMStau"       ]->SetMarkerStyle(1);
    ThGraphMap["PPStau"       ]->SetLineColor(6);  ThGraphMap["PPStau"       ]->SetMarkerColor(6);   ThGraphMap["PPStau"       ]->SetLineWidth(1);   ThGraphMap["PPStau"       ]->SetLineStyle(4);  ThGraphMap["PPStau"       ]->SetMarkerStyle(1);
@@ -902,6 +911,10 @@ std::cout<<"TESTC\n";
    MuGraphMap["PPStau"       ]->SetLineColor(6);  MuGraphMap["PPStau"       ]->SetMarkerColor(6);   MuGraphMap["PPStau"       ]->SetLineWidth(2);   MuGraphMap["PPStau"       ]->SetLineStyle(1);  MuGraphMap["PPStau"       ]->SetMarkerStyle(20);
    TkGraphMap["GMStau"       ]->SetLineColor(1);  TkGraphMap["GMStau"       ]->SetMarkerColor(1);   TkGraphMap["GMStau"       ]->SetLineWidth(2);   TkGraphMap["GMStau"       ]->SetLineStyle(1);  TkGraphMap["GMStau"       ]->SetMarkerStyle(20);
    TkGraphMap["PPStau"       ]->SetLineColor(6);  TkGraphMap["PPStau"       ]->SetMarkerColor(6);   TkGraphMap["PPStau"       ]->SetLineWidth(2);   TkGraphMap["PPStau"       ]->SetLineStyle(1);  TkGraphMap["PPStau"       ]->SetMarkerStyle(20);
+   MuGraphMap["GMStau16"       ]->SetLineColor(1);  MuGraphMap["GMStau16"       ]->SetMarkerColor(1);   MuGraphMap["GMStau16"       ]->SetLineWidth(2);   MuGraphMap["GMStau16"       ]->SetLineStyle(1);  MuGraphMap["GMStau16"       ]->SetMarkerStyle(20);
+   MuGraphMap["PPStau16"       ]->SetLineColor(6);  MuGraphMap["PPStau16"       ]->SetMarkerColor(6);   MuGraphMap["PPStau16"       ]->SetLineWidth(2);   MuGraphMap["PPStau16"       ]->SetLineStyle(1);  MuGraphMap["PPStau16"       ]->SetMarkerStyle(20);
+   TkGraphMap["GMStau16"       ]->SetLineColor(1);  TkGraphMap["GMStau16"       ]->SetMarkerColor(1);   TkGraphMap["GMStau16"       ]->SetLineWidth(2);   TkGraphMap["GMStau16"       ]->SetLineStyle(1);  TkGraphMap["GMStau16"       ]->SetMarkerStyle(20);
+   TkGraphMap["PPStau16"       ]->SetLineColor(6);  TkGraphMap["PPStau16"       ]->SetMarkerColor(6);   TkGraphMap["PPStau16"       ]->SetLineWidth(2);   TkGraphMap["PPStau16"       ]->SetLineStyle(1);  TkGraphMap["PPStau16"       ]->SetMarkerStyle(20);
 
    //ThGraphMap["DY_Q1o3"      ]->SetLineColor(41); ThGraphMap["DY_Q1o3"      ]->SetMarkerColor(41);  ThGraphMap["DY_Q1o3"      ]->SetLineWidth(1);   ThGraphMap["DY_Q1o3"      ]->SetLineStyle(9);  ThGraphMap["DY_Q1o3"      ]->SetMarkerStyle(1);
    //TkGraphMap["DY_Q1o3"      ]->SetLineColor(41); TkGraphMap["DY_Q1o3"      ]->SetMarkerColor(41);  TkGraphMap["DY_Q1o3"      ]->SetLineWidth(2);   TkGraphMap["DY_Q1o3"      ]->SetLineStyle(1);  TkGraphMap["DY_Q1o3"      ]->SetMarkerStyle(33);
@@ -917,10 +930,13 @@ std::cout<<"TESTC\n";
    ThGraphMap["DY_Q1"        ]->SetLineColor(46); ThGraphMap["DY_Q1"        ]->SetMarkerColor(46);  ThGraphMap["DY_Q1"        ]->SetLineWidth(1);   ThGraphMap["DY_Q1"        ]->SetLineStyle(8);  ThGraphMap["DY_Q1"        ]->SetMarkerStyle(1);
    MuGraphMap["DY_Q1"        ]->SetLineColor(46); MuGraphMap["DY_Q1"        ]->SetMarkerColor(46);  MuGraphMap["DY_Q1"        ]->SetLineWidth(2);   MuGraphMap["DY_Q1"        ]->SetLineStyle(1);  MuGraphMap["DY_Q1"      ]->SetMarkerStyle(20);
    TkGraphMap["DY_Q1"        ]->SetLineColor(46); TkGraphMap["DY_Q1"        ]->SetMarkerColor(46);  TkGraphMap["DY_Q1"        ]->SetLineWidth(2);   TkGraphMap["DY_Q1"        ]->SetLineStyle(1);  TkGraphMap["DY_Q1"      ]->SetMarkerStyle(20);
+   ThGraphMap["DY16_Q1"        ]->SetLineColor(46); ThGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  ThGraphMap["DY16_Q1"        ]->SetLineWidth(1);   ThGraphMap["DY16_Q1"        ]->SetLineStyle(8);  ThGraphMap["DY16_Q1"        ]->SetMarkerStyle(1);
+   MuGraphMap["DY16_Q1"        ]->SetLineColor(46); MuGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  MuGraphMap["DY16_Q1"        ]->SetLineWidth(2);   MuGraphMap["DY16_Q1"        ]->SetLineStyle(1);  MuGraphMap["DY16_Q1"      ]->SetMarkerStyle(20);
+   TkGraphMap["DY16_Q1"        ]->SetLineColor(46); TkGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  TkGraphMap["DY16_Q1"        ]->SetLineWidth(2);   TkGraphMap["DY16_Q1"        ]->SetLineStyle(1);  TkGraphMap["DY16_Q1"      ]->SetMarkerStyle(20);
    //HQGraphMap["DY_Q1"        ]->SetLineColor(46); HQGraphMap["DY_Q1"        ]->SetMarkerColor(46);  HQGraphMap["DY_Q1"        ]->SetLineWidth(2);   HQGraphMap["DY_Q1"        ]->SetLineStyle(1);  HQGraphMap["DY_Q1"        ]->SetMarkerStyle(20);
-   ThGraphMap["DY_Q2"        ]->SetLineColor(43); ThGraphMap["DY_Q2"        ]->SetMarkerColor(43);  ThGraphMap["DY_Q2"        ]->SetLineWidth(1);   ThGraphMap["DY_Q2"        ]->SetLineStyle(10);  ThGraphMap["DY_Q2"        ]->SetMarkerStyle(1);
-   MuGraphMap["DY_Q2"        ]->SetLineColor(43); MuGraphMap["DY_Q2"        ]->SetMarkerColor(43);  MuGraphMap["DY_Q2"        ]->SetLineWidth(2);   MuGraphMap["DY_Q2"        ]->SetLineStyle(1);  MuGraphMap["DY_Q2"      ]->SetMarkerStyle(34);
-   TkGraphMap["DY_Q2"        ]->SetLineColor(43); TkGraphMap["DY_Q2"        ]->SetMarkerColor(43);  TkGraphMap["DY_Q2"        ]->SetLineWidth(2);   TkGraphMap["DY_Q2"        ]->SetLineStyle(1);  TkGraphMap["DY_Q2"      ]->SetMarkerStyle(34);
+   ThGraphMap["DY16_Q2"        ]->SetLineColor(43); ThGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  ThGraphMap["DY16_Q2"        ]->SetLineWidth(1);   ThGraphMap["DY16_Q2"        ]->SetLineStyle(10);  ThGraphMap["DY16_Q2"        ]->SetMarkerStyle(1);
+   MuGraphMap["DY16_Q2"        ]->SetLineColor(43); MuGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  MuGraphMap["DY16_Q2"        ]->SetLineWidth(2);   MuGraphMap["DY16_Q2"        ]->SetLineStyle(1);  MuGraphMap["DY16_Q2"      ]->SetMarkerStyle(34);
+   TkGraphMap["DY16_Q2"        ]->SetLineColor(43); TkGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  TkGraphMap["DY16_Q2"        ]->SetLineWidth(2);   TkGraphMap["DY16_Q2"        ]->SetLineStyle(1);  TkGraphMap["DY16_Q2"      ]->SetMarkerStyle(34);
    //HQGraphMap["DY_Q2"        ]->SetLineColor(2 ); HQGraphMap["DY_Q2"        ]->SetMarkerColor(2 );  HQGraphMap["DY_Q2"        ]->SetLineWidth(2);   HQGraphMap["DY_Q2"        ]->SetLineStyle(1);  HQGraphMap["DY_Q2"        ]->SetMarkerStyle(21);
    //ThGraphMap["DY_Q3"        ]->SetLineColor(1 ); ThGraphMap["DY_Q3"        ]->SetMarkerColor(1 );  ThGraphMap["DY_Q3"        ]->SetLineWidth(1);   ThGraphMap["DY_Q3"        ]->SetLineStyle(9);  ThGraphMap["DY_Q3"        ]->SetMarkerStyle(1);
    //HQGraphMap["DY_Q3"        ]->SetLineColor(1 ); HQGraphMap["DY_Q3"        ]->SetMarkerColor(1 );  HQGraphMap["DY_Q3"        ]->SetLineWidth(2);   HQGraphMap["DY_Q3"        ]->SetLineStyle(1);  HQGraphMap["DY_Q3"        ]->SetMarkerStyle(22);
@@ -979,14 +995,14 @@ std::cout<<"TESTD\n";
       TLine* LineAtOne = new TLine(50,1,1550,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
    }
 
-   MuGraphMap["Gluino_f10" ]->Draw("LP");
-   MuGraphMap["Gluino_f50" ]->Draw("LP");
-   MuGraphMap["Stop"       ]->Draw("LP");
-   MuGraphMap["GMStau"     ]->Draw("LP");
-   MuGraphMap["PPStau"     ]->Draw("LP");
+   MuGraphMap["Gluino16_f10" ]->Draw("LP");
+   MuGraphMap["Gluino16_f50" ]->Draw("LP");
+   MuGraphMap["Stop16"       ]->Draw("LP");
+   MuGraphMap["GMStau16"     ]->Draw("LP");
+   MuGraphMap["PPStau16"     ]->Draw("LP");
    //MuGraphMap["DY_Q2o3"    ]->Draw("LP");
-   MuGraphMap["DY_Q1"    ]->Draw("LP");
-   MuGraphMap["DY_Q2"    ]->Draw("LP");
+   MuGraphMap["DY16_Q1"    ]->Draw("LP");
+   MuGraphMap["DY16_Q2"    ]->Draw("LP");
 
    DrawPreliminary(LegendFromType(MuPattern).c_str(), SQRTS, IntegratedLuminosityFromE(SQRTS));
    TLegend* LEGMu = !Combine ? new TLegend(0.60,0.82-7*0.043,0.93,0.82) : new TLegend(0.60,0.15,0.93,0.15+7*0.043);
@@ -995,14 +1011,14 @@ std::cout<<"TESTD\n";
    LEGMu->SetFillColor(0); 
    LEGMu->SetFillStyle(0);
    LEGMu->SetBorderSize(0);
-   LEGMu->AddEntry(MuGraphMap["Gluino_f50"] , "gluino; 50% #tilde{g}g"    ,"LP");
-   LEGMu->AddEntry(MuGraphMap["Gluino_f10"] , "gluino; 10% #tilde{g}g"    ,"LP");
-   LEGMu->AddEntry(MuGraphMap["Stop"      ] , "stop"                      ,"LP");
-   LEGMu->AddEntry(MuGraphMap["PPStau"    ] , "stau; dir. prod."           ,"LP");
-   LEGMu->AddEntry(MuGraphMap["GMStau"    ] , "stau"                 ,"LP");
+   LEGMu->AddEntry(MuGraphMap["Gluino16_f50"] , "gluino; 50% #tilde{g}g"    ,"LP");
+   LEGMu->AddEntry(MuGraphMap["Gluino16_f10"] , "gluino; 10% #tilde{g}g"    ,"LP");
+   LEGMu->AddEntry(MuGraphMap["Stop16"      ] , "stop"                      ,"LP");
+   LEGMu->AddEntry(MuGraphMap["PPStau16"    ] , "stau; dir. prod."           ,"LP");
+   LEGMu->AddEntry(MuGraphMap["GMStau16"    ] , "stau"                 ,"LP");
    //LEGMu->AddEntry(MuGraphMap["DY_Q2o3"   ], "|Q| = 2e/3"                ,"LP");
-   LEGMu->AddEntry(MuGraphMap["DY_Q1"   ], "|Q| = 1e"                ,"LP");
-   LEGMu->AddEntry(MuGraphMap["DY_Q2"   ], "|Q| = 2e"                ,"LP");
+   LEGMu->AddEntry(MuGraphMap["DY16_Q1"   ], "|Q| = 1e"                ,"LP");
+   LEGMu->AddEntry(MuGraphMap["DY16_Q2"   ], "|Q| = 2e"                ,"LP");
 
    TLegend* LEGTh = new TLegend(0.25,0.82-(1+6)*0.043,0.60,0.82);
    LEGTh->SetTextFont(43); //give the font size in pixel (instead of fraction)
@@ -1080,15 +1096,15 @@ std::cout<<"TESTD\n";
       TLine* LineAtOne = new TLine(50,1,1550,1);      LineAtOne->SetLineStyle(3);   LineAtOne->Draw();
    }
 
-   TkGraphMap["Gluino_f10" ]->Draw("LP");
-   TkGraphMap["Gluino_f50" ]->Draw("LP");
-   TkGraphMap["GluinoN_f10"]->Draw("LP");
-   TkGraphMap["Stop"       ]->Draw("LP");
-   TkGraphMap["StopN"      ]->Draw("LP");
-   TkGraphMap["GMStau"     ]->Draw("LP");
-   TkGraphMap["PPStau"     ]->Draw("LP");
-   TkGraphMap["DY_Q1"    ]->Draw("LP");
-   TkGraphMap["DY_Q2"    ]->Draw("LP");
+   TkGraphMap["Gluino16_f10" ]->Draw("LP");
+   TkGraphMap["Gluino16_f50" ]->Draw("LP");
+   TkGraphMap["Gluino16N_f10"]->Draw("LP");
+   TkGraphMap["Stop16"       ]->Draw("LP");
+   TkGraphMap["Stop16N"      ]->Draw("LP");
+   TkGraphMap["GMStau16"     ]->Draw("LP");
+   TkGraphMap["PPStau16"     ]->Draw("LP");
+   TkGraphMap["DY16_Q1"    ]->Draw("LP");
+   TkGraphMap["DY16_Q2"    ]->Draw("LP");
    //TkGraphMap["DY_Q2o3"    ]->Draw("LP");
 
    DrawPreliminary(LegendFromType(TkPattern).c_str(), SQRTS, IntegratedLuminosityFromE(SQRTS));
@@ -1099,16 +1115,16 @@ std::cout<<"TESTD\n";
    LEGTk->SetFillColor(0); 
    LEGTk->SetFillStyle(0);
    LEGTk->SetBorderSize(0);
-   LEGTk->AddEntry(TkGraphMap["Gluino_f50" ], "gluino; 50% #tilde{g}g"            ,"LP");
-   LEGTk->AddEntry(TkGraphMap["Gluino_f10" ], "gluino; 10% #tilde{g}g"            ,"LP");
-   LEGTk->AddEntry(TkGraphMap["GluinoN_f10"], "gluino; 10% #tilde{g}g; CS"        ,"LP");
-   LEGTk->AddEntry(TkGraphMap["Stop"       ], "stop"                              ,"LP");
-   LEGTk->AddEntry(TkGraphMap["StopN"      ], "stop; CS"                          ,"LP");
-   LEGTk->AddEntry(TkGraphMap["PPStau"     ], "stau; dir. prod."                ,"LP");
-   LEGTk->AddEntry(TkGraphMap["GMStau"     ], "stau"                              ,"LP");
+   LEGTk->AddEntry(TkGraphMap["Gluino16_f50" ], "gluino; 50% #tilde{g}g"            ,"LP");
+   LEGTk->AddEntry(TkGraphMap["Gluino16_f10" ], "gluino; 10% #tilde{g}g"            ,"LP");
+   LEGTk->AddEntry(TkGraphMap["Gluino16N_f10"], "gluino; 10% #tilde{g}g; CS"        ,"LP");
+   LEGTk->AddEntry(TkGraphMap["Stop16"       ], "stop"                              ,"LP");
+   LEGTk->AddEntry(TkGraphMap["Stop16N"      ], "stop; CS"                          ,"LP");
+   LEGTk->AddEntry(TkGraphMap["PPStau16"     ], "stau; dir. prod."                ,"LP");
+   LEGTk->AddEntry(TkGraphMap["GMStau16"     ], "stau"                              ,"LP");
    //LEGTk->AddEntry(TkGraphMap["DY_Q2o3"    ], "|Q| = 2e/3"                            ,"LP");
-   LEGTk->AddEntry(TkGraphMap["DY_Q1"    ], "|Q| = 1e"                            ,"LP");
-   LEGTk->AddEntry(TkGraphMap["DY_Q2"    ], "|Q| = 2e"                            ,"LP");
+   LEGTk->AddEntry(TkGraphMap["DY16_Q1"    ], "|Q| = 1e"                            ,"LP");
+   LEGTk->AddEntry(TkGraphMap["DY16_Q2"    ], "|Q| = 2e"                            ,"LP");
 
    TLegend* LEGThTk = new TLegend(0.25,0.82-(1+6)*0.043,0.60,0.82);
    LEGThTk->SetTextFont(43); //give the font size in pixel (instead of fraction)
@@ -2242,7 +2258,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
 
    //normalise the signal samples to XSection * IntLuminosity
    double LInt  = H_Lumi->GetBinContent(1);
-   LInt = Data.find("13TeV16")!=string::npos?IntegratedLuminosity13TeV16:IntegratedLuminosity13TeV15; // from before, but a neat trick
+//   LInt = Data.find("13TeV16")!=string::npos?IntegratedLuminosity13TeV16:IntegratedLuminosity13TeV15; // from before, but a neat trick
    double norm  = samples[CurrentSampleIndex].XSec*LInt/TotalE  ->Integral(); //normalize the samples to the actual lumi used for limits
    double normPU= samples[CurrentSampleIndex].XSec*LInt/(TotalEPU->Integral()>0?TotalEPU->Integral():TotalE->Integral());
 
