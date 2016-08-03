@@ -344,9 +344,11 @@ printf("Test %s\n", MODE.c_str());
    fprintf(talkFile,"Sample & Mass(GeV) & Pt(GeV) & $I_{as}$ & TOF & Mass Cut (GeV) & N pred & N observed & Eff & Signif \\\\\n");
 
    fprintf(talkFile, "\\hline\n");
-   TGraph** TkGraphs  = new TGraph*[modelVector.size()];
+   TGraph** TkGraphs    = new TGraph*[modelVector.size()];
+   TGraph** TkExpGraphs = new TGraph*[modelVector.size()];
    for(unsigned int k=0; k<modelVector.size(); k++){
-     TkGraphs[k] = MakePlot(pFile,talkFile,TkPattern,modelVector[k], 2, modelMap[modelVector[k]], LInt);
+     TkGraphs[k]    = MakePlot(pFile,talkFile,TkPattern,modelVector[k], 2, modelMap[modelVector[k]], LInt);
+     TkExpGraphs[k] = MakePlot(pFile,talkFile,TkPattern,modelVector[k], 1, modelMap[modelVector[k]], LInt);
    }
    fprintf(pFile   ,"      \\end{tabular}\n\\end{table}\n\n");
    fprintf(talkFile,"      \\end{tabular}\n\\end{sidewaystable}\n\n");
@@ -356,11 +358,13 @@ printf("Test %s\n", MODE.c_str());
    fprintf(talkFile, "\\begin{sidewaystable}\n   \\centering\n      \\begin{tabular}{|l|cccccc|}\n      \\hline\n");
    fprintf(talkFile,"Sample & Mass(GeV) & Pt(GeV) & $I_{as}$ & $#beta^{-1]$ & Mass Cut (GeV) & N pred & N observed & Eff \\\\\n");
    fprintf(talkFile, "\\hline\n");
-   TGraph** MuGraphs = new TGraph*[modelVector.size()];
+   TGraph** MuGraphs    = new TGraph*[modelVector.size()];
+   TGraph** MuExpGraphs = new TGraph*[modelVector.size()];
    for(unsigned int k=0; k<modelVector.size(); k++){
       bool isNeutral = false;if(modelVector[k].find("GluinoN")!=string::npos || modelVector[k].find("StopN")!=string::npos)isNeutral = true;
       if(isNeutral) continue;//skip charged suppressed models
-      MuGraphs[k] = MakePlot(pFile,talkFile,MuPattern,modelVector[k], 2, modelMap[modelVector[k]], LInt);
+      MuGraphs[k]    = MakePlot(pFile,talkFile,MuPattern,modelVector[k], 2, modelMap[modelVector[k]], LInt);
+      MuExpGraphs[k] = MakePlot(pFile,talkFile,MuPattern,modelVector[k], 1, modelMap[modelVector[k]], LInt);
    }
    fprintf(pFile   ,"      \\end{tabular}\n\\end{table}\n\n");
    fprintf(talkFile,"      \\end{tabular}\n\\end{sidewaystable}\n\n");
@@ -805,7 +809,7 @@ std::cout<<"TESTA\n";
 std::cout<<"TESTB\n";
 
    //Print the excluded mass range
-   fprintf(pFile,"\n\n\n-----------------------\n Mass range excluded   \n-------------------------\n");
+   fprintf(pFile,"\n\n\n=======================\n Observed mass range excluded   \n=========================\n");
    fprintf(pFile,"-----------------------\n0%% TK-ONLY       \n-------------------------\n");
    for(unsigned int k=0; k<modelVector.size(); k++){
       if(TkGraphs[k]->GetN()==0) continue;
@@ -825,6 +829,26 @@ std::cout<<"TESTB\n";
       //fprintf(pFile,"%20s --> Excluded mass below %8.3fGeV\n", modelVector[k].c_str(), FindIntersectionBetweenTwoGraphs(MuGraphs[k],  ThXSec[k], MuGraphs[k]->GetX()[0], MuGraphs[k]->GetX()[MuGraphs[k]->GetN()-1], 1, 0.00));
    }  
 
+   // JOZZE :: EDIT EXPECTED MASS RANGE EXCLUDED
+   fprintf(pFile,"\n\n\n=======================\n Expected mass range excluded   \n=========================\n");
+   fprintf(pFile,"-----------------------\n0%% TK-ONLY       \n-------------------------\n");
+   for(unsigned int k=0; k<modelVector.size(); k++){
+      if(TkExpGraphs[k]->GetN()==0) continue;
+      if(TkExpGraphs[k]->GetX()[TkExpGraphs[k]->GetN()-1]<0) continue;
+      fprintf(pFile,"%20s --> Excluded mass below %8.3fGeV\n", modelVector[k].c_str(), FindIntersectionBetweenTwoGraphs(TkExpGraphs[k],  ThXSec[k], TkExpGraphs[k]->GetX()[0], TkExpGraphs[k]->GetX()[TkExpGraphs[k]->GetN()-1], 1, 0.00));
+   }
+
+   fprintf(pFile,"-----------------------\n0%% MU+TOF        \n-------------------------\n");
+   for(unsigned int k=0; k<modelVector.size(); k++){
+      bool isNeutral = false;if(modelVector[k].find("GluinoN")!=string::npos || modelVector[k].find("StopN")!=string::npos)isNeutral = true;
+      if(isNeutral) continue;//skip charged suppressed models
+      if(MuExpGraphs[k]->GetN()==0) continue;
+      if(MuExpGraphs[k]->GetX()[MuExpGraphs[k]->GetN()-1]<0) continue;
+      double minMass=-1, maxMass=-1;
+      FindRangeBetweenTwoGraphs(MuExpGraphs[k],  ThXSec[k], MuExpGraphs[k]->GetX()[0], MuExpGraphs[k]->GetX()[MuExpGraphs[k]->GetN()-1], 1, 0.00, minMass, maxMass);
+      fprintf(pFile,"%20s --> Excluded mass range %8.3f - %8.3fGeV\n", modelVector[k].c_str(), minMass, maxMass);
+      //fprintf(pFile,"%20s --> Excluded mass below %8.3fGeV\n", modelVector[k].c_str(), FindIntersectionBetweenTwoGraphs(MuGraphs[k],  ThXSec[k], MuGraphs[k]->GetX()[0], MuGraphs[k]->GetX()[MuGraphs[k]->GetN()-1], 1, 0.00));
+   }
    /*
    fprintf(pFile,"-----------------------\n0%% MU+Only        \n-------------------------\n");
    for(unsigned int k=0; k<modelVector.size(); k++){
@@ -3131,9 +3155,9 @@ bool Combine(string InputPattern, string signal1, string signal2){
 
 
 bool useSample(int TypeMode, string sample) {
-  if(TypeMode==0 && (sample=="Gluino_f10" || sample=="GluinoN_f10" || sample=="StopN" || sample=="Stop" || sample=="DY_Q2o3" || sample=="GMStau" || sample=="PPStau")) return true;
-  if(TypeMode==2 && (sample=="Gluino_f10" || sample=="Gluino_f50" || sample=="Stop" || sample=="GMStau" || sample=="PPStau" || sample=="DY_Q2o3" || sample=="DY_Q1")) return true;
-  if(TypeMode==3 && (sample=="Stop" || sample=="Gluino_f10" || sample=="Gluino_f50" || sample=="Gluino_f100")) return true;
+  if(TypeMode==0 && (sample=="Gluino16_f10" || sample=="Gluino16N_f10" || sample=="Stop16N" || sample=="Stop16" || sample=="DY16_Q2o3" || sample=="GMStau16" || sample=="PPStau16")) return true;
+  if(TypeMode==2 && (sample=="Gluino16_f10" || sample=="Gluino16_f50" || sample=="Stop16" || sample=="GMStau16" || sample=="PPStau16" || sample=="DY16_Q2o3" || sample=="DY16_Q1")) return true;
+  if(TypeMode==3 && (sample=="Stop16" || sample=="Gluino16_f10" || sample=="Gluino16_f50" || sample=="Gluino16_f100")) return true;
   if(TypeMode==4) return true;
   if(TypeMode==5) return true;
   return false;

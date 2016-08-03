@@ -98,6 +98,7 @@ void Analysis_Step3_MakePlots()
 //  std::cout<<"B\n";
 
 //   GetSystematicOnPrediction(InputPattern, "Data13TeV");  //FOR IMPOSSIBLE REASON, THIS FUNCTION CRASHES IF IT IS RUN TOGETHER WITH THE OTHER FUNCTIONS
+   InputPattern="Results/Type2/";
    GetSystematicOnPrediction(InputPattern, "Data13TeV16");  //FOR IMPOSSIBLE REASON, THIS FUNCTION CRASHES IF IT IS RUN TOGETHER WITH THE OTHER FUNCTIONS
 
   std::cout<<"ALL DONE WITH THE PLOTTING CODE\n";
@@ -1659,7 +1660,7 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex, double ylow, double
         T.DrawLatex (histos[0].first->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
 
     leg->Draw();
-    SQRTS=131615; string LegendTitle = LegendFromType(InputPattern);
+    SQRTS=1316; string LegendTitle = LegendFromType(InputPattern);
     DrawPreliminary(LegendTitle, SQRTS, IntegratedLuminosityFromE(SQRTS));
     char SaveName [128]; sprintf (SaveName, "CutFlowPlot_Abs_%u", CutIndex);
     c1->SetGridx(false);
@@ -1723,7 +1724,7 @@ void CutFlowPlot(string InputPattern, unsigned int CutIndex, double ylow, double
         T.DrawLatex (histos[0].second->GetXaxis()->GetBinCenter(cut_i+1), Y, AxisLabels[cut_i]);
 
     leg->Draw();
-    SQRTS=131615; LegendTitle = LegendFromType(InputPattern);
+    SQRTS=1316; LegendTitle = LegendFromType(InputPattern);
     DrawPreliminary(LegendTitle, SQRTS, IntegratedLuminosityFromE(SQRTS));
     sprintf (SaveName, "CutFlowPlot_Eff_%u", CutIndex);
     c1->SetGridx(false);
