@@ -114,6 +114,18 @@ SKIMStreamEXOHSCP = cms.FilteredStream(
     dataTier = cms.untracked.string('USER')
     )
 
+from Configuration.Skimming.PDWG_EXOHSCPCalib_cff import *
+EXOHSCPCalibPath = cms.Path(dedxSeq)
+SKIMStreamEXOHSCPCalib = cms.FilteredStream(
+    responsible = 'PDWG',
+    name = 'EXOHSCPCalib',
+    paths = (EXOHSCPCalibPath),
+    content = EXOHSCPCalibSkim_EventContent.outputCommands,
+    selectEvents = cms.untracked.PSet(),
+    dataTier = cms.untracked.string('RECO')
+    )
+
+
 from Configuration.Skimming.PDWG_HWWSkim_cff import *
 HWWmmPath = cms.Path(diMuonSequence)
 HWWeePath = cms.Path(diElectronSequence)
