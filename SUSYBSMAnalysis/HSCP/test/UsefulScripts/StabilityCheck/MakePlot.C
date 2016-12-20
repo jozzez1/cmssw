@@ -380,7 +380,7 @@ TH2D* getHIPRateGraph(std::vector<string>& runList, TFile* InputFile, string His
 TH1D* getHIPRate(std::vector<string>& runList, TFile* InputFile, string HistoName, float threshold, string HistoWeightName){
    printf("HIP value for %s\n", HistoName.c_str());
 
-   TH1D* toReturn = new TH1D((HistoName+"HIPRate").c_str(), "HIP Rate", 20, 0.0, 10.0);
+   TH1D* toReturn = new TH1D((HistoName+"HIPRate").c_str(), "HIP Rate", 26, 0.0, 13.0);
    toReturn->SetTitle("");
    toReturn->SetStats(kFALSE);
    toReturn->GetXaxis()->SetNdivisions(505);
@@ -704,49 +704,50 @@ void MakePlot()
       TGraphErrors *g1, *g2, *g3;
       TLegend* LEG;
 
+      SQRTS=1316.0;
 
       if(V==0 && T==0){
-         //c1 = new TCanvas("c1","c1,",600,600);                      
-         //TH1D* frame = new TH1D("frameR", "frameR", 1, -5.5, -3.5);
-         //frame->SetTitle("");
-         //frame->SetStats(kFALSE);
-         //frame->GetXaxis()->SetNdivisions(505);
-         //frame->GetXaxis()->SetTitle("Instantaneous Luminosity Log10 (#mu b / Xing)");
-         //frame->GetYaxis()->SetTitleOffset(0.95);
-         //frame->GetYaxis()->SetTitle("HIP Rate (%)");   
-         //frame->SetMinimum(0.0);   
-         //frame->SetMaximum(10.0);
-         //frame->Draw("AXIS");
+/*         c1 = new TCanvas("c1","c1,",600,600);                      
+         TH1D* frame = new TH1D("frameR", "frameR", 1, -5.5, -3.5);
+         frame->SetTitle("");
+         frame->SetStats(kFALSE);
+         frame->GetXaxis()->SetNdivisions(505);
+         frame->GetXaxis()->SetTitle("Instantaneous Luminosity Log10 (#mu b / Xing)");
+         frame->GetYaxis()->SetTitleOffset(0.95);
+         frame->GetYaxis()->SetTitle("HIP Rate (%)");   
+         frame->SetMinimum(0.0);   
+         frame->SetMaximum(10.0);
+         frame->Draw("AXIS");
 
-//         c1->SetLogy(true);
-//         TH2D* PixelHIPG = getHIPRateGraph(runList, InputFile, trigger+"dEdxHitPixel", 2.0, trigger+"NVert");   PixelHIPG->SetMarkerColor(2);  PixelHIPG->Draw("P same");
-         //TH2D* StripHIPG = getHIPRateGraph(runList, InputFile, trigger+"dEdxHitStrip", 2.0, trigger+"NVert");   StripHIPG->SetMarkerColor(4);  StripHIPG->Draw("COLZ");
-         //DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
-         //SaveCanvas(c1,"pictures/","HIP_RateGraph");
-         //delete c1;
+         c1->SetLogy(true);
+         TH2D* PixelHIPG = getHIPRateGraph(runList, InputFile, trigger+"dEdxHitPixel", 2.0, trigger+"NVert");   PixelHIPG->SetMarkerColor(2);  PixelHIPG->Draw("P same");
+         TH2D* StripHIPG = getHIPRateGraph(runList, InputFile, trigger+"dEdxHitStrip", 2.0, trigger+"NVert");   StripHIPG->SetMarkerColor(4);  StripHIPG->Draw("COLZ");
+         DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
+         SaveCanvas(c1,"pictures/","HIP_RateGraph");
+         delete c1;
 
-/*         c1 = new TCanvas("c1","c1,",600,600);
+         c1 = new TCanvas("c1","c1,",600,600);
          c1->SetLogy(true);
          TH1D* PixelHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitPixel", 2.0, trigger+"NVert");   PixelHIP->SetLineColor(2); PixelHIP->SetLineWidth(2); PixelHIP->Draw("HIST E1");
          TH1D* StripHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitStrip", 2.0, trigger+"NVert");   StripHIP->SetLineColor(4); StripHIP->SetLineWidth(2); StripHIP->Draw("HIST E1 same");
          DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
          SaveCanvas(c1,"pictures/","HIP_Rate");
          delete c1;
-*/
 
-         //std::vector<string> subDets = {"PIB", "PIE", "TIB", "TID", "TOB", "TEC"};
-         //c1 = new TCanvas("c1","c1,",600,600);
-         //c1->SetLogy(true);
-         //for(unsigned int d=0;d<subDets.size();d++){
-         //   if((d+1)<3){
-         //      TH1D* PixelHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitPixel"+subDets[d], 2.0, trigger+"NVert");   PixelHIP->SetLineColor(1+d); PixelHIP->SetLineWidth(2); PixelHIP->Draw(d==0?"HIST E1":"HIST E1 same");
-         //   }else{
-         //      TH1D* StripHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitStrip"+subDets[d], 2.0, trigger+"NVert");   StripHIP->SetLineColor(1+d); StripHIP->SetLineWidth(2); StripHIP->Draw("HIST E1 same");
-         //   }
-         //}
-         //DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
-         //SaveCanvas(c1,"pictures/","HIP_RateSubDet");
-         //delete c1;
+
+         std::vector<string> subDets = {"PIB", "PIE", "TIB", "TID", "TOB", "TEC"};
+         c1 = new TCanvas("c1","c1,",600,600);
+         c1->SetLogy(true);
+         for(unsigned int d=0;d<subDets.size();d++){
+            if((d+1)<3){
+               TH1D* PixelHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitPixel"+subDets[d], 2.0, trigger+"NVert");   PixelHIP->SetLineColor(1+d); PixelHIP->SetLineWidth(2); PixelHIP->Draw(d==0?"HIST E1":"HIST E1 same");
+            }else{
+               TH1D* StripHIP = getHIPRate(runList, InputFile, trigger+"dEdxHitStrip"+subDets[d], 2.0, trigger+"NVert");   StripHIP->SetLineColor(1+d); StripHIP->SetLineWidth(2); StripHIP->Draw("HIST E1 same");
+            }
+         }
+         DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
+         SaveCanvas(c1,"pictures/","HIP_RateSubDet");
+         delete c1;*/
       }
      
 
@@ -754,7 +755,7 @@ void MakePlot()
 
       SQRTS = 1316;
       c1 = new TCanvas("c1","c1,",1200,600);        
-      frameR->GetYaxis()->SetTitle("<#Vertices>");       frameR->SetMinimum(0.0);   frameR->SetMaximum(20);  frameR->Draw("AXIS");
+      frameR->GetYaxis()->SetTitle("<#Vertices>");       frameR->SetMinimum(7.0);   frameR->SetMaximum(27);  frameR->Draw("AXIS");
       g1 = getStabilityGraph(runList, InputFile, trigger+"NVert");  g1->Draw("0 P same");
       DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
       SaveCanvas(c1,"pictures/","Summary_Profile_NVert_"+trigger+"_"+version);
@@ -768,6 +769,13 @@ void MakePlot()
       SaveCanvas(c1,"pictures/","Summary_Profile_PreselEff_"+trigger+"_"+version);
       delete c1;
 
+      SQRTS = 1316;
+      c1 = new TCanvas("c1","c1,",1200,600);        
+      frameR->GetYaxis()->SetTitle("<Presel. tracks / Num. of Events>");       frameR->SetMinimum(0.0);   frameR->SetMaximum(0.4);  frameR->Draw("AXIS");
+      g1 = getEfficiencyGraph(runList, InputFile, trigger+"TPsVNEvts");  g1->Draw("0 P same");
+      DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
+      SaveCanvas(c1,"pictures/","Summary_Profile_TPsVNEvts_"+trigger+"_"+version);
+      delete c1;
 
       SQRTS = 1316;
       c1 = new TCanvas("c1","c1,",1200,600);          legend.clear();
@@ -784,6 +792,7 @@ void MakePlot()
       TGraphErrors* gr1 = getStabilityGraphFrom2D(runList, InputFile, trigger+"PtEta", 1, false, kBlack);  gr1->Draw("0 P same"); LEG->AddEntry(gr1, "|#eta| < 0.9", "PE");
       TGraphErrors* gr2 = getStabilityGraphFrom2D(runList, InputFile, trigger+"PtEta", 2, false, kBlue);   gr2->Draw("0 P same"); LEG->AddEntry(gr2, "0.9 < |#eta| < 1.2", "PE");
       TGraphErrors* gr3 = getStabilityGraphFrom2D(runList, InputFile, trigger+"PtEta", 3, false, kRed);    gr3->Draw("0 P same"); LEG->AddEntry(gr3, "1.2 < |#eta| < 2.1", "PE");
+//      TGraphErrors* gr4 = getStabilityGraphFrom2D(runList, InputFile, trigger+"PtEta", 4, false, kGreen);  gr4->Draw("0 P same"); LEG->AddEntry(gr4, "2.1 < |#eta| < 2.4", "PE");
       LEG->Draw();
       DrawPreliminary("", SQRTS, IntegratedLuminosityFromE(SQRTS));
       SaveCanvas(c1,"pictures/","Summary_Profile_PtEta_"+trigger+"_"+version);

@@ -8,10 +8,13 @@ cmdfile = "FARM/inputs/HscpAnalysis.cmd"
 samplesFiles = "Analysis_Samples.txt"
 types = set()
 
-for root, dirs, files in os.walk(indir):
-    if "Type" not in root: continue
-    anaType = int(root.split("/")[-1].replace("Type",""))
-    types.add(anaType)
+#for root, dirs, files in os.walk(indir):
+#    if "Type" not in root: continue
+#    anaType = int(root.split("/")[-1].replace("Type",""))
+#    types.add(anaType)
+
+types.add(0)
+types.add(2)
 
 todo = []
 with open(samplesFiles) as ifile:
@@ -33,12 +36,26 @@ with open(samplesFiles) as ifile:
                             continue
                         todo.append(f)
 
+redo=[]
 with open(cmdfile) as f:
     for l in f:
         line = l.strip()
         for t in todo:
             if t in line:
-                print line
-                #os.system(line)
+                m = line.split('=')[1]
+                m = m.split('/')[len(m.split('/'))-1]
+                m = m.replace('.sh', '')
+                redo.append(m)
+                print line.split('=')[1]
+#                os.system("sh" + line.split('=')[1])
                 break
 
+#newcmd = open("newcmd.cmd", "w")
+#for executable in redo:
+#   newcmd.write('Executable              = FARM/inputs/%s.sh\n' % executable)
+#   newcmd.write('output                  = FARM/logs/%s.out\n' % executable)
+#   newcmd.write('error                   = FARM/logs/%s.err\n' % executable)
+#   newcmd.write('log                     = FARM/logs/%s.log\n' % executable)
+#   newcmd.write('Queue 1\n')
+#   newcmd.write('\n')
+#newcmd.close()

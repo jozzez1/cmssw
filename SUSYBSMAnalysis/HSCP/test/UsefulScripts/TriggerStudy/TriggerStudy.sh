@@ -16,15 +16,9 @@ root -l -b << EOF
   gInterpreter->SetClassAutoparsing(false);
 
 
-  .x TriggerStudy.C+("Gluino1000_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1000.root")
   .x TriggerStudy.C+("Gluino1600_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1600.root")
-  .x TriggerStudy.C+("Gluino600_13TeV16_f10",  "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M600.root")
-  .x TriggerStudy.C+("Gluino1000N_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1000N.root")
-  .x TriggerStudy.C+("Gluino1600N_13TeV16_f10", "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M1600N.root")
-  .x TriggerStudy.C+("Gluino600N_13TeV16_f10",  "/storage/data/cms/store/user/querten/HSCP/2015/Gluino_13TeV_M600N.root")
   .x TriggerStudy.C+("GMStauM308_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M308.root")
-  .x TriggerStudy.C+("GMStauM494_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M494.root")
-  .x TriggerStudy.C+("GMStauM871_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/GMStau_13TeV_M871.root")
+  .x TriggerStudy.C+("PPStauM308_13TeV16", "/storage/data/cms/store/user/querten/HSCP/2015/PPStau_13TeV_M308.root")
 EOF
 
 # FIRST BATCH

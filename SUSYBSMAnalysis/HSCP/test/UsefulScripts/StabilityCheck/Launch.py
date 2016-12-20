@@ -12,6 +12,7 @@ LaunchOnCondor.Jobs_InitCmds       = ['ulimit -c 0;']  #disable production of co
 
 UseRemoteSamples                   = True
 RemoteStorageDir                   = '/storage/data/cms/store/user/jozobec/HSCP2016/'
+#RemoteStorageDir                   = '/store/group/phys_exotica/hscp/'
 
 def initProxy():
    if(not os.path.isfile(os.path.expanduser('~/x509_user_proxy/x509_proxy')) or ((time.time() - os.path.getmtime(os.path.expanduser('~/x509_user_proxy/x509_proxy')))>600)):
@@ -59,7 +60,7 @@ if sys.argv[1]=='1':
    LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='2':
-   os.system('find pictures/Histos_*.root  -type f -size +1024c -cmin -180 | xargs hadd -f  pictures/Histos.root')
+   os.system('find pictures/Histos_*.root  -type f -size +1024c | xargs hadd -f  pictures/Histos.root')
 
 if sys.argv[1]=='3':
    os.system('sh MakePlot.sh')

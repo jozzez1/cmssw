@@ -988,6 +988,7 @@ std::cout<<"TESTD\n";
    frame->GetYaxis()->SetTitleOffset(1.40);
    frame->SetMaximum(PlotMaxScale);
    frame->SetMinimum(PlotMinScale);
+   frame->GetYaxis()->SetRangeUser(1e-4, 1.5e1); // JOZZE EDIT
    frame->Draw("AXIS");
 
 
@@ -1093,6 +1094,7 @@ std::cout<<"TESTD\n";
 //   frame->GetYaxis()->SetTitleOffset(1.40);
 //   frame->SetMaximum(PlotMaxScale);
 //   frame->SetMinimum(PlotMinScale);
+   frame->GetYaxis()->SetRangeUser(1e-4, 1.5e1); // JOZZE EDIT
    frame->Draw("AXIS");
 
    if(!Combine) {

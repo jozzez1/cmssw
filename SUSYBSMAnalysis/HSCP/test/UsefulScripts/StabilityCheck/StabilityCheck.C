@@ -546,6 +546,8 @@ void StabilityCheck(string DIRNAME="COMPILE", string OUTDIRNAME="pictures", stri
             } 
            plots->PreselEff->SetBinContent(1, totalPreselEvents/totalNEvents);
 	   plots->TPsVNEvts->SetBinContent(1, totalPreselTracks/totalNEvents);
+           plots->PreselEff->SetBinError  (1, sqrt(totalPreselEvents + totalNEvents));
+	   plots->TPsVNEvts->SetBinError  (1, sqrt(totalPreselTracks + totalNEvents));
            } 
          }
          plotPerEvent = false;

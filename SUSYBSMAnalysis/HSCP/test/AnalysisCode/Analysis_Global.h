@@ -196,7 +196,9 @@ void InitBaseDirectory(){
 
    // BaseDirectory is first set for the AAA protocol ...
    if(remoteStoragePath!=NULL){
-      BaseDirectory = "root://cms-xrd-global.cern.ch/"+string(remoteStoragePath);
+      string RemoteStorageServer = "cms-xrd-global.cern.ch"; // default value
+      if (getenv("REMOTESTORAGESERVER")!=NULL) RemoteStorageServer = string(getenv("REMOTESTORAGESERVER"));
+      BaseDirectory = string("root://")+RemoteStorageServer+"/"+string(remoteStoragePath);
       printf("Accessing remote files using BaseDirectory = %s\n.", BaseDirectory.c_str());
    // if we give no path to remote storage site, BaseDirectory is then set via hostname
    }else if(host.find("ucl.ac.be")!=std::string::npos){

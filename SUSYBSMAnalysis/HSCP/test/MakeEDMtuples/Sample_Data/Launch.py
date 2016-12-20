@@ -13,7 +13,7 @@ import json
 import collections # kind of map
 
 #script parameters #feel free to edit those
-JSON = 'ReMerge.txt' #'/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt'   
+JSON = 'ToProcess.json' #'/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt'   
 LOCALTIER   = 'T2_BE_UCL'
 DATASETMASKS = ['/DoubleMuon/Run2016*-PromptReco-v*/AOD', '/SingleMuon/Run2016*-PromptReco-v*/AOD', '/MET/Run2016*-PromptReco-v*/AOD']
 ISLOCAL     = False #automatically assigned
@@ -146,7 +146,7 @@ if sys.argv[1]=='1':
             LaunchOnCondor.SendCluster_Push  (["CMSSW", ["HSCParticleProducer_Data_Template_cfg.py"] ])
             INDEX+=1
 
-   LaunchOnCondor.SendCluster_Submit()
+#   LaunchOnCondor.SendCluster_Submit()
 
 
 
@@ -155,9 +155,10 @@ if sys.argv[1]=='2':
    LaunchOnCondor.SendCluster_Create(FarmDirectory, "HSCPEdmMerge")
    LaunchOnCondor.Jobs_Queue = '8nh'
    for RUN in goodLumis:
-        LaunchOnCondor.Jobs_FinalCmds = ["edmLumisInFiles.py out.root --output=%s/out/Run2015_%i.json" % (os.getcwd(), RUN)]
-        LaunchOnCondor.Jobs_FinalCmds += ["mv out.root %s/out/Run2015_%i.root" % (os.getcwd(), RUN)]
+        LaunchOnCondor.Jobs_InitCmds   = ['export HOME=%s' % os.environ['HOME']]
+        LaunchOnCondor.Jobs_FinalCmds  = ["edmLumisInFiles.py Run2016_%i.root --output=%s/out/Run2016_%i.json" % (RUN, os.getcwd(), RUN)]
+        LaunchOnCondor.Jobs_FinalCmds += ["mv Run2016_%i.root %s/out/Run2016_%i.root" % (RUN, os.getcwd(), RUN)]
 	LaunchOnCondor.ListToFile(LaunchOnCondor.GetListOfFiles('"file:','%s/out/%i/*_HSCP_*.root' % (os.getcwd(), RUN),'",'), FarmDirectory + "InputFile.txt")
-	LaunchOnCondor.SendCMSJobs(FarmDirectory, "HSCPEdmMerge_%i"%RUN, "Merge_cfg.py", FarmDirectory + "InputFile.txt", 1, ['XXX_SAVEPATH_XXX','out.root'])
-   os.system("rm " +  FarmDirectory + "InputFile.txt")
+	LaunchOnCondor.SendCMSJobs(FarmDirectory, "HSCPEdmMerge_%i"%RUN, "Merge_cfg.py", FarmDirectory + "InputFile.txt", 1, ['XXX_SAVEPATH_XXX','Run2016_%i.root' % RUN])
+        os.system("rm " +  FarmDirectory + "InputFile.txt")
 

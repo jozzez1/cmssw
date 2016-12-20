@@ -67,6 +67,7 @@ void Analysis_Step3_MakePlots()
    InputPattern = "Results/Type0/";   CutIndex = 4; CutIndexTight = 29;
    MassPrediction(InputPattern, CutIndex,      "Mass", false, "13TeV16_Loose");
    MassPrediction(InputPattern, CutIndexTight, "Mass", false, "13TeV16_Tight");
+   return;
    CutFlow(InputPattern, CutIndex);
    CutFlow(InputPattern, CutIndexTight);
    CutFlowPlot(InputPattern, 0);
@@ -528,6 +529,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
        frame->GetXaxis()->SetTitleFont(43); //give the font size in pixel (instead of fraction)
        frame->GetXaxis()->SetTitleSize(20); //font size
        frame->GetXaxis()->SetRangeUser(0,1600); //x-axis range
+       if(IsTkOnly) frame->GetYaxis()->SetRangeUser(1e-2,4e5); //x-axis range
 //       frame->GetXaxis()->SetTitleOffset(3.75);
        if(r==0)frame->GetXaxis()->SetTitle("Mass (GeV)");
 

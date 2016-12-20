@@ -47,9 +47,39 @@ bool isData = true;
 bool isMC   = !isData;
 
 
-muonTimingCalculator tofCalculator;
+bool NotARegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt>PtCut  || (ICut>-1 && I>ICut)  || (TOFCut>-1 && TOF<=TOFCut));
+}
 
-void DumpCandidateInfo(const susybsm::HSCParticle& hscp, const fwlite::ChainEvent& ev, FILE* pFile, double treeMass)
+bool NotBRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt>PtCut  || (ICut>-1 && I<=ICut) || (TOFCut>-1 && TOF<=TOFCut));
+}
+
+bool NotCRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt<=PtCut || (ICut>-1 && I>ICut)  || (TOFCut>-1 && TOF<=TOFCut));
+}
+
+bool NotDRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt<=PtCut || (ICut>-1 && I<=ICut) || (TOFCut>-1 && TOF<=TOFCut));
+}
+
+bool NotERegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt>PtCut  || (ICut>-1 && I>ICut)  || (TOFCut>-1 && TOF>TOFCut));
+}
+
+bool NotFRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt>PtCut  || (ICut>-1 && I<=ICut) || (TOFCut>-1 && TOF>TOFCut));
+}
+
+bool NotGRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt<=PtCut || (ICut>-1 && I>ICut)  || (TOFCut>-1 && TOF>TOFCut));
+}
+
+bool NotHRegion (double Pt, double PtCut, double I, double ICut, double TOF, double TOFCut){
+   return (Pt<=PtCut || (ICut>-1 && I<=ICut) || (TOFCut>-1 && TOF>TOFCut));
+}
+
+void DumpCandidateInfo(const susybsm::HSCParticle& hscp, const fwlite::ChainEvent& ev, FILE* pFile, double treeMass, muonTimingCalculator tofCalculator)
 {
    reco::MuonRef  muon  = hscp.muonRef();
    reco::TrackRef track = hscp.trackRef();
@@ -150,6 +180,7 @@ void DumpCandidateInfo(const susybsm::HSCParticle& hscp, const fwlite::ChainEven
    }
 
    fprintf(pFile,"\n");
+   fprintf(pFile,"%s\n", ev.getTFile()->GetName());
    fprintf(pFile,"---------------------------------------------------------------------------------------------------\n");
    fprintf(pFile,"Candidate Type = %i --> Mass : %7.2f (recompute-->%7.2f)\n",hscp.type(),treeMass, Mass);
    fprintf(pFile,"------------------------------------------ EVENT INFO ---------------------------------------------\n");
@@ -257,20 +288,32 @@ void DumpCandidateInfo(const susybsm::HSCParticle& hscp, const fwlite::ChainEven
 }
 
 
-void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string MassCutStr="-1")
+void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string MassCutStr="-1", string Region="D")
 {
+   bool (*IncorrectRegion) (double, double, double, double, double, double);
+   if      (Region=="A"){ IncorrectRegion = NotARegion;}
+   else if (Region=="B"){ IncorrectRegion = NotBRegion;}
+   else if (Region=="C"){ IncorrectRegion = NotCRegion;}
+   else if (Region=="D"){ IncorrectRegion = NotDRegion;}
+   else if (Region=="E"){ IncorrectRegion = NotERegion;}
+   else if (Region=="F"){ IncorrectRegion = NotFRegion;}
+   else if (Region=="G"){ IncorrectRegion = NotGRegion;}
+   else if (Region=="H"){ IncorrectRegion = NotHRegion;}
+   else    {Region ="D";  IncorrectRegion = NotDRegion;}
+
    int CutIndex;
    double MassCut;
    sscanf(CutIndexStr.c_str(),"%d", &CutIndex);
    sscanf(MassCutStr.c_str(), "%lf", &MassCut); 
 
    InitBaseDirectory();
+   BaseDirectory="/storage/data/cms/store/user/jozobec/HSCP2016/";
    GetSampleDefinition(samples , DIRNAME+"/../../AnalysisCode/Analysis_Samples.txt");
    keepOnlySamplesOfTypeX(samples, 0);
    TypeMode = TypeFromPattern(Pattern);
    if(TypeMode==4) useClusterCleaning = false;
 
-   string Data="Data13TeV";
+   string Data="Data13TeV16";
 
    TFile* InputFile      = new TFile((Pattern + "/Histos.root").c_str());
    TH1D*  HCuts_Pt       = (TH1D*)GetObjectFromPath(InputFile, "HCuts_Pt");
@@ -290,20 +333,23 @@ void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string Mas
    TOFCut = HCuts_TOF->GetBinContent(CutIndex+1);
 
    unsigned int CurrentRun = 0;
+   moduleGeom::loadGeometry("../../../data/CMS_GeomTree.root");
+   muonTimingCalculator tofCalculator;
    tofCalculator.loadTimeOffset("../../../data/MuonTimeOffset.txt");
-      if(isData){ 
-         dEdxSF [0] = 1.00000;
-         dEdxSF [1] = 1.21836;
-         dEdxTemplates = loadDeDxTemplate("../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
-      }else{  
-         dEdxSF [0] = 1.09708;
-         dEdxSF [1] = 1.01875;
-         dEdxTemplates = loadDeDxTemplate("../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
-      }
+   bool is2016=(Data.find("13TeV16")!=string::npos);
+   if(isData){ 
+      dEdxSF [0] = 1.00000;
+      dEdxSF [1] = (is2016)?1.41822:1.21836;
+      dEdxTemplates = loadDeDxTemplate(is2016?"../../../data/Data13TeV16_dEdxTemplate.root":"../../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
+   }else{  
+      dEdxSF [0] = (is2016)?1.41822:1.09708;
+      dEdxSF [1] = (is2016)?1.09256:1.01875;
+      dEdxTemplates = loadDeDxTemplate(is2016?"../../../data/MC13TeV16_dEdxTemplate.root":"../../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root", true);
+   }
 
-      if(isData){    trackerCorrector.LoadDeDxCalibration("../../../data/Data13TeVGains_v2.root"); 
-      }else{ trackerCorrector.TrackerGains = NULL; //FIXME check gain for MC
-      }
+   if(isData){    trackerCorrector.LoadDeDxCalibration("../../../data/Data13TeVGains_v2.root"); 
+   }else{ trackerCorrector.TrackerGains = NULL; //FIXME check gain for MC
+   }
 
 
 
@@ -339,7 +385,7 @@ void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string Mas
    fprintf(pFile, "PREDICTED EVENTS = %6.2E+-%6.2E\n",H_P->GetBinContent(CutIndex+1), H_P->GetBinError(CutIndex+1));
    FILE* pickEvent = fopen("PickEvent.txt","w");
    printf("Progressing Bar              :0%%       20%%       40%%       60%%       80%%       100%%\n");
-   printf("Scanning D                   :");
+   printf("Scanning %s                   :", Region.c_str());
 
    int TreeStep = tree->GetEntries()/50;if(TreeStep==0)TreeStep=1;
    for (Int_t i=0;i<tree->GetEntries();i++){
@@ -347,7 +393,7 @@ void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string Mas
       tree->GetEntry(i);
 //      printf("%6i %9i %1i  %6.2f %6.2f %6.2f\n",Run,Event,HscpI,Pt,I,TOF);
 
-      if(Pt<=PtCut || (ICut>-1 && I<=ICut) || (TOFCut>-1 && TOF<=TOFCut) || (MassCut>-1 && Mass<=MassCut))continue;
+      if (IncorrectRegion((double)Pt, PtCut, (double)I, ICut, (double)TOF, TOFCut) || (MassCut>-1 && Mass<=MassCut))continue;
       ev.to(Run, Event);
       fprintf(pickEvent, "%i:%i:%i,\n",Run,ev.eventAuxiliary().luminosityBlock(), Event);
 
@@ -366,7 +412,7 @@ void DumpInfo(string DIRNAME, string Pattern, string CutIndexStr="0", string Mas
       const susybsm::HSCParticleCollection& hscpColl = *hscpCollHandle;
 
       susybsm::HSCParticle hscp  = hscpColl[HscpI];
-      DumpCandidateInfo(hscp, ev, pFile, Mass);
+      DumpCandidateInfo(hscp, ev, pFile, Mass, tofCalculator);
 
       for(unsigned int h=0;h<hscpColl.size();h++){
          if(h==HscpI)continue;

@@ -14,6 +14,7 @@ LaunchOnCondor.Jobs_Queue = '8nh'
 
 UseRemoteSamples          = True
 RemoteStorageDir          = '/storage/data/cms/store/user/jozobec/HSCP2016/'
+RemoteServer              = 'ingrid-se03.cism.ucl.ac.be'
 #RemoteStorageDir          = '/store/group/phys_exotica/hscp/'
 
 #the vector below contains the "TypeMode" of the analyses that should be run
@@ -81,7 +82,7 @@ if sys.argv[1]=='1':
            if((vals[0].replace('"','')) in CMSSW_VERSION):
               for Type in AnalysesToRun:
                  if(UseRemoteSamples and int(vals[1])==0 and vals[3].find('2016') != -1):
-                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
+                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGESERVER='+RemoteServer, 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
                  else: LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0']
                  if(int(vals[1])>=2 and skipSamples(Type, vals[2])==True):continue
 #                 if(int(vals[1])==0):continue

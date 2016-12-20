@@ -119,6 +119,13 @@ void makeFigure(string outfile, TH1* frame, string chambersList){
       for(unsigned int c=0;c<chambersToDraw.size();c++){
           TGraphErrors* graph = graphMap[chambersToDraw[c]];
           double* xpoints = graph->GetX();  for(unsigned int x=0;x<graph->GetN();x++){xpoints[x] = floor(xpoints[x]) + double(1+c%chambersToDraw.size())/(chambersToDraw.size()+1); }
+	  if (outfile.find("Station")!=string::npos){
+          double* yErr          = graph->GetEY();
+          double* yVal          = graph->GetY();
+          for (unsigned int x=0; x<graph->GetN();x++){
+             const char* runString = frame->GetXaxis()->GetBinLabel(frame->FindBin(xpoints[x]));
+	     if (yErr[x] > 5.0 || std::fabs(yVal[x]) > 25.0) printf ("%s: %lf +- %lf\n", runString, yVal[x], yErr[x]);
+          }}
           graph->SetMarkerStyle(20);
           graph->SetMarkerColor(gStyle->GetColorPalette(int(c*(255.0/chambersToDraw.size()))));
           graph->SetLineColor(graph->GetMarkerColor()); 
