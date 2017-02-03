@@ -15,7 +15,7 @@ toRun = ["cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/HSCPppstau
          --python_filename step1_cfg.py \
          --magField 38T_PostLS1 \
          --geometry Extended2023D4 \
-         --era Phase2C2 _timing \
+         --era Phase2C2_timing \
          --customise SimG4Core/CustomPhysics/Exotica_HSCP_SIM_cfi.customise \
          --customise SimG4Core/Application/customiseSequentialSim.customiseSequentialSim \
          --no_exec \
