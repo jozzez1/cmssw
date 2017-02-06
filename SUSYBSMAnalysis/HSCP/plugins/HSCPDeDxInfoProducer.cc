@@ -82,7 +82,7 @@ void  HSCPDeDxInfoProducer::beginRun(edm::Run const& run, const edm::EventSetup&
 
 void HSCPDeDxInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  unique_ptr<ValueMap<susybsm::HSCPDeDxInfo> > trackDeDxAssociation(new ValueMap<susybsm::HSCPDeDxInfo> );
+  auto_ptr<ValueMap<susybsm::HSCPDeDxInfo> > trackDeDxAssociation(new ValueMap<susybsm::HSCPDeDxInfo> );
   ValueMap<susybsm::HSCPDeDxInfo>::Filler filler(*trackDeDxAssociation);
 
   edm::Handle<reco::TrackCollection> trackCollectionHandle;
@@ -134,7 +134,7 @@ void HSCPDeDxInfoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   
   filler.insert(trackCollectionHandle, dEdxInfos.begin(), dEdxInfos.end());
   filler.fill();
-  iEvent.put(std::move(trackDeDxAssociation));
+  iEvent.put(trackDeDxAssociation);   
 }
 
 void HSCPDeDxInfoProducer::processHit(const TrackingRecHit* recHit, float trackMomentum, float& cosine, susybsm::HSCPDeDxInfo& hscpDeDxInfo,  LocalPoint HitLocalPos){

@@ -116,7 +116,7 @@ class SimHitShifter : public edm::EDProducer {
 
    private:
       std::string ShiftFileName;
-      virtual void beginJob() override;
+      virtual void beginJob(const edm::Run&, const edm::EventSetup&) ;
       virtual void produce(edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override ;
     
@@ -164,9 +164,9 @@ void SimHitShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
    iEvent.getManyByType(theSimHitContainers);
    //std::cout << " The Number of sim Hits is  " << theSimHitContainers.size() <<std::endl;
 
-   std::unique_ptr<edm::PSimHitContainer> pcsc(new edm::PSimHitContainer);
-   std::unique_ptr<edm::PSimHitContainer> pdt(new edm::PSimHitContainer);
-   std::unique_ptr<edm::PSimHitContainer> prpc(new edm::PSimHitContainer);
+   std::auto_ptr<edm::PSimHitContainer> pcsc(new edm::PSimHitContainer);
+   std::auto_ptr<edm::PSimHitContainer> pdt(new edm::PSimHitContainer);
+   std::auto_ptr<edm::PSimHitContainer> prpc(new edm::PSimHitContainer);
 
    std::vector<PSimHit> theSimHits;
 
@@ -263,9 +263,9 @@ void SimHitShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
    std::cout<<"Putting collections in the event"<<std::endl;
 
-   iEvent.put(std::move(pcsc),"MuonCSCHits");
-   iEvent.put(std::move(pdt),"MuonDTHits");
-   iEvent.put(std::move(prpc),"MuonRPCHits");
+   iEvent.put(pcsc,"MuonCSCHits");
+   iEvent.put(pdt,"MuonDTHits");
+   iEvent.put(prpc,"MuonRPCHits");
    
 }
 
@@ -277,7 +277,7 @@ SimHitShifter::beginRun(const edm::Run& run, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-SimHitShifter::beginJob()
+SimHitShifter::beginJob(const edm::Run& run, const edm::EventSetup& iSetup)
 {
 
 }

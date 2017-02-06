@@ -35,8 +35,8 @@ class HSCPHLTFilter : public edm::EDFilter {
       bool IncreasedTreshold(const trigger::TriggerEvent& trEv, const edm::InputTag& InputPath, double NewThreshold, double etaCut, int NObjectAboveThreshold, bool averageThreshold);
 
       std::string TriggerProcess;
-      edm::EDGetTokenT<edm::TriggerResults> triggerResultsToken_;
       edm::EDGetTokenT< trigger::TriggerEvent > trEvToken;
+      edm::EDGetTokenT< edm::TriggerResults > trResultsToken;
       std::map<std::string, bool > DuplicateMap;
 
       unsigned int CountEvent;
@@ -56,9 +56,9 @@ HSCPHLTFilter::HSCPHLTFilter(const edm::ParameterSet& iConfig)
    RemoveDuplicates      = iConfig.getParameter<bool>                ("RemoveDuplicates");
 
    TriggerProcess        = iConfig.getParameter<std::string>         ("TriggerProcess");
-   triggerResultsToken_ = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", TriggerProcess));
-
    trEvToken = consumes< trigger::TriggerEvent >( edm::InputTag( "hltTriggerSummaryAOD" ) );
+   trResultsToken = consumes <edm::TriggerResults> (edm::InputTag (std::string("TriggerResults"), std::string(""), TriggerProcess));
+
    MuonTrigger1Mask      = iConfig.getParameter<int>                 ("MuonTrigger1Mask");
    PFMetTriggerMask      = iConfig.getParameter<int>                 ("PFMetTriggerMask");
    L2MuMETTriggerMask    = iConfig.getParameter<int>                 ("L2MuMETTriggerMask");
@@ -94,15 +94,16 @@ bool HSCPHLTFilter::isDuplicate(unsigned int Run, unsigned int Event){
 /////////////////////////////////////////////////////////////////////////////////////
 bool HSCPHLTFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   edm::Handle<edm::TriggerResults> triggerResults;
-   iEvent.getByToken(triggerResultsToken_, triggerResults);
-
-   edm::TriggerResultsByName tr(nullptr, nullptr);
-   if (triggerResults.isValid()) {
-     tr = iEvent.triggerResultsByName(*triggerResults);
-   }
+   edm::Handle <edm::TriggerResults> trResultsHandle;
+   iEvent.getByToken (trResultsToken,  trResultsHandle);
+   if (!trResultsHandle.isValid())
+      printf("NoValidTrigger\n");
+   edm::TriggerResultsByName tr = edm::TriggerResultsByName(trResultsHandle.isValid()?trResultsHandle.product():0,
+         trResultsHandle.isValid()?&(iEvent.triggerNames(*trResultsHandle.product())):0);
    if(!tr.isValid()){    printf("NoValidTrigger\n");  }
-
+   
+//   edm::TriggerResultsByName tr = iEvent.triggerResultsByName(TriggerProcess);
+//   if(!tr.isValid()){    printf("NoValidTrigger\n");  }
 
    if(RemoveDuplicates) {
      if(isDuplicate(iEvent.eventAuxiliary().run(),iEvent.eventAuxiliary().event()))return false;

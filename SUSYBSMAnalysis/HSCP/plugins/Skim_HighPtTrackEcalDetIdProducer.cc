@@ -127,7 +127,7 @@ HighPtTrackEcalDetIdProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 //   if(!iSetup) continue;
    Handle<TrackCollection> tkTracks;
    iEvent.getByToken(inputCollectionToken_,tkTracks);
-   std::unique_ptr< DetIdCollection > interestingDetIdCollection( new DetIdCollection() ) ;
+   std::auto_ptr< DetIdCollection > interestingDetIdCollection( new DetIdCollection() ) ;
    for(TrackCollection::const_iterator itTrack = tkTracks->begin();
        itTrack != tkTracks->end();
        ++itTrack) {
@@ -148,7 +148,7 @@ HighPtTrackEcalDetIdProducer::produce(edm::Event& iEvent, const edm::EventSetup&
         }
 
    }
-   iEvent.put(std::move(interestingDetIdCollection));
+   iEvent.put(interestingDetIdCollection);
 
 }
 //define this as a plug-in
