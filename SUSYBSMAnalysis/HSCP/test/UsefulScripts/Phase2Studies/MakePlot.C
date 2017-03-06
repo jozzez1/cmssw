@@ -49,7 +49,9 @@ typedef struct dEdxPlotObj
    map <string, double> C;   map <string, double> Cerr;
    
    // List of histograms to plot -- one for each *ObjName vector
-   TH3F**       dEdxTemplate;
+   TH3F**       dEdxTemplate_Pixel;
+   TH3F**       dEdxTemplate_Strip;
+   TH3F**       dEdxTemplate_HoT;
    TH1D**       hit_MIP;
    TH2D***      Charge_Vs_XYH;
    TH2D***      Charge_Vs_XYHN;
@@ -86,7 +88,9 @@ typedef struct dEdxPlotObj
       InputFile = new TFile (FileName.c_str());
 
       // initialize all the histograms
-      dEdxTemplate       = new TH3F*     [HitObjName.size()];
+      dEdxTemplate_Pixel = new TH3F*     [HitObjName.size()];
+      dEdxTemplate_Strip = new TH3F*     [HitObjName.size()];
+      dEdxTemplate_HoT   = new TH3F*     [HitObjName.size()];
       hit_MIP            = new TH1D*     [HitObjName.size()];
       Charge_Vs_XYH      = new TH2D**    [HitObjName.size()];
       Charge_Vs_XYHN     = new TH2D**    [HitObjName.size()];
@@ -103,8 +107,10 @@ typedef struct dEdxPlotObj
       HdedxVsEtaProfile  = new TProfile* [StdObjName.size()];
 
       for (unsigned int i = 0; i < HitObjName.size(); i++){
-         dEdxTemplate   [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath").c_str());
-         hit_MIP        [i] = (TH1D*) GetObjectFromPath (InputFile, (HitObjName[i] + "_Hit"         ).c_str());
+         dEdxTemplate_Pixel [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath"       ).c_str());
+         dEdxTemplate_Strip [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2").c_str());
+         dEdxTemplate_HoT   [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_HOT"   ).c_str());
+/*         hit_MIP            [i] = (TH1D*) GetObjectFromPath (InputFile, (HitObjName[i] + "_Hit"         ).c_str());
 
          Charge_Vs_XYH  [i] = new TH2D* [15];
          Charge_Vs_XYHN [i] = new TH2D* [15];
@@ -114,7 +120,7 @@ typedef struct dEdxPlotObj
             Charge_Vs_XYH  [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYH"  + Id).c_str());
             Charge_Vs_XYHN [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYHN" + Id).c_str());
             Charge_Vs_XYLN [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYLN" + Id).c_str());
-         }
+         }*/
       }
 
       for (unsigned int i = 0; i < StdObjName.size(); i++){
@@ -165,6 +171,7 @@ void SaveKC (vector<dEdxPlotObj*> plotObj, string filename = "Report.txt");
 void SystStudy(string SaveDir, vector<dEdxPlotObj*> plotObj, bool createTable=true, bool showChi2=false);
 void ExtractSlope (string SaveDir, vector <dEdxPlotObj*> plotObj);
 void HitPlots (string SaveDir, vector <dEdxPlotObj*> plotObj);
+void PlotTemplates (string SaveDir, vector <dEdxPlotObj*> plotObj);
 
 double GetMass(double P, double I, dEdxPlotObj* plotObj, string ObjName){
    return sqrt((I-plotObj->C[ObjName])/plotObj->K[ObjName])*P;
@@ -233,20 +240,10 @@ void MakePlot()
    gStyle->SetPalette(1); 
    gStyle->SetNdivisions(510,"X");
 
-   TFile* PixTemplate = new TFile ("dEdxTemplate_MC140.root");
-   TFile* StrTemplate = new TFile ("dEdxTemplate_MC140_Phase2.root");
-   TH3F* pixTemplate140 = (TH3F*) GetObjectFromPath (PixTemplate, "Charge_Vs_Path");
-   TH3F* strTemplate140 = (TH3F*) GetObjectFromPath (StrTemplate, "Charge_Vs_Path_Phase2");
-
-   MakeMapPlots (pixTemplate140, "pixel", "pictures/", "Map");
-   MakeMapPlots (strTemplate140, "strip", "pictures/", "Map");
-
-   return;
-
    vector<string> HitObjName;                         vector<string> HitObjLegend;
-   HitObjName.push_back("hit_PO");                    HitObjLegend.push_back("Pixel");
+//   HitObjName.push_back("hit_PO");                    HitObjLegend.push_back("Pixel");
 //   HitObjName.push_back("hit_PO_noHIP");              HitObjLegend.push_back("Pixel w/o HIP");
-   HitObjName.push_back("hit_SO_in_noC_CCC");         HitObjLegend.push_back("Strip");
+//   HitObjName.push_back("hit_SO_in_noC_CCC");         HitObjLegend.push_back("Strip");
 //   HitObjName.push_back("hit_SO_in_noC_CCC_noHIP");   HitObjLegend.push_back("Strip w/o HIP, new CC");
 //   HitObjName.push_back("hit_SO_in_noC_newCCC");      HitObjLegend.push_back("Strip, new CC");
 //   HitObjName.push_back("hit_SO_in_noC_newCCC_noHIP");HitObjLegend.push_back("Strip w/o HIP, new CC");
@@ -254,7 +251,7 @@ void MakePlot()
 //   HitObjName.push_back("hit_SP_in_noC");
 //   HitObjName.push_back("hit_SP_in_noC_CI");
 //   HitObjName.push_back("hit_SP_in_noC_CC");
-   HitObjName.push_back("hit_SP_in_noC_CCC");         HitObjLegend.push_back("Strip+Pixel charges");
+   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel");
 //   HitObjName.push_back("hit_SP_in_noC_newCCC");      HitObjLegend.push_back("Strip+Pixel charges, new CC");
 
    vector<string> StdObjName;                         vector<string> StdObjLegend;
@@ -279,7 +276,7 @@ void MakePlot()
 //   StdObjName.push_back("hybr204_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-40, SP");
 //   StdObjName.push_back("harm2_SO_in_noC_CCC");       StdObjLegend.push_back("harm-2, SO");
 //   StdObjName.push_back("Hybr201_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-10, SP");
-   StdObjName.push_back("Hybr2015_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-15");
+//   StdObjName.push_back("Hybr2015_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-15");
 //   StdObjName.push_back("Hybr2015_SP_in_noC_newCCC"); StdObjLegend.push_back("Hybrid2-15, new CC");
 //   StdObjName.push_back("Hybr202_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-20, SP");
 //   StdObjName.push_back("Hybr2025_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-25, SP");
@@ -305,35 +302,24 @@ void MakePlot()
 //   StdObjName.push_back("Ias_SP_in_noC");
 //   StdObjName.push_back("Ias_SP_in_noC_CI");
 //   StdObjName.push_back("Ias_SP_in_noC_CC");
-   StdObjName.push_back("Ias_SP_in_noC_CCC");           StdObjLegend.push_back("Ias (2015)");
-   StdObjName.push_back("Ias_SP_in_noC_CCC16");         StdObjLegend.push_back("Ias (2016)");
+//   StdObjName.push_back("Ias_SP_in_noC_CCC");           StdObjLegend.push_back("Ias (2015)");
+//   StdObjName.push_back("Ias_SP_in_noC_CCC16");         StdObjLegend.push_back("Ias (2016)");
 //   StdObjName.push_back("Ias_SP_in_noC_newCCC");      StdObjLegend.push_back("Ias, new CC");
 
 
    vector <dEdxPlotObj*> plotObj;
-   plotObj.push_back(new dEdxPlotObj("Histos_MCMinBias.root", "MC (MinBias)", "MCMinBias", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
-//   plotObj.push_back(new dEdxPlotObj("Histos_Data2015.root", "Data 2015",   "Data", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-//   plotObj.push_back(new dEdxPlotObj("Histos_Data2016.root", "Data 2016",   "Data", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-//   plotObj.push_back(new dEdxPlotObj("Histos_Run273158.root", "Run 273158",   "Run273158", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-//   plotObj.push_back(new dEdxPlotObj("Histos_Run273502.root", "Run 273502",   "Run273502", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run273725.root", "Run 273725",   "Run273725", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run274199.root", "Run 274199",   "Run274199", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run274200.root", "Run 274200",   "Run274200", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run274240.root", "Run 274240",   "Run274240", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run274998.root", "Run 274998",   "Run274998", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run274999.root", "Run 274999",   "Run274999", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run275000.root", "Run 275000",   "Run275000", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_Run275001.root", "Run 275001",   "Run275001", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-//   plotObj.push_back(new dEdxPlotObj("Histos_MCDYM2600Q2.root",        "DY, Q = 2, M = 2.6TeV",    "DYM2600Q2",        HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
-//   plotObj.push_back(new dEdxPlotObj("Histos_MCGluino_M1000_f10.root", "Gluino, f=10, M = 1TeV",   "Gluino_M1000_f10", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
-//   plotObj.push_back(new dEdxPlotObj("Histos_MCGluino_M1800_f10.root", "Gluino, f=10, M = 1.8TeV", "Gluino_M1800_f10", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
-//   plotObj.push_back(new dEdxPlotObj("Histos_MCStop_M1000.root",       "Stop, M = 1TeV",           "Stop_M1000",       HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
-//   plotObj.push_back(new dEdxPlotObj("Histos_MCGMStau_M494.root",      "GMStau, M = 494GeV",       "GMStau_M494",      HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_NoPU.root",  "MC (MinBias) 0 PU",   "MCMinBiasNoPU",  HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_140PU.root", "MC (MinBias) 140 PU", "MCMinBias140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_200PU.root", "MC (MinBias) 200 PU", "MCMinBias200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
 
    string SaveDir = "pictures_FAST/";
    system (string("rm -rf "+SaveDir+" && mkdir "+SaveDir).c_str());
-   system ("rm -rf systematics && mkdir systematics");
-   SaveKC (plotObj, SaveDir+"ConstantReport.txt");
+   system (string("rm -rf "+SaveDir+"systematics && mkdir -p "+SaveDir+"systematics").c_str());
+
+   PlotTemplates (SaveDir, plotObj);
+
+   return;
+
    // copy K and C from SMMC to signal MC
    size_t MCIndex = 0;
    for (size_t m = 0; m < plotObj.size()-1; m++)
@@ -1263,6 +1249,26 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
    }
 }
 
+void PlotTemplates (string SaveDir, vector <dEdxPlotObj*> plotObj)
+{
+   for (unsigned int i=0; i<plotObj.size(); i++){
+      for (unsigned int j=0; j<plotObj[i]->HitObjName.size(); j++){
+         if (plotObj[i]->HitObjName[j].find("SP")==string::npos) continue;
+         plotObj[i]->dEdxTemplate_Pixel[j]->SetName ( "Charge_Vs_Path"        );
+         plotObj[i]->dEdxTemplate_Strip[j]->SetName ( "Charge_Vs_Path_Phase2" );
+         plotObj[i]->dEdxTemplate_HoT  [j]->SetName ( "Charge_Vs_Path_HoT"    );
+
+         plotObj[i]->dEdxTemplate_Pixel[j]->SaveAs(("dEdxTemplate_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_Strip[j]->SaveAs(("dEdxTemplate_Phase2_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_HoT  [j]->SaveAs(("dEdxTemplate_HoT_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+
+         MakeMapPlots (plotObj[i]->dEdxTemplate_Pixel[j], plotObj[i]->HitObjName[j], SaveDir, "MapPix" + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_Strip[j], plotObj[i]->HitObjName[j], SaveDir, "MapPh2" + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_HoT  [j], plotObj[i]->HitObjName[j], SaveDir, "MapHoT" + plotObj[i]->SavePrefix);
+      }
+   }
+}
+
 void MakeMapPlots(TH3F* Charge_Vs_Path3D, string ObjName, string SaveDir, string Prefix)
 {
    for(int x=0;x<17;x++){
@@ -2073,9 +2079,9 @@ void Draw2D (string SaveDir, vector<dEdxPlotObj*> plotObj){
 
       for (size_t j=0; j < plotObj[i]->HitObjName.size(); j++){
          if (plotObj[i]->HitObjName[j].find("SP")==string::npos) continue;
-         plotObj[i]->dEdxTemplate[j]->SetName("Charge_Vs_Path");
-         plotObj[i]->dEdxTemplate[j]->SaveAs (("dEdxTemplate_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
-         MakeMapPlots (plotObj[i]->dEdxTemplate[j], plotObj[i]->HitObjName[j], SaveDir, "Map" + plotObj[i]->SavePrefix);
+         plotObj[i]->dEdxTemplate_Pixel[j]->SetName("Charge_Vs_Path");
+         plotObj[i]->dEdxTemplate_Pixel[j]->SaveAs (("dEdxTemplate_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         MakeMapPlots (plotObj[i]->dEdxTemplate_Pixel[j], plotObj[i]->HitObjName[j], SaveDir, "Map" + plotObj[i]->SavePrefix);
 /*         
          TH1D* hit_MIP = (TH1D*) GetObjectFromPath (InputFiles[fileIndex], (ObjName[i]+"_Hit").c_str());
 

@@ -3,16 +3,36 @@
 import string, os, sys
 import SUSYBSMAnalysis.HSCP.LaunchOnCondor as LaunchOnCondor
 
+removeOld = False
+
 datasets     = [
-   '/MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-   '/MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-   '/MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO'
+#   '/MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#
+#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+#
+#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+#	
+#   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#
+#   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#
+#   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+#
+   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO'
 ]
 
 outdir          = 'out'
@@ -37,7 +57,8 @@ def getDatasetFiles (dataset):
 def createOutStructure ():
     transferDir = outdir if not storageTransfer else storageDir
     for dataset in datasets:
-        os.system ('rm -rf %s/%s' % (transferDir, outDirName (dataset)))
+        if removeOld:
+            os.system ('rm -rf %s/%s' % (transferDir, outDirName (dataset)))
         os.system ('mkdir -p %s/%s' % (transferDir, outDirName (dataset)))
 
 def initProxy():
@@ -50,7 +71,8 @@ if sys.argv[1] == '1':
    createOutStructure()
 
    JobName = "dEdxSkimmer"
-   FarmDirectory = "FARM"
+   FarmDirectory = "FARM2"
+   os.system('rm -rf %s' % FarmDirectory)
    LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
    LaunchOnCondor.Jobs_Queue = '8nh'
    LaunchOnCondor.Jobs_InitCmds   = ['export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy']

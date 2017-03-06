@@ -24,10 +24,17 @@ if len(sys.argv)==1:
         sys.exit()
 
 
-
+LocalStorePath = '/storage/data/cms/store/user/jozobec/Phase2HSCP/'
 datasetList = [
-  ["MCMinBias_140PU", "/storage/data/cms/store/user/jozobec/Phase2/MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/"],
-  ["MCMinBias_200PU", "/storage/data/cms/store/user/jozobec/Phase2/MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/"],
+   ['MinBias_NoPU'    , LocalStorePath + 'MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/'],
+   ['MinBias_140PU'   , LocalStorePath + 'MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/'],
+   ['MinBias_200PU'   , LocalStorePath + 'MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/'],
+   ['DYJetsToLL_NoPU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_NoPU/'],
+   ['DYJetsToLL_140PU', LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_140PU/'],
+   ['DYJetsToLL_200PU', LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_200PU/'],
+   ['TTTo2L2Nu_NoPU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_NoPU/'],
+   ['TTTo2L2Nu_140PU' , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_140PU/'],
+   ['TTTo2L2Nu_200PU' , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_200PU/']
 ]
 
 remote_ls_command    = 'gfal-ls -l srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2\?SFN='
@@ -71,7 +78,7 @@ if sys.argv[1]=='1':
            print FILELIST
            for inFileList in getChunksFromList(FILELIST,max(1,len(FILELIST)/50)): #50 jobs, this is a trade off between hadding time and processing time
               InputListCSV = ''
-  	      for inFile in inFileList:
+              for inFile in inFileList:
                  InputListCSV+= inFile + ','
               InputListCSV = InputListCSV[:-1] #remove the last duplicated comma
               LaunchOnCondor.SendCluster_Push  (["BASH", "sh " + os.getcwd() + "/DeDxStudy.sh " + InputListCSV + " out.root; mv out.root " + outdir+"dEdxHistos_%i.root" %  LaunchOnCondor.Jobs_Count ])
