@@ -21,7 +21,7 @@
 #include "TCutG.h"
 #include "TGraphAsymmErrors.h"
 #include "TProfile.h"
-#include "TProfile3D.h"
+#include "TProfile2D.h"
 #include "TPaveText.h"
 
 namespace reco    { class Vertex; class Track; class GenParticle; class DeDxData; class MuonTimeExtra;}
@@ -183,6 +183,8 @@ struct dEdxStudyObj
    TH1D* HHit;
    TProfile* HHitProfile; 
    TProfile* HHitProfile_U; 
+   TProfile2D* HdedxVsHit;
+   TProfile2D* HdedxVsHitOT;
 
    TH3F* pixel_dEdxTemplates = NULL;
    TH3F* strip_dEdxTemplates = NULL;
@@ -230,8 +232,8 @@ struct dEdxStudyObj
          HistoName = Name + "_MIP";               HdedxMIP              = new TH1D(      HistoName.c_str(), HistoName.c_str(), 1000, 0, isDiscrim?1.0:25);
          HistoName = Name + "_dedxVsP";           HdedxVsP              = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
          HistoName = Name + "_dedxVsPSyst";       HdedxVsPSyst          = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
-         HistoName = Name + "_HitProfile";        HdedxVsHit     		= new TH3D(		 HistoName.c_str(), Form("%s;pixel hits;strip hits;dE/dx",HistoName.c_str()),   60, 0, 60,  60, 0, 60, 1000, 0, isDiscrim?1.0:15);
-         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT     		= new TH3D(		 HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   60, 0, 60,  60, 0, 60, 1000, 0, isDiscrim?1.0:15);
+         HistoName = Name + "_HitProfile";        HdedxVsHit            = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;PS hits;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 200, 0, isDiscrim?1.0:25);
+         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT          = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 200, 0, isDiscrim?1.0:25);
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
@@ -528,7 +530,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
              if(isSignal){
                 if(track->pt()<45)continue;
                 const std::vector<reco::GenParticle>& genColl = *genCollHandle;
-//                if (DistToHSCP (track, genColl)>0.03) continue;
+                if (DistToHSCP (track, genColl)>0.03) continue;
              }else if (isMinBias){
                 if(track->pt()>=45)continue;
              }
@@ -599,27 +601,34 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                       results[R]->HP->SetBins(1000, 0, 2400); // if it's signal sample increase axis range
                    results[R]->HP->Fill (track->p());
                    if (track->pt() < 55 && !isMinBias) continue;
-                   if (track->pt() > 5 && isMinBias) continue;
-                   DeDxData dedxObj = computedEdx (dedxHits, dEdxSF, results[R]->pixel_dEdxTemplates, results[R]->strip_dEdxTemplates, results[R]->pixelIasThreshold, results[R]->useHoTTemplate, results[R]->usePixel, false, results[R]->useTrunc, results[R]->useStrip, results[R]->useRingGeometry);
-
                    // number of Pixel Hits, PS hits and the dEdx -- in the end we select the one with best resolution
-                   unsigned char PSHits = 0, PHits = 0;
+                   unsigned char PSHits = 0, PHits = 0, NHoT = 0;
                    for (unsigned int h=0;h<dedxHits->size();h++){
                       switch (isTrackerHit(dedxHits->detId(h))){
-                         case TrackerComponent::PSHit:   PSHits++; break;
-                         case TrackerComponent::PxHit:   PHits++;  break;
+                         case TrackerComponent::PxHit:   PHits++;                                                         break;
+                         case TrackerComponent::PSHit:   PSHits++; if (dedxHits->phase2cluster(h)->threshold()>0) NHoT++; break;
                          case TrackerComponent::NotAHit:
                                  std::cerr << "Error! This is not a tracker hit!" << std::endl;
                                  exit (EXIT_FAILURE);
                       }
                    }
+
+                   // kind of isolate protons ... check how many hits you need to maximize dE/dx distriminator of an HSCP-like particle
+                   if (track->p() < 3 && dedxObj.dEdx() > 0.3){
+                      results[R]->HdedxVsHit   ->Fill (PHits, PSHits, dedxObj.dEdx());
+                      results[R]->HdedxVsHitOT ->Fill (PHits, NHoT,   dedxObj.dEdx());
+                   }
+
+                   // regular plots
                    if (PSHits >= 3 && PHits >= 3){
                       if (!isMinBias)
                          results[R]->HdedxVsP->SetBins(1000, 0, 2400, results[R]->isDiscrim?1000:2000, 0, results[R]->isDiscrim?1.0:30); // if it's signal sample increase axis range
+
                       results[R]->HdedxVsEtaProfile ->Fill(track->eta(), dedxObj.dEdx() );
                       results[R]->HdedxVsEta        ->Fill(track->eta(), dedxObj.dEdx() );
                       results[R]->HdedxVsP          ->Fill(track  ->p(), dedxObj.dEdx() );
-                      results[R]->HdedxMIP          ->Fill(dedxObj.dEdx());
+                      if (!isSignal && track->p() > 5)
+                         results[R]->HdedxMIP          ->Fill(dedxObj.dEdx());
                    }
 
                    if (results[R]->enableTest){
