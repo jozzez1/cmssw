@@ -84,6 +84,7 @@ if sys.argv[1]=='1':
                  print initCommand + remote_ls_command + DATASET[1]+' | awk \'{print $9}\''
                  print commands.getstatusoutput(initCommand + remote_ls_command+DATASET[1] + ' | awk \'{print $9}\'')
                  LocalFileList = commands.getstatusoutput(initCommand + remote_ls_command + DATASET[1] + ' | awk \'{print $9}\'')[1].split('\n')
+
                  for f in LocalFileList:
                     if(f[-5:].find('.root')==-1):continue #only .root file considered
                     FILELIST += [remote_access_prefix + DATASET[1].replace('/storage/data/cms/store/','/store/')+f]

@@ -76,15 +76,16 @@ process.dedxHitInfo = dedxHitInfo.clone(
 #make the pool output
 process.Out = cms.OutputModule("PoolOutputModule",
      outputCommands = cms.untracked.vstring(
-         "keep *",
-         #"drop *",
-         #"keep EventAux_*_*_*",
-         #"keep LumiSummary_*_*_*",
-         #"keep *_RefitterForDeDx_*_DEDXUNCSKIM",
-         #"keep *_offlinePrimaryVertices_*_*",
-         #"keep *_siPixelClusters_*_*",
-         #"keep *_siPhase2Clusters_*_*",
-         #"keep *_dedxHitInfo_*_DEDXUNCSKIM",
+         # "keep *",
+         "drop *",
+         "keep EventAux_*_*_*",
+         "keep LumiSummary_*_*_*",
+         "keep *_RefitterForDeDx_*_DEDXUNCSKIM",
+         "keep *_offlinePrimaryVertices_*_*",
+         "keep *_siPixelClusters_*_*",
+         "keep *_siPhase2Clusters_*_*",
+         "keep *_dedxHitInfo_*_DEDXUNCSKIM",
+         "keep *_genParticles_*_*",
     ),
     fileName = cms.untracked.string("dEdxSkim.root"),
     SelectEvents = cms.untracked.PSet(
@@ -98,11 +99,11 @@ process.p = cms.Path(process.tracksForDeDx * process.offlineBeamSpot * process.R
 process.endPath1 = cms.EndPath(process.Out)
 process.schedule = cms.Schedule(process.p, process.endPath1)
 
-process.Out.fileName = cms.untracked.string('dEdxSkim_step3.root')
-process.source.fileNames.extend(['file:/afs/cern.ch/user/j/jpazzini/work/public/PhaseII/Files/step3.root'])
+# process.Out.fileName = cms.untracked.string('dEdxSkim_step3.root')
+# process.source.fileNames.extend(['file:/afs/cern.ch/user/j/jpazzini/work/public/PhaseII/Files/step3.root'])
 
-#process.Out.fileName = cms.untracked.string('dEdxSkim_MinBias140.root')
-#process.source.fileNames.extend(['file:/afs/cern.ch/user/j/jpazzini/work/public/PhaseII/Files/MinBias140.root'])
+process.Out.fileName = cms.untracked.string('dEdxSkim_MinBias140.root')
+process.source.fileNames.extend(['file:/afs/cern.ch/user/j/jpazzini/work/public/PhaseII/Files/MinBias140.root'])
 
 #import PhysicsTools.PythonAnalysis.LumiList as LumiList
 #process.source.lumisToProcess = LumiList.LumiList(filename = 'OneFillRuns.json').getVLuminosityBlockRange()

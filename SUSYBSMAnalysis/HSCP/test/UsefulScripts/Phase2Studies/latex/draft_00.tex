@@ -1,0 +1,214 @@
+\documentclass[11pt,oneside,a4paper]{article}
+
+\usepackage{rotating,booktabs,graphicx}
+
+\title{HSCP section for Phase2 Trk TDR}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Several theoretical extensions of the Standard Model (SM), including Super Symmetry (split SUSY and MSSM), Gauge mediated Symmetry Breaking (GMSB), Hidden-Valley, Extra dimensions, and several others, predict the existence of heavy particles with long lifetime.
+If produced with lifetime larger that a few nanoseconds, these particles can travel through most part the detector before decaying, and therefore appear as stable.
+Depending on the mass and the charge of such particles, anomalously high rates of energy loss through ionization ($\mathrm{d}E/\mathrm{d}x$) with respect to the typical energy loss for SM particles, $\approx 3 \mathrm{MeV}/\mathrm{cm}$ for SM particles with 10-1000 GeV momentum, can be expected. 
+Searches for heavy stable (or quasi-stable) charged particles (HSCPs) can be performed exploiting this feature, by measuring the energy loss in the CMS silicon Tracker discriminating heavily ionizing particles (HIPs) from minimum ionizing particles (MIPs).
+
+\section{Signal Benchmarks}
+
+Two benchmark scenarios are exploited to account for a wider range of possible signatures of HSCP production at LHC.
+
+A first kind of signal considered in this study is the production of gluino ($\tilde{g}$) pairs. 
+In this model, HSCPs can bound with SM quarks to form R-hadrons by strong interaction, leading to modifications of their quark constituents and therefore of their electric charge during the propagation through the detector material.
+Pair produced signal gluinos have been generated with masses in the range 600-2600 GeV under the Split SUSY scenarios and assuming high squark mass (10 TeV), by the PYTHIA v8.xxx generator with the tune CUETP8M1.
+The fraction $f$ of produced $\tilde{g}$ hadronizing into a $\tilde{g}$-g state (R-gluonball) is an unknown parameter affecting the fraction of R-hadrons that are neutral at production; the gluino signal samples have been generated in the assumption of $f = 0.1$.
+
+
+The second kind of signal consists of lepton-like HSCPs, which interacts via electromagnetic and weak forces behaving similarly to muons, as they tend to be deeply penetrating into the detector.
+The benchmark chosen for lepton-like HSCP is the minimal gauge mediated supersymmetry breaking (mGMSB) model, where production of supersymmetric quasi-stable $\tilde{\tau}$ pairs can proceed either directly or via production of heavier supersymmetric particles (mainly squarks and gluino pairs) further decaying to one or more $\tilde{\tau}$ particles.
+The mGMSB model is chosen as benchmark using the SPS7 slope, which has the stau as the next-to-lightest supersymmetric particle (NLSP). 
+The particle mass spectrum and the decay table are produced with the program ISASUGRA version 7.69. The mGMSB parameter $\Lambda$ is varied from 31 to
+160 TeV, with fixed parameters $\mathrm{N}_{\mathrm{mes}} = 3$, $\tan \beta = 10$, $\mu > 0$, $\mathrm{C}_{\mathrm{grav}} = 10000$, and $\mathrm{M}_{\mathrm{mes}}/\Lambda = 2$. 
+The large value of $\mathrm{C}_{\mathrm{grav}}$ results in a long-lived stau, while $\Lambda = 31-510$ TeV gives a stau mass of 200 to 1600 GeV. 
+Signal is generated using PYTHIA v8.xxx with the default tune CUETP8M1.
+
+
+SM background samples have been used to simulate MIP tracks produced as the result of proton-proton interactions in the CMS detector.
+For this purpose, Minimum Bias samples have been used, generated assuming a proton-proton inelastic cross section of xxx mb.
+
+
+To simulate high transverse momentum muons traversing the detector, a samples of Drell-Yan production is also used, to exploit muons from the leptonic Z boson decay, as well as leptonic decaying top quark pairs.
+Drell-Yan samples have been produced with the MadgraphMLM generator interfaced with PYTHIA to describe the hadronization, whereas the $\mathrm{t}\bar{\mathrm{t}}$ SM background the Powheg generator has been used, interfaced with PYTHIA8.
+
+
+All the signal and background samples used in this analysis have been subjected to the full simulation of the CMS detector with the phase 2 geometry (2023-D4) using GEANT 4. 
+For all signal and background samples, three different configuration have been produced to account for additional events produced in association with the primary collision in the same beam crossing (pileup): no pileup, 140 pileup, and 200 pileup.
+
+
+The list of signal and background samples used in the analysis is summarized in Table~\ref{tab:samples}
+
+
+\begin{sidewaystable}
+\small
+\centering
+\caption{Simulated samples used for this study. All the samples have been produced in three different pileup configurations: NoPU, 140PU, and 200PU.\label{tab:samples}}
+\begin{tabular}{ll}
+\toprule
+Sample & $\sigma$ \\
+\midrule
+\verb|/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\midrule
+\verb|/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO| 	& xxx \\
+\verb|/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\midrule
+\verb|/MinBias_*_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|		& xxx \\
+\midrule
+\verb|/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-*_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO|	& xxx \\
+\verb|/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-*_90X_upgrade2023_realistic__v1_ext1-v1/GEN-SIM-RECO|	& xxx \\
+\bottomrule
+\end{tabular}
+\end{sidewaystable}
+
+\section{Event Selection}
+
+Events are selected by requiring the presence of at least one muon with high transverse momentum, or high missing transverse momentum $E_{\mathrm{T}}^{\mathrm{miss}}$ as reconstructed from the particle-flow algorithm, to emulate the typical trigger requirements applied for this analysis.
+Single muon triggers are especially indicated for lepton-like HSCPs, which interact weakly with the detector and are normally reconstructed as muons inside the detector.
+To recover efficiency for hadron-like HSCPs, for which R-hadrons can change charge as they propagate through the detector and become neutral within or outside the tracker, online selection criteria relying on the missing transverse momentum reconstructed in the detector are also exploited to complement the single muon triggers.
+For the purpose of this study, online trigger performances similar to the ones of the Run2 data-taking have been assumed, and events are retained if having at least one muon with $p_{\mathrm{T}} > 55$ GeV or $E_{\mathrm{T}}^{\mathrm{miss}} > 200$ GeV.
+The signal efficiency is shown in Figure~\ref{fig:effbeta}.
+% , values for which the triggers have been assumed to be fully efficient. 
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{figures/dummy.pdf}
+\caption{Signal efficiency versus the velocity $\beta$ of the fastest HSCP in the event for hadron-like (left) and lepton-like (right) HSCPs.\label{fig:effbeta}}
+\end{figure}
+
+
+Candidates HSCP are defined as all the tracks with $p_{\mathrm{T}} > 55$ GeV reconstructed witin the tracker acceptance of $|\eta| < 4$, with a relative uncertainty on $p_{\mathrm{T}}$ less than 25\%, goodness of track fit $\chi^2/\mathrm{dof} < 5$, and magnitudes of the longitudinal and transverse impact parameters with respect to the primary vertex less than 0.5 cm. 
+Candidates tracks must have at least XXX measurements in the silicon pixel detector.
+The selection criteria are summarized in Table~\ref{tab:selection}.
+
+\begin{table}
+ \centering
+ \caption{Reconstructed tracks selection criteria.\label{tab:selection}}
+ \begin{tabular}{ll}
+  \toprule
+  Variable 			& cut \\ 
+  \midrule	
+  $p_{\mathrm{T}}$		& $> 55$ GeV \\
+  $|\eta|$			& $< 4$ \\
+  $d_z$ and $d_{xy}$		& $< 0.5$ cm \\
+  $\sigma(p_{\mathrm{T}})/p_{\mathrm{T}}$		& $< 0.25$ \\
+  track $\chi^2/$dof		& $> 5$ \\
+  pixel hits			& $> X$ \\
+  strip hits			& $> X$ \\
+  $\mathrm{d}E/\mathrm{d}x$ measurements			& $> X$ \\
+  \bottomrule
+ \end{tabular}
+\end{table}
+
+\section{Ionizing Particle Discriminator}
+
+An estimator of the degree of compatibility of the track with the hypothesis of it being generated by a MIP is defined in the analysis to separate candidate HSCP from tracks from SM background sources.
+The $\mathrm{d}E/\mathrm{d}x$ discriminator $I_{\mathrm{as}}$ is defined as:
+
+$$
+I_{\mathrm{as}} = \frac{3}{N} \times \left( \frac{1}{12N} + \sum_{i=1}^{N} \left[ P_i \times \left( P_i - \frac{2i-1}{2N} \right)^2 \right] \right)
+$$
+
+where $N$ is the number of measurements in the silicon-tracker detectors, $P_i$ is the probability for a minimum-ionizing particle to produce a charge smaller or equal to that of the $i$-th measurement for the observed path length in the detector, and the sum is over the track measurements ordered in terms of increasing $P_i$.
+
+
+All the measurements provided by the pixel modules are used for the computation of the discriminator due to the high resolution of the $\mathrm{d}E/\mathrm{d}x$ measurements in this part of the tracker detector.
+PS modules do not provide a direct information of the amount of charge deposited in the sensors, but a coarser $\mathrm{d}E/\mathrm{d}x$ information; however, sensitivity to highly ionizing particles is recovered by a dedicated Hit-Over-Threshold (HoT) bit in the case the charge deposited in the PS modules is greater than $1.4$ times the one expected from a MIP.
+
+
+For this reason, three different implementations of the $I_{\mathrm{as}}$ discriminator are implemented in order to investigate which strategy could exploit the most out of the PS modules information.
+
+\begin{itemize}
+ \item[i.]   Evaluate a simplified $I_{\mathrm{as}}^{\mathrm{pixel}}$ discriminator relying solely on the pixel modules to exploit the higher granularity of the pixel detector, and recompute $I_{\mathrm{as}}$ including the HoT bits only if $I_{\mathrm{as}}^{\mathrm{pixel}}$ is found to be above the threshold of XXX.
+ \item[ii.]  Define multiple discriminator templates depending on the multiplicity of HoT bits associated to the tracks
+ \item[iii.] Build different discriminators based on the  geometry type of APV modules 
+\end{itemize}
+
+Figure~\ref{fig:dedxvsp} illustrates the profile of the $I_{\mathrm{as}}$ discriminator versus the momentum of the tracks for the three strategies.
+Receiver operating characteristic (ROC) curves have been evaluated to evaluate the strategy providing the best performances, as shown in Figure~\ref{fig:roc}.
+% Signal samples have been exploited to measure the signal efficieny, while the SM backgound sample have been used to estimate the probability o
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{figures/dummy.pdf}
+\caption{$\mathrm{d}E/\mathrm{d}x$ discriminator $I_{\mathrm{as}}$ versus the momentum of the track for the three strategies.\label{fig:dedxvsp}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{figures/dummy.pdf}
+\caption{ROC.\label{fig:roc}}
+\end{figure}
+
+\section{Background Estimation}
+
+The HSCP candidates are selected using the $I_{\mathrm{as}}$ discriminator by requiring tracks with  criteria are $p_{\mathrm{T}} > 65$ GeV and $I_{\mathrm{as}} > 0.3$. 
+Signal efficiency is expected to be XXX and is shown in Figure~\ref{fig:effeta}.
+
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{figures/dummy.pdf}
+\caption{Signal efficiency versus the pseudorapidity $\eta$ of the reconstructed track associated to the HSCP.\label{fig:effeta}}
+\end{figure}
+
+
+% Due to the selection requirements, SM processes producing high momentum muons and potentially large $E_{\mathrm{T}}$, such as semileptonic W decays, 
+The SM background entering the signal region is predicted relying on two non-correlated variables discriminating between signal and background.
+The background yield is in fact estimated from the Drell-Yan and $\mathrm{t}\bar{\mathrm{t}}$ MC samples with a "ABCD" procedure.
+The number of background events estimated in the signal region (region D) is obtained by correcting the number of events passing the $I_{\mathrm{as}}$ requirement only (region B), for the ratio of the events yields passing the $p_{\mathrm{T}}$ requirement alone (region C) divided by the number of events failing both requirements (region A).
+
+
+The results are summarized in Table~\ref{tab:numbers}.
+
+
+\begin{table}
+ \centering
+ \caption{Expected background events.\label{tab:numbers}}
+ \begin{tabular}{llll}
+  \toprule
+  region 	& \multicolumn{3}{c}{expected events} \\
+		& NoPU	& 140PU	& 200PU \\
+  \midrule
+  A		& X 	& X	& X	\\
+  B		& X 	& X	& X	\\
+  C		& X 	& X	& X	\\
+  \midrule
+  D		& X 	& X	& X	\\
+  \bottomrule
+ \end{tabular}
+\end{table}
+
+\section{Results}
+
+The expected performances of the analysis are estimated in terms of cross-section reach, defined as the cross-section for which we expect to observe signal with a significance of at least 5 standard deviations (5$\sigma$).
+The results are presented for the three pileup scenarios (NoPU, 140PU, 200PU) for an integrated luminosity of 3000 $\mathrm{fb}^{-1}$, and summarized in Figure~\ref{fig:limit}.
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{figures/dummy.pdf}
+\caption{Limit\label{fig:limit}}
+\end{figure}
+
+
+\end{document}
+

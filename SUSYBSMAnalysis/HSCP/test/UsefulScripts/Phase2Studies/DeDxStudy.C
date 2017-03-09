@@ -21,6 +21,7 @@
 #include "TCutG.h"
 #include "TGraphAsymmErrors.h"
 #include "TProfile.h"
+#include "TProfile3D.h"
 #include "TPaveText.h"
 
 namespace reco    { class Vertex; class Track; class GenParticle; class DeDxData; class MuonTimeExtra;}
@@ -96,6 +97,7 @@ const int    Charge_NBins        = 500 ;
 struct perTrackHistos 
 {
     TH1F * chi2                 = new TH1F ("chi2","chi2;#Chi^{2}/ndof;;",50,0,5);
+    TH1F * dist                 = new TH1F ("dist","dist;track dist. wrt HSCP;;",60,0,3);
 
     TH1I * dEdXHits             = new TH1I ("dEdXHits","dEdXHits;dE/dX clusters;;",40,0,40);
     TH1I * pixelHits            = new TH1I ("pixelHits","pixelHits;pixel clusters;;",40,0,40);
@@ -133,7 +135,6 @@ struct perTrackHistos
     TH2F * phase2sHoTLayVsEta       = new TH2F ("phase2sHoTLayVsEta","phase2sHoTLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
     TH2F * phase2sHoTBarLayVsEta    = new TH2F ("phase2sHoTBarLayVsEta","phase2sHoTBarLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
     TH2F * phase2sHoTEndLayVsEta    = new TH2F ("phase2sHoTEndLayVsEta","phase2sHoTEndLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
-    TH1D * distanceToHSCP           = new TH1D ("DistanceToHSCP","DistanceToHSCP;distance to closest HSCP gen track (cm);a.u.;",200, 0, 10);
     
 };
 
@@ -229,6 +230,8 @@ struct dEdxStudyObj
          HistoName = Name + "_MIP";               HdedxMIP              = new TH1D(      HistoName.c_str(), HistoName.c_str(), 1000, 0, isDiscrim?1.0:25);
          HistoName = Name + "_dedxVsP";           HdedxVsP              = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
          HistoName = Name + "_dedxVsPSyst";       HdedxVsPSyst          = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
+         HistoName = Name + "_HitProfile";        HdedxVsHit     		= new TH3D(		 HistoName.c_str(), Form("%s;pixel hits;strip hits;dE/dx",HistoName.c_str()),   60, 0, 60,  60, 0, 60, 1000, 0, isDiscrim?1.0:15);
+         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT     		= new TH3D(		 HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   60, 0, 60,  60, 0, 60, 1000, 0, isDiscrim?1.0:15);
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
@@ -430,13 +433,11 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
             if(track->ptError()>0.25*track->pt()) continue;        
             if(track->chi2()/track->ndof()>5 )continue;
 
-            const std::vector<reco::GenParticle>& genColl = *genCollHandle;
             if (isSignal){
-               const std::vector<reco::GenParticle>& genColl = *genCollHandle;
-               hists.distanceToHSCP->Fill(DistToHSCP (track, genColl));
+                const std::vector<reco::GenParticle>& genColl = *genCollHandle;
+                hists.dist->Fill(DistToHSCP (track, genColl));
+                if (DistToHSCP (track, genColl)>0.03) continue;
             }
-//            if (DistToHSCP (track, genColl)>0.03 && isSignal) continue;
-
             
             //load the track dE/dx hit info
             const DeDxHitInfo* dedxHits = NULL;
