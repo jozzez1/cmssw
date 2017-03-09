@@ -133,6 +133,7 @@ struct perTrackHistos
     TH2F * phase2sHoTLayVsEta       = new TH2F ("phase2sHoTLayVsEta","phase2sHoTLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
     TH2F * phase2sHoTBarLayVsEta    = new TH2F ("phase2sHoTBarLayVsEta","phase2sHoTBarLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
     TH2F * phase2sHoTEndLayVsEta    = new TH2F ("phase2sHoTEndLayVsEta","phase2sHoTEndLayVsEta;phase2 strip layer w/ HoT;#eta;",16,-0.5,15.5,40,-4,4);
+    TH1D * distanceToHSCP           = new TH1D ("DistanceToHSCP","DistanceToHSCP;distance to closest HSCP gen track (cm);a.u.;",200, 0, 10);
     
 };
 
@@ -430,6 +431,10 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
             if(track->chi2()/track->ndof()>5 )continue;
 
             const std::vector<reco::GenParticle>& genColl = *genCollHandle;
+            if (isSignal){
+               const std::vector<reco::GenParticle>& genColl = *genCollHandle;
+               hists.distanceToHSCP->Fill(DistToHSCP (track, genColl));
+            }
 //            if (DistToHSCP (track, genColl)>0.03 && isSignal) continue;
 
             

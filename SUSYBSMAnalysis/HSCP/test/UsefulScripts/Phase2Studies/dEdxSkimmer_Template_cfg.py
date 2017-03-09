@@ -76,6 +76,8 @@ process.Out = cms.OutputModule("PoolOutputModule",
 #         "keep *_siPixelClusters_*_*",
 #         "keep *_siPhase2Clusters_*_*",
          "keep *_dedxHitInfo_*_DEDXUNCSKIM",
+         "keep *_pfMet_*_*",    # to emulate triggers
+         "keep *_muons__RECO",  # to emulate triggers
     ),
     fileName = cms.untracked.string("dEdxSkim.root"),
     SelectEvents = cms.untracked.PSet(
