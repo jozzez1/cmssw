@@ -51,6 +51,7 @@ typedef struct dEdxPlotObj
    // List of histograms to plot -- one for each *ObjName vector
    TH3F**       dEdxTemplate_Pixel;
    TH3F**       dEdxTemplate_Strip;
+   TH3F**       dEdxTemplate_StripR;
    TH3F**       dEdxTemplate_HoT;
    TH1D**       hit_MIP;
    TH2D***      Charge_Vs_XYH;
@@ -90,6 +91,7 @@ typedef struct dEdxPlotObj
       // initialize all the histograms
       dEdxTemplate_Pixel = new TH3F*     [HitObjName.size()];
       dEdxTemplate_Strip = new TH3F*     [HitObjName.size()];
+      dEdxTemplate_StripR= new TH3F*     [HitObjName.size()];
       dEdxTemplate_HoT   = new TH3F*     [HitObjName.size()];
       hit_MIP            = new TH1D*     [HitObjName.size()];
       Charge_Vs_XYH      = new TH2D**    [HitObjName.size()];
@@ -107,9 +109,10 @@ typedef struct dEdxPlotObj
       HdedxVsEtaProfile  = new TProfile* [StdObjName.size()];
 
       for (unsigned int i = 0; i < HitObjName.size(); i++){
-         dEdxTemplate_Pixel [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath"       ).c_str());
-         dEdxTemplate_Strip [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2").c_str());
-         dEdxTemplate_HoT   [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_HOT"   ).c_str());
+         dEdxTemplate_Pixel [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath"        ).c_str());
+         dEdxTemplate_Strip [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2" ).c_str());
+         dEdxTemplate_StripR[i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2R").c_str());
+         dEdxTemplate_HoT   [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_HOT"    ).c_str());
 /*         hit_MIP            [i] = (TH1D*) GetObjectFromPath (InputFile, (HitObjName[i] + "_Hit"         ).c_str());
 
          Charge_Vs_XYH  [i] = new TH2D* [15];
@@ -1254,17 +1257,20 @@ void PlotTemplates (string SaveDir, vector <dEdxPlotObj*> plotObj)
    for (unsigned int i=0; i<plotObj.size(); i++){
       for (unsigned int j=0; j<plotObj[i]->HitObjName.size(); j++){
          if (plotObj[i]->HitObjName[j].find("SP")==string::npos) continue;
-         plotObj[i]->dEdxTemplate_Pixel[j]->SetName ( "Charge_Vs_Path"        );
-         plotObj[i]->dEdxTemplate_Strip[j]->SetName ( "Charge_Vs_Path_Phase2" );
-         plotObj[i]->dEdxTemplate_HoT  [j]->SetName ( "Charge_Vs_Path_HoT"    );
+         plotObj[i]->dEdxTemplate_Pixel [j]->SetName ( "Charge_Vs_Path"        );
+         plotObj[i]->dEdxTemplate_Strip [j]->SetName ( "Charge_Vs_Path_Phase2" );
+         plotObj[i]->dEdxTemplate_StripR[j]->SetName ( "Charge_Vs_Path_Phase2R" );
+         plotObj[i]->dEdxTemplate_HoT   [j]->SetName ( "Charge_Vs_Path_HoT"    );
 
-         plotObj[i]->dEdxTemplate_Pixel[j]->SaveAs(("dEdxTemplate_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
-         plotObj[i]->dEdxTemplate_Strip[j]->SaveAs(("dEdxTemplate_Phase2_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
-         plotObj[i]->dEdxTemplate_HoT  [j]->SaveAs(("dEdxTemplate_HoT_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_Pixel [j]->SaveAs(("dEdxTemplate_"          + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_Strip [j]->SaveAs(("dEdxTemplate_Phase2_"   + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_StripR[j]->SaveAs(("dEdxTemplate_Phase2R_"  + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
+         plotObj[i]->dEdxTemplate_HoT   [j]->SaveAs(("dEdxTemplate_HoT_"      + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
 
-         MakeMapPlots (plotObj[i]->dEdxTemplate_Pixel[j], plotObj[i]->HitObjName[j], SaveDir, "MapPix" + plotObj[i]->SavePrefix);
-         MakeMapPlots (plotObj[i]->dEdxTemplate_Strip[j], plotObj[i]->HitObjName[j], SaveDir, "MapPh2" + plotObj[i]->SavePrefix);
-         MakeMapPlots (plotObj[i]->dEdxTemplate_HoT  [j], plotObj[i]->HitObjName[j], SaveDir, "MapHoT" + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_Pixel [j], plotObj[i]->HitObjName[j], SaveDir, "MapPix"  + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_Strip [j], plotObj[i]->HitObjName[j], SaveDir, "MapPh2"  + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_StripR[j], plotObj[i]->HitObjName[j], SaveDir, "MapPh2R" + plotObj[i]->SavePrefix);
+         MakeMapPlots (plotObj[i]->dEdxTemplate_HoT   [j], plotObj[i]->HitObjName[j], SaveDir, "MapHoT"  + plotObj[i]->SavePrefix);
       }
    }
 }

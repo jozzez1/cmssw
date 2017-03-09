@@ -26,15 +26,31 @@ if len(sys.argv)==1:
 
 LocalStorePath = '/storage/data/cms/store/user/jozobec/Phase2HSCP/'
 datasetList = [
-   ['MinBias_NoPU'    , LocalStorePath + 'MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/'],
-   ['MinBias_140PU'   , LocalStorePath + 'MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/'],
-   ['MinBias_200PU'   , LocalStorePath + 'MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/'],
-   ['DYJetsToLL_NoPU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_NoPU/'],
-   ['DYJetsToLL_140PU', LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_140PU/'],
-   ['DYJetsToLL_200PU', LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_200PU/'],
-   ['TTTo2L2Nu_NoPU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_NoPU/'],
-   ['TTTo2L2Nu_140PU' , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_140PU/'],
-   ['TTTo2L2Nu_200PU' , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_200PU/']
+#   ['MinBias_NoPU'     , LocalStorePath + 'MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/'],
+#   ['MinBias_140PU'    , LocalStorePath + 'MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/'],
+#   ['MinBias_200PU'    , LocalStorePath + 'MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/'],
+#   ['DYJetsToLL_NoPU'  , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_NoPU/'],
+#   ['DYJetsToLL_140PU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_140PU/'],
+#   ['DYJetsToLL_200PU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_200PU/'],
+#   ['TTTo2L2Nu_NoPU'   , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_NoPU/'],
+#   ['TTTo2L2Nu_140PU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_140PU/'],
+#   ['TTTo2L2Nu_200PU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_200PU/'],
+
+   ['ppstau_651_NoPU'  , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['ppstau_651_140PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_651_200PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+
+   ['ppstau_1218_NoPU' , LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['ppstau_1218_140PU', LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_1218_200PU', LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+
+#   ['ppstau_1599_NoPU' , LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+#   ['ppstau_1599_140PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+#   ['ppstau_1599_200PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+
+#   ['ppstau_200_NoPU'  , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+#   ['ppstau_200_140PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+#   ['ppstau_200_200PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_200PU/'],
 ]
 
 remote_ls_command    = 'gfal-ls -l srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2\?SFN='

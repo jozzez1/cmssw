@@ -69,15 +69,16 @@ typedef enum DeDxTemplateType {
    Pixel    = 1,
    Phase2   = 2,
    HoTPix   = 3,
+   Phase2R  = 4, // Phase2, endcap geometry uses rings instead of layers
 } DeDxTemplateType;
 
 double DistToHSCP (const reco::TrackRef& track, const std::vector<reco::GenParticle>& genColl);
-int getModuleGeometry (DetId detId);
+int getModuleGeometry (DetId detId, bool useRings=false);
 bool isCompatibleWithCosmic (const reco::TrackRef& track, const std::vector<reco::Vertex>& vertexColl);
 TrackerComponent isTrackerHit (DetId detid);
 double GetMass (double P, double I, double K, double C);
 TH3F* loadDeDxTemplate(string path, DeDxTemplateType type, bool splitByModuleType=false);
-reco::DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, TH3* strip_templateHisto=NULL, double pixelIasCut=-1.0, bool isHoTPixTemplate=false, bool usePixel=false, bool reverseProb=false, bool useTruncated=false, bool useStrip=true);
+reco::DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* templateHisto=NULL, TH3* strip_templateHisto=NULL, double pixelIasCut=-1.0, bool isHoTPixTemplate=false, bool usePixel=false, bool reverseProb=false, bool useTruncated=false, bool useStrip=true, bool useRingGeometry=false);
 char* getProgressBar (double percentage, unsigned int barLength=100);
 void printProgressBar (const char* bar, const char* prefix=NULL);
 
@@ -150,11 +151,13 @@ struct dEdxStudyObj
    bool splitTemplates;
 
    bool removeCosmics;
+   bool useRingGeometry;
    bool enableTest;
 
 
    TH3D* Charge_Vs_Path;
    TH3D* Charge_Vs_Path_Phase2;
+   TH3D* Charge_Vs_Path_Phase2R;
    TH3D* Charge_Vs_Path_HOT;
    TH1D* HdedxMIP;
    TH2D* HdedxVsP;
@@ -178,15 +181,12 @@ struct dEdxStudyObj
    TH1D* HHit;
    TProfile* HHitProfile; 
    TProfile* HHitProfile_U; 
-   TH1D* HProtonHitSO; 
-   TH1D* HProtonHitPO; 
-
 
    TH3F* pixel_dEdxTemplates = NULL;
    TH3F* strip_dEdxTemplates = NULL;
    std::unordered_map<unsigned int,double>* TrackerGains = NULL;
 
-   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* pixel_dEdxTemplates_=NULL, TH3F* strip_dEdxTemplates_=NULL, bool removeCosmics_=true, double pixelIasThreshold_=-1, bool useHoTTemplate_=false, bool splitTemplates_=false, bool enableTest_=false){
+   dEdxStudyObj(string Name_, int type_, int subdet_, TH3F* pixel_dEdxTemplates_=NULL, TH3F* strip_dEdxTemplates_=NULL, bool removeCosmics_=true, double pixelIasThreshold_=-1, bool useRingGeometry_=false, bool useHoTTemplate_=false, bool splitTemplates_=false, bool enableTest_=false){
       Name = Name_;
 
       if     (type_==0){ isHit=true;  isEstim= false; isDiscrim = false; useTrunc = false;} // hit level only
@@ -203,10 +203,11 @@ struct dEdxStudyObj
       strip_dEdxTemplates = strip_dEdxTemplates_;
       removeCosmics       = removeCosmics_; 
       enableTest          = enableTest_;
+      useRingGeometry     = useRingGeometry_;
 
-      useHoTTemplate = useHoTTemplate_;
-      splitTemplates = splitTemplates_;
-      pixelIasThreshold = pixelIasThreshold_;
+      useHoTTemplate      = useHoTTemplate_;
+      splitTemplates      = splitTemplates_;
+      pixelIasThreshold   = pixelIasThreshold_;
 
       string HistoName;
       //HitLevel plot      
@@ -215,9 +216,10 @@ struct dEdxStudyObj
          HistoName = Name + "_HitProfile";        HHitProfile           = new TProfile(  HistoName.c_str(), HistoName.c_str(),  50, 0, 100); 
          HistoName = Name + "_HitProfile_U";      HHitProfile_U         = new TProfile(  HistoName.c_str(), HistoName.c_str(),  50, 0, 100);
          if(usePixel && useStrip){ 
-            HistoName = Name + "_ChargeVsPath";        Charge_Vs_Path        = new TH3D( HistoName.c_str(), HistoName.c_str(), P_NBins, P_Min, P_Max, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
-            HistoName = Name + "_ChargeVsPath_HOT";    Charge_Vs_Path_HOT    = new TH3D( HistoName.c_str(), HistoName.c_str(), 8, 0, 8, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
-            HistoName = Name + "_ChargeVsPath_Phase2"; Charge_Vs_Path_Phase2 = new TH3D( HistoName.c_str(), HistoName.c_str(), 11, 1, 12, Path_NBins, Path_Min, Path_Max, 2, 0, 2);
+            HistoName = Name + "_ChargeVsPath";         Charge_Vs_Path         = new TH3D( HistoName.c_str(), HistoName.c_str(), P_NBins, P_Min, P_Max, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
+            HistoName = Name + "_ChargeVsPath_HOT";     Charge_Vs_Path_HOT     = new TH3D( HistoName.c_str(), HistoName.c_str(), 8, 0, 8, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
+            HistoName = Name + "_ChargeVsPath_Phase2";  Charge_Vs_Path_Phase2  = new TH3D( HistoName.c_str(), HistoName.c_str(), 11, 1, 12, Path_NBins, Path_Min, Path_Max, 2, 0, 2);
+            HistoName = Name + "_ChargeVsPath_Phase2R"; Charge_Vs_Path_Phase2R = new TH3D( HistoName.c_str(), HistoName.c_str(), 11, 1, 16, Path_NBins, Path_Min, Path_Max, 2, 0, 2);
          }
       }
 
@@ -227,11 +229,11 @@ struct dEdxStudyObj
          HistoName = Name + "_dedxVsP";           HdedxVsP              = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
          HistoName = Name + "_dedxVsPSyst";       HdedxVsPSyst          = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
-         HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
+         HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
          HistoName = Name + "_NOMVsdEdxProfile";  HNOMVsdEdxProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   200, 0, isDiscrim?1.0:25);
          HistoName = Name + "_NOMVsdEdx";         HNOMVsdEdx            = new TH2D(      HistoName.c_str(), HistoName.c_str(), 200, 0, isDiscrim?1.0:25, 30, 0, 30);
-         HistoName = Name + "_Eta2D";             HdedxVsEta            = new TH2D(      HistoName.c_str(), HistoName.c_str(),   60,-3,  3, 100,0, isDiscrim?1.0:5);
+         HistoName = Name + "_Eta2D";             HdedxVsEta            = new TH2D(      HistoName.c_str(), HistoName.c_str(),   100,-5,  5, 100,0, isDiscrim?1.0:5);
          HistoName = Name + "_NOS";               HNOSVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
          HistoName = Name + "_NOM";               HNOMVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
          HistoName = Name + "_NOMS";              HNOMSVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
@@ -259,8 +261,6 @@ struct dEdxStudyObj
       if(isEstim){
          HistoName = Name + "_Mass";              HMass                 = new TH1D(      HistoName.c_str(), HistoName.c_str(),  250, 0, 10);
          HistoName = Name + "_MassHSCP";          HMassHSCP             = new TH1D(      HistoName.c_str(), HistoName.c_str(),  300, 0, 3000);
-         HistoName = Name + "_ProtonHitPO";       HProtonHitPO          = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20);
-         HistoName = Name + "_ProtonHitSO";       HProtonHitSO          = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20);
       }
 
    }
@@ -286,32 +286,40 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    fprintf (stdout, "Loading the dE/dx Templates ... "); fflush (stdout);
    TH3F* pixel_dEdxTemplates;
    TH3F* strip_dEdxTemplates;
+   TH3F* strip_dEdxTemplatesR;
    TH3F* PixHoT_dEdxTemplates;
    TH3F* incPix_dEdxTemplates;
    TH3F* incStr_dEdxTemplates;
    if (INPUT.find("NoPU")!=std::string::npos){
-      pixel_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBiasNoPU.root",         DeDxTemplateType::Pixel, true);
-      strip_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBiasNoPU.root",  DeDxTemplateType::Phase2, true);
-      PixHoT_dEdxTemplates = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBiasNoPU.root",     DeDxTemplateType::HoTPix, true);
-      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBiasNoPU.root",         DeDxTemplateType::Pixel, false);
-      incStr_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBiasNoPU.root",  DeDxTemplateType::Phase2, false);
+      pixel_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBiasNoPU.root",          DeDxTemplateType::Pixel,   true);
+      strip_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBiasNoPU.root",   DeDxTemplateType::Phase2,  true);
+      strip_dEdxTemplatesR  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2R_hit_SP_MCMinBiasNoPU.root",  DeDxTemplateType::Phase2R, true);
+      PixHoT_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBiasNoPU.root",      DeDxTemplateType::HoTPix,  true);
+      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBiasNoPU.root",          DeDxTemplateType::Pixel,  false);
+      incStr_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBiasNoPU.root",   DeDxTemplateType::Phase2, false);
    } else if (INPUT.find("200PU")!=std::string::npos) {
-      pixel_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias200PU.root",        DeDxTemplateType::Pixel, true);
-      strip_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias200PU.root", DeDxTemplateType::Phase2, true);
-      PixHoT_dEdxTemplates = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBias200PU.root",    DeDxTemplateType::HoTPix, true);
-      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias200PU.root",         DeDxTemplateType::Pixel, false);
+      pixel_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias200PU.root",         DeDxTemplateType::Pixel,   true);
+      strip_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias200PU.root",  DeDxTemplateType::Phase2,  true);
+      strip_dEdxTemplatesR  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2R_hit_SP_MCMinBias200PU.root", DeDxTemplateType::Phase2R, true);
+      PixHoT_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBias200PU.root",     DeDxTemplateType::HoTPix,  true);
+      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias200PU.root",         DeDxTemplateType::Pixel,  false);
       incStr_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias200PU.root",  DeDxTemplateType::Phase2, false);
    } else {
-      pixel_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias140PU.root",        DeDxTemplateType::Pixel, true);
-      strip_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias140PU.root", DeDxTemplateType::Phase2, true);
-      PixHoT_dEdxTemplates = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBias140PU.root",    DeDxTemplateType::HoTPix, true);
-      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias140PU.root",         DeDxTemplateType::Pixel, false);
+      pixel_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias140PU.root",         DeDxTemplateType::Pixel,   true);
+      strip_dEdxTemplates   = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias140PU.root",  DeDxTemplateType::Phase2,  true);
+      strip_dEdxTemplatesR  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2R_hit_SP_MCMinBias140PU.root", DeDxTemplateType::Phase2R, true);
+      PixHoT_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_HoT_hit_SP_MCMinBias140PU.root",     DeDxTemplateType::HoTPix,  true);
+      incPix_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_hit_SP_MCMinBias140PU.root",         DeDxTemplateType::Pixel,  false);
       incStr_dEdxTemplates  = loadDeDxTemplate (DIRNAME + "/dEdxTemplate_Phase2_hit_SP_MCMinBias140PU.root",  DeDxTemplateType::Phase2, false);
    }
    fprintf (stdout, "Done!\n"); fflush (stdout);
-   bool isSignal                  = false;
-   if (INPUT.find("uino")!=std::string::npos
-    || INPUT.find("stau")!=std::string::npos) isSignal = true;
+   bool isSignal  = false,
+        isMinBias = false;
+   if (INPUT.find("luino")!=std::string::npos
+    || INPUT.find("tau")!=std::string::npos)
+      isSignal = true;
+   else if (INPUT.find("MinBias")!=std::string::npos)
+      isMinBias = true;
 
    std::vector<string> FileName;
    if(INPUT.find(".root")<std::string::npos){
@@ -330,26 +338,34 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
    TFile* OutputHisto = new TFile((OUTPUT).c_str(),"RECREATE");  //File must be opened before the histogram are created
 
    std::vector<dEdxStudyObj*> results;
-   results.push_back ( new dEdxStudyObj ("hit_PO", 0, 1, NULL, NULL,  true) );
-   results.push_back ( new dEdxStudyObj ("hit_SO", 0, 2, NULL, NULL,  true) );
-   results.push_back ( new dEdxStudyObj ("hit_SP", 0, 3, NULL, NULL,  true) );
+   results.push_back ( new dEdxStudyObj ("hit_PO", 0, 1, NULL, NULL, true) );
+   results.push_back ( new dEdxStudyObj ("hit_SO", 0, 2, NULL, NULL, true) );
+   results.push_back ( new dEdxStudyObj ("hit_SP", 0, 3, NULL, NULL, true) );
 
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, -1.0) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr3", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, 0.3) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr4", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, 0.4) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr5", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, 0.5) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr6", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, 0.6) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr7", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, 0.7) );
+   results.push_back ( new dEdxStudyObj ("Ias_PO_inc"     , 2, 1, incPix_dEdxTemplates,                 NULL, true, -1.0) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc"     , 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true, -1.0) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr3", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true,  0.3) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr4", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true,  0.4) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr5", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true,  0.5) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr6", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true,  0.6) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_inc_thr7", 2, 3, incPix_dEdxTemplates, incStr_dEdxTemplates, true,  0.7) );
 
-   results.push_back ( new dEdxStudyObj ("Ias_SP", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, -1.0) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_thr3", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, 0.3) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_thr4", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, 0.4) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_thr5", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, 0.5) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_thr6", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, 0.6) );
-   results.push_back ( new dEdxStudyObj ("Ias_SP_thr7", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true, 0.7) );
+   results.push_back ( new dEdxStudyObj ("Ias_PO"     , 2, 1, pixel_dEdxTemplates,                NULL, true, -1.0) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP"     , 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true, -1.0) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr3", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true,  0.3) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr4", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true,  0.4) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr5", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true,  0.5) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr6", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true,  0.6) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr7", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates, true,  0.7) );
 
-   results.push_back ( new dEdxStudyObj ("Ias_SP_PixHOT", 2, 3, PixHoT_dEdxTemplates, PixHoT_dEdxTemplates,  true, -1.0, true) );
-//   results.push_back ( new dEdxStudyObj ("Ias_SP", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplates,  true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_Ring"     , 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true, -1.0, true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr3_Ring", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true,  0.3, true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr4_Ring", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true,  0.4, true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr5_Ring", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true,  0.5, true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr6_Ring", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true,  0.6, true) );
+   results.push_back ( new dEdxStudyObj ("Ias_SP_thr7_Ring", 2, 3, pixel_dEdxTemplates, strip_dEdxTemplatesR, true,  0.7, true) );
+
+   results.push_back ( new dEdxStudyObj ("Ias_SP_PixHOT", 2, 3, PixHoT_dEdxTemplates, PixHoT_dEdxTemplates,  true, -1.0, false, true) );
 
    perTrackHistos hists;
    
@@ -408,13 +424,13 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
             reco::TrackRef track = reco::TrackRef( trackCollHandle.product(), c );
             if(track.isNull())continue;
             if(fabs(track->eta())>4)continue; // should be useless
-            if(track->pt()<55 && isSignal)continue; // might be a quite tight cut
+            if(track->pt()<55 && !isMinBias)continue; // might be a quite tight cut
             if( (fabs(track->dz(vertexColl[0].position())) > 0.5) || (fabs(track->dxy(vertexColl[0].position())) > 0.5) ) continue; // possibly related to cosmics more than tracks
             if(track->ptError()>0.25*track->pt()) continue;        
             if(track->chi2()/track->ndof()>5 )continue;
 
             const std::vector<reco::GenParticle>& genColl = *genCollHandle;
-            if (DistToHSCP (track, genColl)>0.03 && isSignal) continue;
+//            if (DistToHSCP (track, genColl)>0.03 && isSignal) continue;
 
             
             //load the track dE/dx hit info
@@ -506,8 +522,8 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
              if(isSignal){
                 if(track->pt()<45)continue;
                 const std::vector<reco::GenParticle>& genColl = *genCollHandle;
-                if (DistToHSCP (track, genColl)>0.03) continue;
-             }else{
+//                if (DistToHSCP (track, genColl)>0.03) continue;
+             }else if (isMinBias){
                 if(track->pt()>=45)continue;
              }
 
@@ -523,12 +539,14 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                unsigned int NHoT = 0;
                for(unsigned int h=0;h<dedxHits->size();h++){
                   if (dedxHits->detId(h).subdetId() >= 4 && dedxHits->phase2cluster(h)->threshold()>0){
-                     if (++NHoT == 7) break;
+                     if (++NHoT == 8) break;
                   }
                }
+
                for(unsigned int h=0;h<dedxHits->size();h++){
                    DetId detid(dedxHits->detId(h));
                    int moduleGeometry = getModuleGeometry (detid);
+                   int ringGeometry   = getModuleGeometry (detid, true);
 
                    for(unsigned int R=0;R<results.size();R++){
                       double scaleFactor = dEdxSF[0];
@@ -543,11 +561,11 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 
 
                       int charge = dedxHits->charge(h);
-                      double ChargeOverPathlength   = 0.;
+                      double ChargeOverPathlength = 0.;
                       if (detid.subdetId()>=3) {
-                        ChargeOverPathlength   = dedxHits->phase2cluster(h)->threshold(); // FIXME -> not dividing for pathlength
-                      } else {                          
-                        ChargeOverPathlength   = scaleFactor*Norm*charge/dedxHits->pathlength(h);
+                        ChargeOverPathlength = dedxHits->phase2cluster(h)->threshold(); // FIXME -> not dividing for pathlength
+                      } else {                        
+                        ChargeOverPathlength = scaleFactor*Norm*charge/dedxHits->pathlength(h);
                       }
                       results[R]->HHit->Fill(ChargeOverPathlength);
 
@@ -557,19 +575,27 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                             results[R]->Charge_Vs_Path        ->Fill (moduleGeometry, dedxHits->pathlength(h)*10, scaleFactor * charge/(dedxHits->pathlength(h)*10*265)); 
                             results[R]->Charge_Vs_Path_HOT    ->Fill (NHoT, dedxHits->pathlength(h)*10, scaleFactor * charge/(dedxHits->pathlength(h)*10*265)); 
                          }
-                         else if(hitType == TrackerComponent::PSHit)results[R]->Charge_Vs_Path_Phase2 ->Fill (moduleGeometry, dedxHits->pathlength(h)*10, dedxHits->phase2cluster(h)->threshold()>0?1:0);
+                         else if(hitType == TrackerComponent::PSHit){
+                            results[R]->Charge_Vs_Path_Phase2 ->Fill (moduleGeometry, dedxHits->pathlength(h)*10, dedxHits->phase2cluster(h)->threshold()>0?1:0);
+                            results[R]->Charge_Vs_Path_Phase2R->Fill (  ringGeometry, dedxHits->pathlength(h)*10, dedxHits->phase2cluster(h)->threshold()>0?1:0);
+                         }
                       }
                    }
                 }
              }
 
-
              for (unsigned int R=0; R<results.size();R++)
              {
-                if (track->pt() < 55 && isSignal) continue;
-                if (track->pt() > 5 && !isSignal) continue;
+                if (results[R]->removeCosmics && isCompatibleWithCosmic(track, vertexColl))
+                   continue;
                 if (results[R]->isDiscrim || results[R]->isEstim){
-                   DeDxData dedxObj   = computedEdx(dedxHits, dEdxSF, results[R]->pixel_dEdxTemplates, results[R]->strip_dEdxTemplates, results[R]->pixelIasThreshold, results[R]->useHoTTemplate, results[R]->usePixel, false, results[R]->useTrunc, results[R]->useStrip);
+                   if (!isMinBias)
+                      results[R]->HP->SetBins(1000, 0, 2400); // if it's signal sample increase axis range
+                   results[R]->HP->Fill (track->p());
+                   if (track->pt() < 55 && !isMinBias) continue;
+                   if (track->pt() > 5 && isMinBias) continue;
+                   DeDxData dedxObj = computedEdx (dedxHits, dEdxSF, results[R]->pixel_dEdxTemplates, results[R]->strip_dEdxTemplates, results[R]->pixelIasThreshold, results[R]->useHoTTemplate, results[R]->usePixel, false, results[R]->useTrunc, results[R]->useStrip, results[R]->useRingGeometry);
+
                    // number of Pixel Hits, PS hits and the dEdx -- in the end we select the one with best resolution
                    unsigned char PSHits = 0, PHits = 0;
                    for (unsigned int h=0;h<dedxHits->size();h++){
@@ -577,16 +603,18 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                          case TrackerComponent::PSHit:   PSHits++; break;
                          case TrackerComponent::PxHit:   PHits++;  break;
                          case TrackerComponent::NotAHit:
-                                                         std::cerr << "Error! This is not a tracker hit!" << std::endl;
-                                                         exit (EXIT_FAILURE);
+                                 std::cerr << "Error! This is not a tracker hit!" << std::endl;
+                                 exit (EXIT_FAILURE);
                       }
                    }
-		   if (PSHits >= 3 && PHits >= 3){
+                   if (PSHits >= 3 && PHits >= 3){
+                      if (!isMinBias)
+                         results[R]->HdedxVsP->SetBins(1000, 0, 2400, results[R]->isDiscrim?1000:2000, 0, results[R]->isDiscrim?1.0:30); // if it's signal sample increase axis range
                       results[R]->HdedxVsEtaProfile ->Fill(track->eta(), dedxObj.dEdx() );
                       results[R]->HdedxVsEta        ->Fill(track->eta(), dedxObj.dEdx() );
                       results[R]->HdedxVsP          ->Fill(track  ->p(), dedxObj.dEdx() );
                       results[R]->HdedxMIP          ->Fill(dedxObj.dEdx());
-		   }
+                   }
 
                    if (results[R]->enableTest){
                       for (unsigned char i=0; i < std::min<unsigned char>(PHits,12,std::less<unsigned char>()); i++){
@@ -598,7 +626,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    }
                 }
              }
-//              bool isCosmic = isCompatibleWithCosmic(track, vertexColl);
 //              bool lockOnTrack=false;
 //              double dEdxDebug = 0;
 //              for(unsigned int R=0;R<results.size();R++){
@@ -662,8 +689,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 //                          }
 //                          double ChargeOverPathlength = scaleFactor*Norm*charge/dedxHits->pathlength(h);
 // 
-// 			 if (detid.subdetId()<3) results[R]->HProtonHitPO->Fill(ChargeOverPathlength);
-// 			 else                    results[R]->HProtonHitSO->Fill(ChargeOverPathlength);
 //                       }
 //                    }
 //                 }
@@ -734,21 +759,23 @@ TrackerComponent isTrackerHit (DetId detId){
    return NotAHit;
 }
 
-int getModuleGeometry (DetId detid) {
+int getModuleGeometry (DetId detid, bool useRing) {
    int moduleGeometry = 0;
    switch (detid.subdetId()){
-      case 1: moduleGeometry = static_cast <int> (detid>>20&0xF); break; // 4 layers for Pix Barrel
-      case 2: moduleGeometry = 4 + (int) (detid>>20&0xF);         break; // 10 layers for Pix Endcap
-      case 4: moduleGeometry = static_cast <int> (detid>>20&0xF); break; // 5 layers for phase2 Strip Endcap
-      case 5: moduleGeometry = 5 + (int) (detid>>20&0xF);         break; // 6 layers for phase2 Strip Barrel
+      case 1: moduleGeometry = static_cast <int> (detid>>20&0xF);                break;         //  4 layers for Pix Barrel
+      case 2: moduleGeometry = 4 + (int) (detid>>18&0xF);                        break;         // 10 disks for Pix Endcap
+      case 4: if (!useRing) moduleGeometry = static_cast <int> (detid>>18&0xF);                 // 5 layers for phase2 Strip Endcap
+              else moduleGeometry = ((int) detid>>12&0x3F) + (((int) (detid>>18&0xF) > 2)?2:0); // 0-9 rings for endcap instead
+              break;
+      case 5: moduleGeometry = (useRing?9:5) + ((int) (detid>>20&0xF)); break;                  //6 disks for phase2 Strip Barrel
       default:
-              std::cerr << "Invalid detId! Aborting!" << std::endl;      // other detId are invalid
+              std::cerr << "Invalid detId! Aborting!" << std::endl;                             // other detId are invalid
               exit (EXIT_FAILURE);
    }
    return moduleGeometry;
 }
 
-DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* pixel_TemplateHisto, TH3* strip_TemplateHisto, double pixelIasCut, bool isHoTPixTemplate, bool usePixel, bool reverseProb, bool useTruncated, bool useStrip){
+DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* pixel_TemplateHisto, TH3* strip_TemplateHisto, double pixelIasCut, bool isHoTPixTemplate, bool usePixel, bool reverseProb, bool useTruncated, bool useStrip, bool useRingGeometry){
      if(!dedxHits) return DeDxData(-1, -1, -1);
 //     if(templateHisto)usePixel=false; //never use pixel for discriminator
 
@@ -761,7 +788,7 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* pix
      if (isHoTPixTemplate){
         for(unsigned int h=0;h<dedxHits->size();h++){
            if (dedxHits->detId(h).subdetId() >= 4 && dedxHits->phase2cluster(h)->threshold()>0){
-              if (++NHoT == 7) break;
+              if (++NHoT == 8) break;
            }
         }
      }
@@ -794,7 +821,7 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* pix
         if(templateHisto){  //save discriminator probability
            double ChargeOverPathlength = ClusterCharge*(detid.subdetId()<3?(scaleFactor/(dedxHits->pathlength(h)*10.0*265)):1);
 
-           int moduleGeometry = isHoTPixTemplate?NHoT:getModuleGeometry (detid);
+           int moduleGeometry = isHoTPixTemplate?NHoT:getModuleGeometry (detid, useRingGeometry);
            int    BinX   = templateHisto->GetXaxis()->FindBin(moduleGeometry);
            int    BinY   = templateHisto->GetYaxis()->FindBin(dedxHits->pathlength(h)*10.0); //*10 because of cm-->mm
            int    BinZ   = templateHisto->GetZaxis()->FindBin(ChargeOverPathlength);
@@ -821,7 +848,7 @@ DeDxData computedEdx(const DeDxHitInfo* dedxHits, double* scaleFactors, TH3* pix
      int size = vect.size();
 
      if(size>0){
-        if(!isHoTPixTemplate && (pixel_TemplateHisto && strip_TemplateHisto)){  //dEdx discriminator
+        if(pixel_TemplateHisto || strip_TemplateHisto){  //dEdx discriminator
            //Prod discriminator
            //result = 1;
            //for(int i=0;i<size;i++){
@@ -886,7 +913,11 @@ TH3F* loadDeDxTemplate(string path, DeDxTemplateType type, bool splitByModuleTyp
       case DeDxTemplateType::Phase2:
          DeDxMap_ = (TH3F*) GetObjectFromPath (InputFile, "Charge_Vs_Path_Phase2");
          suffix = "_Phase2";
-	 break;
+         break;
+      case DeDxTemplateType::Phase2R:
+         DeDxMap_ = (TH3F*) GetObjectFromPath (InputFile, "Charge_Vs_Path_Phase2R");
+         suffix = "_Phase2_Rings";
+         break;
       case DeDxTemplateType::HoTPix:
          DeDxMap_ = (TH3F*) GetObjectFromPath (InputFile, "Charge_Vs_Path_HoT");
          suffix = "_HoT";
