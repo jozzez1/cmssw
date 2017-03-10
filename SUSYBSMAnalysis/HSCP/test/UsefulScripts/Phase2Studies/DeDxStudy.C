@@ -165,7 +165,6 @@ struct dEdxStudyObj
    TH2D* HdedxVsP;
    TH1D*** HdedxMIP_test;
    TH2D*** HdedxVsP_test;
-   TH2D* HdedxVsPSyst;
 //   TH2D* HdedxVsQP;
 //   TProfile2D* HdedxVsP_NS;
    TProfile* HdedxVsPProfile;
@@ -185,6 +184,9 @@ struct dEdxStudyObj
    TProfile* HHitProfile_U; 
    TProfile2D* HdedxVsHit;
    TProfile2D* HdedxVsHitOT;
+   TProfile2D* HdedxVsPHoT;
+   TProfile2D* HdedxVsPPSHits;
+   TProfile2D* HdedxVsP_NPixPSHits;
 
    TH3F* pixel_dEdxTemplates = NULL;
    TH3F* strip_dEdxTemplates = NULL;
@@ -231,9 +233,13 @@ struct dEdxStudyObj
       if(isEstim || isDiscrim){
          HistoName = Name + "_MIP";               HdedxMIP              = new TH1D(      HistoName.c_str(), HistoName.c_str(), 1000, 0, isDiscrim?1.0:25);
          HistoName = Name + "_dedxVsP";           HdedxVsP              = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
-         HistoName = Name + "_dedxVsPSyst";       HdedxVsPSyst          = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
-         HistoName = Name + "_HitProfile";        HdedxVsHit            = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;PS hits;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
-         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT          = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
+         if (usePixel && useStrip){
+            HistoName = Name + "_HitProfile";        HdedxVsHit            = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;PS hits;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
+            HistoName = Name + "_HitOTProfile";      HdedxVsHitOT          = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
+            HistoName = Name + "_dedxVsPHoT";        HdedxVsPHoT           = new TProfile2D(HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15, 0, 25);
+            HistoName = Name + "_dedxVsPPSHits";     HdedxVsPPSHits        = new TProfile2D(HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15, 0, 25);
+            HistoName = Name + "_dedxVsPNPxPsHits";  HdedxVsP_NPixPSHits   = new TProfile2D(HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15, 0, 25);
+         }
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
@@ -479,42 +485,42 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                     default : std::cerr << "This should not happen: not in the tracker...\n"; 
                               break;
                 }
-                
             }
-            const std::vector <SiPixelCluster> pixels = dedxHits->pixelClusters();
-            const std::vector <SiStripCluster> strips = dedxHits->stripClusters();
-            const std::vector <Phase2TrackerCluster1D> phase2s = dedxHits->phase2TrackerCluster1D();
+
+	    unsigned int NPixHits    = (unsigned int) dedxHits->pixelClusters()         .size(),
+			 NStripHits  = (unsigned int) dedxHits->stripClusters()         .size(),
+			 NPhase2Hits = (unsigned int) dedxHits->phase2TrackerCluster1D().size();
 
             unsigned int phase2sHoT = 0;
-            for (auto & it : phase2s ){
+            for (auto & it : dedxHits->phase2TrackerCluster1D()){
                 if ( it.threshold() > 0 ) ++phase2sHoT;
             }
 
             hists.chi2->Fill(track->chi2()/track->ndof());
             
             hists.dEdXHits->Fill(dedxHits->size());
-            hists.pixelHits->Fill(pixels.size());
-            hists.phase2sHits->Fill(phase2s.size());
+            hists.pixelHits->Fill(NPixHits);
+            hists.phase2sHits->Fill(NPhase2Hits);
             hists.phase2sHitsHoT->Fill(phase2sHoT);
             
             hists.dEdXHitsVsEta->Fill(dedxHits->size(),track->eta());
-            hists.pixelHitsVsEta->Fill(pixels.size(),track->eta());
-            hists.phase2sHitsVsEta->Fill(phase2s.size(),track->eta());
+            hists.pixelHitsVsEta->Fill(NPixHits,track->eta());
+            hists.phase2sHitsVsEta->Fill(NPhase2Hits,track->eta());
             hists.phase2sHitsHoTVsEta->Fill(phase2sHoT,track->eta());
             
             hists.dEdXHitsVsPt->Fill(dedxHits->size(),track->pt());
-            hists.pixelHitsVsPt->Fill(pixels.size(),track->pt());
-            hists.phase2sHitsVsPt->Fill(phase2s.size(),track->pt());
+            hists.pixelHitsVsPt->Fill(NPixHits,track->pt());
+            hists.phase2sHitsVsPt->Fill(NPhase2Hits,track->pt());
             hists.phase2sHitsHoTVsPt->Fill(phase2sHoT,track->pt());
             
             hists.dEdXHitsVsP->Fill(dedxHits->size(),track->p());
-            hists.pixelHitsVsP->Fill(pixels.size(),track->p());
-            hists.phase2sHitsVsP->Fill(phase2s.size(),track->p());
+            hists.pixelHitsVsP->Fill(NPixHits,track->p());
+            hists.phase2sHitsVsP->Fill(NPhase2Hits,track->p());
             hists.phase2sHitsHoTVsP->Fill(phase2sHoT,track->p());
             
             hists.dEdXHitsVsTrkHits->Fill(dedxHits->size(),track->numberOfValidHits());
-            hists.pixelHitsVsTrkHits->Fill(pixels.size(),track->numberOfValidHits());
-            hists.phase2sHitsVsTrkHits->Fill(phase2s.size(),track->numberOfValidHits());            
+            hists.pixelHitsVsTrkHits->Fill(NPixHits,track->numberOfValidHits());
+            hists.phase2sHitsVsTrkHits->Fill(NPhase2Hits,track->numberOfValidHits());            
             hists.phase2sHitsHoTVsTrkHits->Fill(phase2sHoT,track->numberOfValidHits());
          } // END TEST TRACK LOOP
 
@@ -592,9 +598,10 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                 }
              }
 
+             bool isCosmic = isCompatibleWithCosmic(track, vertexColl);
              for (unsigned int R=0; R<results.size();R++)
              {
-                if (results[R]->removeCosmics && isCompatibleWithCosmic(track, vertexColl))
+                if (results[R]->removeCosmics && isCosmic)
                    continue;
                 if (results[R]->isDiscrim || results[R]->isEstim){
                    if (!isMinBias)
@@ -639,11 +646,16 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                       if (!isMinBias)
                          results[R]->HdedxVsP->SetBins(1000, 0, 2400, results[R]->isDiscrim?1000:2000, 0, results[R]->isDiscrim?1.0:30); // if it's signal sample increase axis range
 
-                      results[R]->HdedxVsEtaProfile ->Fill(track->eta(), dedxObj.dEdx() );
-                      results[R]->HdedxVsEta        ->Fill(track->eta(), dedxObj.dEdx() );
-                      results[R]->HdedxVsP          ->Fill(track  ->p(), dedxObj.dEdx() );
+                      results[R]->HdedxVsEtaProfile->Fill(track->eta(), dedxObj.dEdx() );
+                      results[R]->HdedxVsEta       ->Fill(track->eta(), dedxObj.dEdx() );
+                      results[R]->HdedxVsP         ->Fill(track  ->p(), dedxObj.dEdx() );
+                      if (results[R]->usePixel && results[R]->useStrip){
+                         results[R]->HdedxVsPHoT        ->Fill (track->p(), dedxObj.dEdx(), NHoT  );
+                         results[R]->HdedxVsPPSHits     ->Fill (track->p(), dedxObj.dEdx(), PSHits);
+                         results[R]->HdedxVsP_NPixPSHits->Fill (track->p(), dedxObj.dEdx(), PHits );
+                      }
                       if (!isSignal && track->p() > 5)
-                         results[R]->HdedxMIP          ->Fill(dedxObj.dEdx());
+                         results[R]->HdedxMIP->Fill(dedxObj.dEdx());
                    }
 
                    if (results[R]->enableTest){
