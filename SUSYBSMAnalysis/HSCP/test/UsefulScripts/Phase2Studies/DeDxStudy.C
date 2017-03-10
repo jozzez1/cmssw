@@ -232,8 +232,8 @@ struct dEdxStudyObj
          HistoName = Name + "_MIP";               HdedxMIP              = new TH1D(      HistoName.c_str(), HistoName.c_str(), 1000, 0, isDiscrim?1.0:25);
          HistoName = Name + "_dedxVsP";           HdedxVsP              = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
          HistoName = Name + "_dedxVsPSyst";       HdedxVsPSyst          = new TH2D(      HistoName.c_str(), HistoName.c_str(),  500, 0, 10,1000,0, isDiscrim?1.0:15);
-         HistoName = Name + "_HitProfile";        HdedxVsHit            = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;PS hits;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 200, 0, isDiscrim?1.0:25);
-         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT          = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 200, 0, isDiscrim?1.0:25);
+         HistoName = Name + "_HitProfile";        HdedxVsHit            = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;PS hits;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
+         HistoName = Name + "_HitOTProfile";      HdedxVsHitOT          = new TProfile2D(HistoName.c_str(), Form("%s;pixel hits;strip hits over threshold;dE/dx",HistoName.c_str()),   18, 0, 18,  18, 0, 18, 0, isDiscrim?1.0:25);
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
@@ -600,6 +600,21 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    if (!isMinBias)
                       results[R]->HP->SetBins(1000, 0, 2400); // if it's signal sample increase axis range
                    results[R]->HP->Fill (track->p());
+
+                   DeDxData dedxObj = computedEdx (
+                         dedxHits, 
+                         dEdxSF,
+                         results[R]->pixel_dEdxTemplates,
+                         results[R]->strip_dEdxTemplates,
+                         results[R]->pixelIasThreshold,
+                         results[R]->useHoTTemplate,
+                         results[R]->usePixel,
+                         false,
+                         results[R]->useTrunc,
+                         results[R]->useStrip,
+                         results[R]->useRingGeometry
+                   );
+
                    if (track->pt() < 55 && !isMinBias) continue;
                    // number of Pixel Hits, PS hits and the dEdx -- in the end we select the one with best resolution
                    unsigned char PSHits = 0, PHits = 0, NHoT = 0;
