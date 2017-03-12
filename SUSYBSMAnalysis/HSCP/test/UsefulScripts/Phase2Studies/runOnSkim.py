@@ -26,31 +26,62 @@ if len(sys.argv)==1:
 
 LocalStorePath = '/storage/data/cms/store/user/jozobec/Phase2HSCP/'
 datasetList = [
+### MinBias
 #   ['MinBias_NoPU'     , LocalStorePath + 'MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/'],
 #   ['MinBias_140PU'    , LocalStorePath + 'MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/'],
 #   ['MinBias_200PU'    , LocalStorePath + 'MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/'],
+### Background
 #   ['DYJetsToLL_NoPU'  , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_NoPU/'],
 #   ['DYJetsToLL_140PU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_140PU/'],
 #   ['DYJetsToLL_200PU' , LocalStorePath + 'DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1_200PU/'],
 #   ['TTTo2L2Nu_NoPU'   , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_NoPU/'],
 #   ['TTTo2L2Nu_140PU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_140PU/'],
 #   ['TTTo2L2Nu_200PU'  , LocalStorePath + 'TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8_200PU/'],
-
+#
+### Signal -- PPStau
+## NoPU
+   ['ppstau_200_NoPU'  , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['ppstau_432_NoPU'  , LocalStorePath + 'HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
    ['ppstau_651_NoPU'  , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
-   ['ppstau_651_140PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_140PU/'],
-   ['ppstau_651_200PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_200PU/'],
-
+   ['ppstau_871_NoPU'  , LocalStorePath + 'HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
    ['ppstau_1218_NoPU' , LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['ppstau_1599_NoPU' , LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+## 140 PU
+   ['ppstau_200_140PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_432_140PU' , LocalStorePath + 'HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_651_140PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_871_140PU' , LocalStorePath + 'HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8_140PU/'],
    ['ppstau_1218_140PU', LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['ppstau_1599_140PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+## 200 PU
+   ['ppstau_200_200PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['ppstau_432_200PU' , LocalStorePath + 'HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['ppstau_651_200PU' , LocalStorePath + 'HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['ppstau_871_200PU' , LocalStorePath + 'HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8_200PU/'],
    ['ppstau_1218_200PU', LocalStorePath + 'HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8_200PU/'],
-
-#   ['ppstau_1599_NoPU' , LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
-#   ['ppstau_1599_140PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_140PU/'],
-#   ['ppstau_1599_200PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_200PU/'],
-
-#   ['ppstau_200_NoPU'  , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
-#   ['ppstau_200_140PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_140PU/'],
-#   ['ppstau_200_200PU' , LocalStorePath + 'HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['ppstau_1599_200PU', LocalStorePath + 'HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+### Signa -- Gluino
+## NoPU
+   ['gluino_600_NoPU'  , LocalStorePath + 'HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['gluino_1000_NoPU'  , LocalStorePath + 'HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['gluino_1400_NoPU'  , LocalStorePath + 'HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['gluino_1800_NoPU'  , LocalStorePath + 'HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['gluino_2200_NoPU' , LocalStorePath + 'HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+   ['gluino_2600_NoPU' , LocalStorePath + 'HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8_NoPU/'],
+## 140 PU
+   ['gluino_600_140PU'  , LocalStorePath + 'HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['gluino_1000_140PU'  , LocalStorePath + 'HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['gluino_1400_140PU'  , LocalStorePath + 'HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['gluino_1800_140PU'  , LocalStorePath + 'HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['gluino_2200_140PU' , LocalStorePath + 'HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+   ['gluino_2600_140PU' , LocalStorePath + 'HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8_140PU/'],
+## 200 PU
+   ['gluino_600_200PU'  , LocalStorePath + 'HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['gluino_1000_200PU'  , LocalStorePath + 'HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['gluino_1400_200PU'  , LocalStorePath + 'HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['gluino_1800_200PU'  , LocalStorePath + 'HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['gluino_2200_200PU' , LocalStorePath + 'HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8_200PU/'],
+   ['gluino_2600_200PU' , LocalStorePath + 'HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8_200PU/'],
 ]
 
 remote_ls_command    = 'gfal-ls -l srm://ingrid-se02.cism.ucl.ac.be:8444/srm/managerv2\?SFN='

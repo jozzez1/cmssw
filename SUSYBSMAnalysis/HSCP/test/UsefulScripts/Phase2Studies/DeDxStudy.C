@@ -636,7 +636,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                    }
 
                    // kind of isolate protons ... check how many hits you need to maximize dE/dx distriminator of an HSCP-like particle
-                   if (track->p() < 3 && dedxObj.dEdx() > 0.3){
+                   if (track->p() < 3 && dedxObj.dEdx() > 0.3 && results[R]->usePixel && results[R]->useStrip){
                       results[R]->HdedxVsHit   ->Fill (PHits, PSHits, dedxObj.dEdx());
                       results[R]->HdedxVsHitOT ->Fill (PHits, NHoT,   dedxObj.dEdx());
                    }
@@ -646,16 +646,17 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                       if (!isMinBias)
                          results[R]->HdedxVsP->SetBins(1000, 0, 2400, results[R]->isDiscrim?1000:2000, 0, results[R]->isDiscrim?1.0:30); // if it's signal sample increase axis range
 
-                      results[R]->HdedxVsEtaProfile->Fill(track->eta(), dedxObj.dEdx() );
-                      results[R]->HdedxVsEta       ->Fill(track->eta(), dedxObj.dEdx() );
                       results[R]->HdedxVsP         ->Fill(track  ->p(), dedxObj.dEdx() );
                       if (results[R]->usePixel && results[R]->useStrip){
                          results[R]->HdedxVsPHoT        ->Fill (track->p(), dedxObj.dEdx(), NHoT  );
                          results[R]->HdedxVsPPSHits     ->Fill (track->p(), dedxObj.dEdx(), PSHits);
                          results[R]->HdedxVsP_NPixPSHits->Fill (track->p(), dedxObj.dEdx(), PHits );
                       }
-                      if (!isSignal && track->p() > 5)
-                         results[R]->HdedxMIP->Fill(dedxObj.dEdx());
+                      if (!isSignal && track->p() > 5){
+                         results[R]->HdedxVsEtaProfile->Fill(track->eta(), dedxObj.dEdx() );
+                         results[R]->HdedxVsEta       ->Fill(track->eta(), dedxObj.dEdx() );
+                         results[R]->HdedxMIP         ->Fill(dedxObj.dEdx());
+                      }
                    }
 
                    if (results[R]->enableTest){
