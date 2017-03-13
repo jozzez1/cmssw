@@ -62,7 +62,6 @@ process.dedxHitInfo = dedxHitInfo.clone(
       minTrackPt = cms.double(0.0),
       usePhase2Strip = cms.bool(True)
 )
- 
 
 #make the pool output
 process.Out = cms.OutputModule("PoolOutputModule",
@@ -89,3 +88,4 @@ process.Out = cms.OutputModule("PoolOutputModule",
 process.p = cms.Path(process.tracksForDeDx * process.offlineBeamSpot * process.RefitterForDeDx * process.dedxHitInfo)
 process.endPath1 = cms.EndPath(process.Out)
 process.schedule = cms.Schedule(process.p, process.endPath1)
+

@@ -156,7 +156,6 @@ struct dEdxStudyObj
    bool useRingGeometry;
    bool enableTest;
 
-
    TH3D* Charge_Vs_Path;
    TH3D* Charge_Vs_Path_Phase2;
    TH3D* Charge_Vs_Path_Phase2R;
@@ -165,14 +164,10 @@ struct dEdxStudyObj
    TH2D* HdedxVsP;
    TH1D*** HdedxMIP_test;
    TH2D*** HdedxVsP_test;
-//   TH2D* HdedxVsQP;
-//   TProfile2D* HdedxVsP_NS;
    TProfile* HdedxVsPProfile;
    TProfile* HdedxVsEtaProfile;
    TProfile* HdedxVsNOH;
-   TProfile* HNOMVsdEdxProfile;
    TH2D* HdedxVsEta;
-   TH2D* HNOMVsdEdx;
    TProfile* HNOSVsEtaProfile;
    TProfile* HNOMVsEtaProfile;
    TProfile* HNOMSVsEtaProfile;
@@ -180,8 +175,6 @@ struct dEdxStudyObj
    TH1D* HMassHSCP;
    TH1D* HP;
    TH1D* HHit;
-   TProfile* HHitProfile; 
-   TProfile* HHitProfile_U; 
    TProfile2D* HdedxVsHit;
    TProfile2D* HdedxVsHitOT;
    TProfile2D* HdedxVsPHoT;
@@ -219,8 +212,6 @@ struct dEdxStudyObj
       //HitLevel plot      
       if(isHit){ 
          HistoName = Name + "_Hit";               HHit                  = new TH1D(      HistoName.c_str(), HistoName.c_str(),  200, 0, 20); 
-         HistoName = Name + "_HitProfile";        HHitProfile           = new TProfile(  HistoName.c_str(), HistoName.c_str(),  50, 0, 100); 
-         HistoName = Name + "_HitProfile_U";      HHitProfile_U         = new TProfile(  HistoName.c_str(), HistoName.c_str(),  50, 0, 100);
          if(usePixel && useStrip){ 
             HistoName = Name + "_ChargeVsPath";         Charge_Vs_Path         = new TH3D( HistoName.c_str(), HistoName.c_str(), P_NBins, P_Min, P_Max, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
             HistoName = Name + "_ChargeVsPath_HOT";     Charge_Vs_Path_HOT     = new TH3D( HistoName.c_str(), HistoName.c_str(), 8, 0, 8, Path_NBins, Path_Min, Path_Max, Charge_NBins, Charge_Min, Charge_Max);
@@ -243,12 +234,7 @@ struct dEdxStudyObj
          HistoName = Name + "_Profile";           HdedxVsPProfile       = new TProfile(  HistoName.c_str(), HistoName.c_str(),   50, 0,100);
          HistoName = Name + "_Eta";               HdedxVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   100,-5,  5);
          HistoName = Name + "_dedxVsNOH";         HdedxVsNOH            = new TProfile(  HistoName.c_str(), HistoName.c_str(),   80, 0, 80);
-         HistoName = Name + "_NOMVsdEdxProfile";  HNOMVsdEdxProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   200, 0, isDiscrim?1.0:25);
-         HistoName = Name + "_NOMVsdEdx";         HNOMVsdEdx            = new TH2D(      HistoName.c_str(), HistoName.c_str(), 200, 0, isDiscrim?1.0:25, 30, 0, 30);
          HistoName = Name + "_Eta2D";             HdedxVsEta            = new TH2D(      HistoName.c_str(), HistoName.c_str(),   100,-5,  5, 100,0, isDiscrim?1.0:5);
-         HistoName = Name + "_NOS";               HNOSVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
-         HistoName = Name + "_NOM";               HNOMVsEtaProfile      = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
-         HistoName = Name + "_NOMS";              HNOMSVsEtaProfile     = new TProfile(  HistoName.c_str(), HistoName.c_str(),   60,-3,  3);
          HistoName = Name + "_P";                 HP                    = new TH1D(      HistoName.c_str(), HistoName.c_str(),   50, 0, 100);  
 
          if (enableTest){
@@ -635,7 +621,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                       }
                    }
 
-                   // kind of isolate protons ... check how many hits you need to maximize dE/dx distriminator of an HSCP-like particle
                    if (track->p() < 3 && dedxObj.dEdx() > 0.3 && results[R]->usePixel && results[R]->useStrip){
                       results[R]->HdedxVsHit   ->Fill (PHits, PSHits, dedxObj.dEdx());
                       results[R]->HdedxVsHitOT ->Fill (PHits, NHoT,   dedxObj.dEdx());
@@ -695,8 +680,6 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
 // 
 //                 if(track->pt()>5){
 //                    results[R]->HdedxVsNOH->Fill(track->found(), dedxObj.dEdx());
-//                    results[R]->HNOMVsdEdxProfile->Fill(dedxObj.dEdx(), (int)dedxObj.numberOfMeasurements());
-//                    results[R]->HNOMVsdEdx->Fill(dedxObj.dEdx(), (int)dedxObj.numberOfMeasurements());
 //                    results[R]->HdedxMIP  ->Fill(dedxObj.dEdx());
 //                    results[R]->HP->Fill(track->p());
 //                 }

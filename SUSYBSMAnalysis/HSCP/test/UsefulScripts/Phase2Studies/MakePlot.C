@@ -44,7 +44,7 @@ typedef struct dEdxPlotObj
    std::vector <string> StdObjLegend;
    std::vector <string> HitObjLegend;
 
-   unsigned short type; // 0 - data, 1 - SMMC, 2 - signal MC
+   unsigned short type; // 0 - calib, 1 - SMMC, 2 - signal MC
    map <string, double> K;   map <string, double> Kerr;
    map <string, double> C;   map <string, double> Cerr;
    
@@ -54,20 +54,16 @@ typedef struct dEdxPlotObj
    TH3F**       dEdxTemplate_StripR;
    TH3F**       dEdxTemplate_HoT;
    TH1D**       hit_MIP;
-   TH2D***      Charge_Vs_XYH;
-   TH2D***      Charge_Vs_XYHN;
-   TH2D***      Charge_Vs_XYLN;
 
    TH1D**       HdedxMIP;
    TH1D**       HMass;
    TH1D**       HMassHSCP;
-   TH1D**       HProtonHitSO;
-   TH1D**       HProtonHitPO;
    TH2D**       HdedxVsP;
    TH2D**       HdedxVsPSyst;
    TProfile**   HdedxVsPProfile;
    TH2D**       HdedxVsEta;
    TProfile**   HdedxVsEtaProfile;
+   TProfile2D** HdedxVsPHoT;
 
    // constructor
    dEdxPlotObj (string FileName_, string LegEntry_, string SavePrefix_,
@@ -89,61 +85,46 @@ typedef struct dEdxPlotObj
       InputFile = new TFile (FileName.c_str());
 
       // initialize all the histograms
-      dEdxTemplate_Pixel = new TH3F*     [HitObjName.size()];
-      dEdxTemplate_Strip = new TH3F*     [HitObjName.size()];
-      dEdxTemplate_StripR= new TH3F*     [HitObjName.size()];
-      dEdxTemplate_HoT   = new TH3F*     [HitObjName.size()];
-      hit_MIP            = new TH1D*     [HitObjName.size()];
-      Charge_Vs_XYH      = new TH2D**    [HitObjName.size()];
-      Charge_Vs_XYHN     = new TH2D**    [HitObjName.size()];
-      Charge_Vs_XYLN     = new TH2D**    [HitObjName.size()];
-      HdedxMIP           = new TH1D*     [StdObjName.size()];
-      HMass              = new TH1D*     [StdObjName.size()];
-      HMassHSCP          = new TH1D*     [StdObjName.size()];
-      HProtonHitSO       = new TH1D*     [StdObjName.size()];
-      HProtonHitPO       = new TH1D*     [StdObjName.size()];
-      HdedxVsP           = new TH2D*     [StdObjName.size()];
-      HdedxVsPSyst       = new TH2D*     [StdObjName.size()];
-      HdedxVsPProfile    = new TProfile* [StdObjName.size()];
-      HdedxVsEta         = new TH2D*     [StdObjName.size()];
-      HdedxVsEtaProfile  = new TProfile* [StdObjName.size()];
+      dEdxTemplate_Pixel = new TH3F*       [HitObjName.size()];
+      dEdxTemplate_Strip = new TH3F*       [HitObjName.size()];
+      dEdxTemplate_StripR= new TH3F*       [HitObjName.size()];
+      dEdxTemplate_HoT   = new TH3F*       [HitObjName.size()];
+      hit_MIP            = new TH1D*       [HitObjName.size()];
+      HdedxMIP           = new TH1D*       [StdObjName.size()];
+      HMass              = new TH1D*       [StdObjName.size()];
+      HMassHSCP          = new TH1D*       [StdObjName.size()];
+      HdedxVsP           = new TH2D*       [StdObjName.size()];
+      HdedxVsPSyst       = new TH2D*       [StdObjName.size()];
+      HdedxVsPProfile    = new TProfile*   [StdObjName.size()];
+      HdedxVsEta         = new TH2D*       [StdObjName.size()];
+      HdedxVsEtaProfile  = new TProfile*   [StdObjName.size()];
+      HdedxVsPHoT        = new TProfile2D* [StdObjName.size()];
 
       for (unsigned int i = 0; i < HitObjName.size(); i++){
          dEdxTemplate_Pixel [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath"        ).c_str());
          dEdxTemplate_Strip [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2" ).c_str());
          dEdxTemplate_StripR[i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_Phase2R").c_str());
          dEdxTemplate_HoT   [i] = (TH3F*) GetObjectFromPath (InputFile, (HitObjName[i] + "_ChargeVsPath_HOT"    ).c_str());
-/*         hit_MIP            [i] = (TH1D*) GetObjectFromPath (InputFile, (HitObjName[i] + "_Hit"         ).c_str());
-
-         Charge_Vs_XYH  [i] = new TH2D* [15];
-         Charge_Vs_XYHN [i] = new TH2D* [15];
-         Charge_Vs_XYLN [i] = new TH2D* [15];
-         for (unsigned int g = 1; g < 16; g++){
-            char Id[255]; sprintf (Id, "%02i", g);
-            Charge_Vs_XYH  [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYH"  + Id).c_str());
-            Charge_Vs_XYHN [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYHN" + Id).c_str());
-            Charge_Vs_XYLN [i][g-1] = (TH2D*) GetObjectFromPath (InputFile, (HitObjName[i]+"_ChargeVsXYLN" + Id).c_str());
-         }*/
+         hit_MIP            [i] = (TH1D*) GetObjectFromPath (InputFile, (HitObjName[i] + "_Hit"         ).c_str());
       }
 
       for (unsigned int i = 0; i < StdObjName.size(); i++){
-         HdedxMIP          [i] = (TH1D*)     GetObjectFromPath (InputFile, (StdObjName[i] + "_MIP"         ).c_str() );
-         HdedxVsP          [i] = (TH2D*)     GetObjectFromPath (InputFile, (StdObjName[i] + "_dedxVsP"     ).c_str() );
-         HdedxVsPSyst      [i] = (TH2D*)     GetObjectFromPath (InputFile, (StdObjName[i] + "_dedxVsPSyst" ).c_str() );
-         HdedxVsPProfile   [i] = (TProfile*) GetObjectFromPath (InputFile, (StdObjName[i] + "_Profile"     ).c_str() );
-         HdedxVsEta        [i] = (TH2D*)     GetObjectFromPath (InputFile, (StdObjName[i] + "_Eta2D"       ).c_str() );
-         HdedxVsEtaProfile [i] = (TProfile*) GetObjectFromPath (InputFile, (StdObjName[i] + "_Eta"         ).c_str() );
+         HdedxMIP          [i] = (TH1D*)       GetObjectFromPath (InputFile, (StdObjName[i] + "_MIP"         ).c_str() );
+         HdedxVsP          [i] = (TH2D*)       GetObjectFromPath (InputFile, (StdObjName[i] + "_dedxVsP"     ).c_str() );
+         HdedxVsPSyst      [i] = (TH2D*)       GetObjectFromPath (InputFile, (StdObjName[i] + "_dedxVsPSyst" ).c_str() );
+         HdedxVsPProfile   [i] = (TProfile*)   GetObjectFromPath (InputFile, (StdObjName[i] + "_Profile"     ).c_str() );
+         HdedxVsEta        [i] = (TH2D*)       GetObjectFromPath (InputFile, (StdObjName[i] + "_Eta2D"       ).c_str() );
+         HdedxVsEtaProfile [i] = (TProfile*)   GetObjectFromPath (InputFile, (StdObjName[i] + "_Eta"         ).c_str() );
+         HdedxVsPHoT       [i] = (TProfile2D*) GetObjectFromPath (InputFile, (StdObjName[i] + "_dedxVsPHoT"  ).c_str() );
 
          if (StdObjName[i].find("Ias")==string::npos){
             HMass        [i]  = (TH1D*) GetObjectFromPath(InputFile, (StdObjName[i] + "_Mass").c_str() );
-            HProtonHitSO [i]  = (TH1D*) GetObjectFromPath(InputFile, (StdObjName[i] + "_ProtonHitSO").c_str() );
-            HProtonHitPO [i]  = (TH1D*) GetObjectFromPath(InputFile, (StdObjName[i] + "_ProtonHitPO").c_str() );
             K [StdObjName[i]] = K_;  Kerr[StdObjName[i]] = Kerr_;
             C [StdObjName[i]] = C_;  Cerr[StdObjName[i]] = Cerr_;
             //while we're at it, get the constants
             if (type != 2){
                double Ktmp = K_; double Ctmp = C_; double KerrTmp = Kerr_; double CerrTmp = Cerr_;
-               ExtractConstants (HdedxVsP[i], &Ktmp, &Ctmp, &KerrTmp, &CerrTmp);
+//               ExtractConstants (HdedxVsP[i], &Ktmp, &Ctmp, &KerrTmp, &CerrTmp);
                K [StdObjName[i]] = Ktmp;  Kerr[StdObjName[i]] = KerrTmp;
                C [StdObjName[i]] = Ctmp;  Cerr[StdObjName[i]] = CerrTmp;
                printf ("FINAL %s :: %s :: K = %.3lf\tC = %.3lf\n", LegEntry.c_str(), StdObjLegend[i].c_str(), Ktmp, Ctmp);
@@ -244,76 +225,42 @@ void MakePlot()
    gStyle->SetNdivisions(510,"X");
 
    vector<string> HitObjName;                         vector<string> HitObjLegend;
-//   HitObjName.push_back("hit_PO");                    HitObjLegend.push_back("Pixel");
-//   HitObjName.push_back("hit_PO_noHIP");              HitObjLegend.push_back("Pixel w/o HIP");
-//   HitObjName.push_back("hit_SO_in_noC_CCC");         HitObjLegend.push_back("Strip");
-//   HitObjName.push_back("hit_SO_in_noC_CCC_noHIP");   HitObjLegend.push_back("Strip w/o HIP, new CC");
-//   HitObjName.push_back("hit_SO_in_noC_newCCC");      HitObjLegend.push_back("Strip, new CC");
-//   HitObjName.push_back("hit_SO_in_noC_newCCC_noHIP");HitObjLegend.push_back("Strip w/o HIP, new CC");
-//   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel charges, untrimmed");
-//   HitObjName.push_back("hit_SP_in_noC");
-//   HitObjName.push_back("hit_SP_in_noC_CI");
-//   HitObjName.push_back("hit_SP_in_noC_CC");
-   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel");
-//   HitObjName.push_back("hit_SP_in_noC_newCCC");      HitObjLegend.push_back("Strip+Pixel charges, new CC");
+   HitObjName.push_back("hit_PO");                    HitObjLegend.push_back("Pixel");
+//   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel");
+//   HitObjName.push_back("hit_SP");                    HitObjLegend.push_back("Strip+Pixel");
 
    vector<string> StdObjName;                         vector<string> StdObjLegend;
-//   StdObjName.push_back("harm2_SO");
-//   StdObjName.push_back("harm2_SO_in");
-//   StdObjName.push_back("harm2_SO_in_noC");
-//   StdObjName.push_back("harm2_SP");
-//   StdObjName.push_back("harm2_SP_in");
-//   StdObjName.push_back("harm2_SP_in_noC");
-//   StdObjName.push_back("harm2_SP_in_noC_CI");
-//   StdObjName.push_back("harm2_SP_in_noC_CC");
-//   StdObjName.push_back("harm2_SP_in_noC_CCC");       StdObjLegend.push_back("harm-2, old CC");
-//   StdObjName.push_back("harm2_SP_in_noC_newCCC");    StdObjLegend.push_back("harm-2, new CC");
+   StdObjName.push_back("Ias_PO_inc");                StdObjLegend.push_back("Pixel (inc)");
+   StdObjName.push_back("Ias_SP_inc");                StdObjLegend.push_back("Strip+Pixel (inc)");
+//   StdObjName.push_back("Ias_SP_inc_thr3");           StdObjLegend.push_back("Strip+Pixel (inc, Ias_{pix} > 0.3)");
+//   StdObjName.push_back("Ias_SP_inc_thr4");           StdObjLegend.push_back("Strip+Pixel (inc, Ias_{pix} > 0.4)");
+//   StdObjName.push_back("Ias_SP_inc_thr5");           StdObjLegend.push_back("Strip+Pixel (inc, Ias_{pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_inc_thr6");           StdObjLegend.push_back("Strip+Pixel (inc, Ias_{pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_inc_thr7");           StdObjLegend.push_back("Strip+Pixel (inc, Ias_{pix} > 0.7)");
+//
+   StdObjName.push_back("Ias_PO");                    StdObjLegend.push_back("Pixel");
+   StdObjName.push_back("Ias_SP");                    StdObjLegend.push_back("Strip+Pixel");
+//   StdObjName.push_back("Ias_SP_thr3");               StdObjLegend.push_back("Strip+Pixel (Ias_{Pix} > 0.3)");
+//   StdObjName.push_back("Ias_SP_thr4");               StdObjLegend.push_back("Strip+Pixel (Ias_{Pix} > 0.4)");
+//   StdObjName.push_back("Ias_SP_thr5");               StdObjLegend.push_back("Strip+Pixel (Ias_{Pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_thr6");               StdObjLegend.push_back("Strip+Pixel (Ias_{Pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_thr7");               StdObjLegend.push_back("Strip+Pixel (Ias_{Pix} > 0.7)");
+//
+   StdObjName.push_back("Ias_SP_Ring");               StdObjLegend.push_back("Strip+Pixel (rings)");
+//   StdObjName.push_back("Ias_SP_thr3_Ring");          StdObjLegend.push_back("Strip+Pixel (rings, Ias_{Pix} > 0.3)");
+//   StdObjName.push_back("Ias_SP_thr4_Ring");          StdObjLegend.push_back("Strip+Pixel (rings, Ias_{Pix} > 0.4)");
+//   StdObjName.push_back("Ias_SP_thr5_Ring");          StdObjLegend.push_back("Strip+Pixel (rings, Ias_{Pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_thr6_Ring");          StdObjLegend.push_back("Strip+Pixel (rings, Ias_{Pix} > 0.5)");
+//   StdObjName.push_back("Ias_SP_thr7_Ring");          StdObjLegend.push_back("Strip+Pixel (rings, Ias_{Pix} > 0.7)");
+//
+   StdObjName.push_back("Ias_SP_PixHOT");             StdObjLegend.push_back("Pix-HoT templates");
 
-//   StdObjName.push_back("harm2_SO_in_noC_CCC");
-//   StdObjName.push_back("hybr201_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-10, SP");
-//   StdObjName.push_back("hybr2015_SP_in_noC_CCC");    StdObjLegend.push_back("hybrid2-15, SP");
-//   StdObjName.push_back("hybr202_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-20, SP");
-//   StdObjName.push_back("hybr2025_SP_in_noC_CCC");    StdObjLegend.push_back("hybrid2-25, SP");
-//   StdObjName.push_back("hybr203_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-30, SP");
-//   StdObjName.push_back("hybr2035_SP_in_noC_CCC");    StdObjLegend.push_back("hybrid2-35, SP");
-//   StdObjName.push_back("hybr204_SP_in_noC_CCC");     StdObjLegend.push_back("hybrid2-40, SP");
-//   StdObjName.push_back("harm2_SO_in_noC_CCC");       StdObjLegend.push_back("harm-2, SO");
-//   StdObjName.push_back("Hybr201_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-10, SP");
-//   StdObjName.push_back("Hybr2015_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-15");
-//   StdObjName.push_back("Hybr2015_SP_in_noC_newCCC"); StdObjLegend.push_back("Hybrid2-15, new CC");
-//   StdObjName.push_back("Hybr202_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-20, SP");
-//   StdObjName.push_back("Hybr2025_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-25, SP");
-//   StdObjName.push_back("Hybr203_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-30, SP");
-//   StdObjName.push_back("Hybr2035_SP_in_noC_CCC");    StdObjLegend.push_back("Hybrid2-35, SP");
-//   StdObjName.push_back("Hybr204_SP_in_noC_CCC");     StdObjLegend.push_back("Hybrid2-40, SP");
-//   StdObjName.push_back("hybr201_SO_in_noC_CCC");
-//   StdObjName.push_back("hybr202_SO_in_noC_CCC");
-//   StdObjName.push_back("hybr203_SO_in_noC_CCC");
-//   StdObjName.push_back("hybr204_SO_in_noC_CCC");
-//   StdObjName.push_back("harm2_PO_raw"); // FIXME does not fit well
-//   StdObjName.push_back("Ias_PO");
-//   StdObjName.push_back("Ias_SO_inc");
-//   StdObjName.push_back("Ias_SO");
-//   StdObjName.push_back("Ias_SO_in");
-//   StdObjName.push_back("Ias_SO_in_noC");
-//   StdObjName.push_back("Ias_SO_in_noC_CI");
-//   StdObjName.push_back("Ias_SO_in_noC_CC");
-//   StdObjName.push_back("Ias_SO_in_noC_CCC");
-//   StdObjName.push_back("Ias_SP_inc");
-//   StdObjName.push_back("Ias_SP");
-//   StdObjName.push_back("Ias_SP_in");
-//   StdObjName.push_back("Ias_SP_in_noC");
-//   StdObjName.push_back("Ias_SP_in_noC_CI");
-//   StdObjName.push_back("Ias_SP_in_noC_CC");
-//   StdObjName.push_back("Ias_SP_in_noC_CCC");           StdObjLegend.push_back("Ias (2015)");
-//   StdObjName.push_back("Ias_SP_in_noC_CCC16");         StdObjLegend.push_back("Ias (2016)");
-//   StdObjName.push_back("Ias_SP_in_noC_newCCC");      StdObjLegend.push_back("Ias, new CC");
 
 
    vector <dEdxPlotObj*> plotObj;
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_NoPU.root",  "MC (MinBias) 0 PU",   "MCMinBiasNoPU",  HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_140PU.root", "MC (MinBias) 140 PU", "MCMinBias140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_200PU.root", "MC (MinBias) 200 PU", "MCMinBias200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_NoPU.root",  "MC (MinBias) 0 PU",   "MCMinBiasNoPU",  HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_140PU.root", "MC (MinBias) 140 PU", "MCMinBias140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_200PU.root", "MC (MinBias) 200 PU", "MCMinBias200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
 
    string SaveDir = "pictures_FAST/";
    system (string("rm -rf "+SaveDir+" && mkdir "+SaveDir).c_str());
@@ -321,11 +268,9 @@ void MakePlot()
 
    PlotTemplates (SaveDir, plotObj);
 
-   return;
-
    // copy K and C from SMMC to signal MC
    size_t MCIndex = 0;
-   for (size_t m = 0; m < plotObj.size()-1; m++)
+/*   for (size_t m = 0; m < plotObj.size()-1; m++)
       if (plotObj[m]->type == 1){ MCIndex = m; break; }
    for (size_t i = 0; i < plotObj.size()-1; i++){
       if (plotObj[i]->type != 2) continue;
@@ -335,19 +280,20 @@ void MakePlot()
          plotObj[i]->C[plotObj[i]->StdObjName[j]] = plotObj[MCIndex]->C[plotObj[i]->StdObjName[j]];
       }
    }
-
+*/
    cerr << "====== TESTA :: 2D Histograms ======" << endl;
-//   Draw2D (SaveDir, plotObj);
+   Draw2D (SaveDir, plotObj);
 
    cerr << "====== TESTB :: Standard Histos ======" << endl;
    SuperposeFilesOnDeDxObj (SaveDir, plotObj);
-//   HitPlots (SaveDir, plotObj);
+   HitPlots (SaveDir, plotObj);
 
    cerr << "====== TESTC :: Cross-compare estimators ======" << endl;
    CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "Hybr");
    
-   cerr << "====== TESTD :: Systematics study ======" << endl;
-   SystStudy (SaveDir, plotObj);
+   return ;
+ //  cerr << "====== TESTD :: Systematics study ======" << endl;
+ //  SystStudy (SaveDir, plotObj);
 
    cerr << "====== TESTE :: Scale Factors ======" << endl;
    double SFMip, SFProfile;
@@ -390,21 +336,12 @@ void MakePlot()
    ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-25"); Colors.push_back(kBlue);
    ObjNames.push_back("Hybr2030_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-30"); Colors.push_back(kGreen);
    ObjNames.push_back("Hybr2035_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-35"); Colors.push_back(kCyan);
-   ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");           LegendLabels.push_back("Ias (old)"); Colors.push_back(kMagenta);
-   ObjNames.push_back("Ias_SP_in_noC_CCC16_MIP");         LegendLabels.push_back("Ias (new)"); Colors.push_back(kAzure+2);
+   ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");       LegendLabels.push_back("Ias (old)"); Colors.push_back(kMagenta);
+   ObjNames.push_back("Ias_SP_in_noC_CCC16_MIP");     LegendLabels.push_back("Ias (new)"); Colors.push_back(kAzure+2);
    MakeROCGeneral (plotObj[8]->InputFile, plotObj[12]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators");
 }
 
-   /* 
-   std::cout << "TESTD\n";
 
-   getScaleFactor(InputFile, NULL, "harm2_SO_in_noC_CCC", "harm2_PO_raw", SaveDir, SaveName); // shift PO_raw to SO for File1
-   if (InputFile2) {
-      getScaleFactor(InputFile, InputFile2, "harm2_SO_in_noC_CCC", "", SaveDir, SaveName+SaveName2); // shift File2 to File1
-      getScaleFactor(InputFile2, NULL, "harm2_SO_in_noC_CCC", "harm2_PO_raw", SaveDir, SaveName2);   // shift PO_raw to SO for File2
-   }
-}
-*/
 
 void getScaleFactor(TFile* InputFile1, TFile* InputFile2, string ObjName1, string ObjName2, string SaveDir, string Prefix,
       double* SFMip, double* SFProfile){
@@ -756,8 +693,8 @@ void SystStudy(string SaveDir, vector<dEdxPlotObj*> plotObj, bool createTable, b
       for (size_t i = 0; i < inputnew.size(); i++){
          TCanvas* c1 = new TCanvas("canvas", "canvas", 600,600);
          c1->SetLogz(true);
-	 TH2D htmp ("2Dtmp", "2Dtmp", 1, 0, 1.5, 1, isEstim?4:0, isEstim?16:1);
-	 htmp.Draw("");
+         TH2D htmp ("2Dtmp", "2Dtmp", 1, 0, 1.5, 1, isEstim?4:0, isEstim?16:1);
+         htmp.Draw("");
          inputnew[i]->Draw("same COLZ");
          SaveCanvas (c1, "systematics/", "Syst_"+SavePrefix[i]+"_"+plotObj[0]->StdObjName[j]+"_inputnew");
          delete c1;
@@ -1188,67 +1125,6 @@ void CompareDeDx (TFile* InputFile, string SaveDir, string SaveName, string ObjN
       SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_MIP", true);
       delete leg;
       delete c1;
-
-   } else if (ObjName1.find("hit")!=string::npos && ObjName2.find("hit")!=string::npos){
-      for (unsigned int g=0;g<16;g++){
-         char Id[255]; sprintf (Id, "%02i", g);
-         TH2D* Charge_Vs_XYLN1 = (TH2D*) GetObjectFromPath (InputFile, (ObjName1 + "_ChargeVsXYLN" + Id).c_str());
-         TH2D* Charge_Vs_XYLN2 = (TH2D*) GetObjectFromPath (InputFile, (ObjName2 + "_ChargeVsXYLN" + Id).c_str());
-         TH1D* ProjX1          = Charge_Vs_XYLN1->ProjectionX (("X1_"+string(Id)).c_str());
-         TH1D* ProjY1          = Charge_Vs_XYLN1->ProjectionY (("Y1_"+string(Id)).c_str());
-         TH1D* ProjX2          = Charge_Vs_XYLN2->ProjectionX (("X2_"+string(Id)).c_str());
-         TH1D* ProjY2          = Charge_Vs_XYLN2->ProjectionY (("Y2_"+string(Id)).c_str());
-
-         TCanvas* c1  = new TCanvas ("c1", "c1", 600, 600);
-         TLegend* leg = new TLegend (0.50, 0.75, 0.80, 0.90);
-         c1->SetLogy (true);
-         leg->SetHeader (("Module No. " + string(Id)).c_str());
-         leg->SetHeader (SaveName.c_str());
-         leg->SetFillColor(0);
-         leg->SetFillStyle(0);
-         leg->SetBorderSize(0);
-         ProjX1->SetStats(kFALSE);
-         ProjX1->SetLineColor (kBlack);
-         ProjX2->SetLineColor (kBlue);
-         ProjX1->GetXaxis()->SetTitle("normalized x coordinate");
-         ProjX1->GetYaxis()->SetTitle("number of hits");
-         ProjX1->SetAxisRange (-1.5, 1.5, "X");
-         ProjX1->Draw("L");
-         ProjX2->Draw("same");
-         leg->AddEntry(ProjX1, ObjName1.c_str(), "L");
-         leg->AddEntry(ProjX2, ObjName2.c_str(), "L");
-         DrawPreliminary("", 13, "");
-         SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_ProjX"+string(Id), true);
-         delete leg;
-         delete c1;
- 
-         c1  = new TCanvas ("c1", "c1", 600, 600);
-         leg = new TLegend (0.50, 0.75, 0.80, 0.90);
-         c1->SetLogy (true);
-         leg->SetHeader (("Module No. " + string(Id)).c_str());
-         leg->SetHeader (SaveName.c_str());
-         leg->SetFillColor(0);
-         leg->SetFillStyle(0);
-         leg->SetBorderSize(0);
-         ProjY1->SetStats(kFALSE);
-         ProjY1->SetLineColor (kBlack);
-         ProjY2->SetLineColor (kBlue);
-         ProjY1->GetXaxis()->SetTitle("normalized y coordinate");
-         ProjY1->GetYaxis()->SetTitle("number of hits");
-         ProjY1->SetAxisRange (-1.5, 1.5, "X");
-         ProjY1->Draw("L");
-         ProjY2->Draw("same");
-         leg->AddEntry(ProjY1, ObjName1.c_str(), "L");
-         leg->AddEntry(ProjY2, ObjName2.c_str(), "L");
-         DrawPreliminary("", 13, "");
-         SaveCanvas(c1, SaveDir, "Comparison"+SaveName+"_"+ObjName1+"_"+ObjName2+"_ProjY"+string(Id), true);
-         delete leg;
-         delete c1;
-         delete ProjX1;
-         delete ProjX2;
-         delete ProjY1;
-         delete ProjY2;
-      }
    }
 }
 
@@ -1475,43 +1351,6 @@ void MakeROCGeneral (TFile* InputFile1, TFile* InputFile2, vector<string> HistoN
 }
 
 void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj, string Reject, string Select){
-   // some ROC plots
-/*
-  for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type != 2) continue;
-      vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
-
-      ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");       LegendLabels.push_back("harmonic2, old CC");  Colors.push_back(kRed);
-      ObjNames.push_back("harm2_SP_in_noC_newCCC_MIP");    LegendLabels.push_back("harmonic2, new CC");  Colors.push_back(kBlue);
-      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP");    LegendLabels.push_back("hybrid2-15, old CC"); Colors.push_back(kOrange);
-      ObjNames.push_back("Hybr2015_SP_in_noC_newCCC_MIP"); LegendLabels.push_back("hybrid2-15, new CC"); Colors.push_back(kGreen);
-      ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");         LegendLabels.push_back("I_{as}, old CC");     Colors.push_back(kBlack);
-      ObjNames.push_back("Ias_SP_in_noC_newCCC_MIP");      LegendLabels.push_back("I_{as}, new CC");     Colors.push_back(kOrange+3);
-      MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_hybrid-"+plotObj[i]->SavePrefix);
-   }
-
-   for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type != 2) continue;
-      vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
-      ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("harmonic2");  Colors.push_back(kRed);
-      ObjNames.push_back("Hybr201_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-10"); Colors.push_back(kBlue);
-      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-15"); Colors.push_back(kOrange);
-      ObjNames.push_back("Hybr202_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid2-20"); Colors.push_back(kGreen);
-      ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP"); LegendLabels.push_back("Hybrid2-25"); Colors.push_back(kMagenta);
-      MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_Hybrid"+plotObj[i]->SavePrefix);
-   }
-
-   for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type != 2) continue;
-      vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
-      ObjNames.push_back("harm2_SP_in_noC_CCC_noF_MIP");     LegendLabels.push_back("harmonic2");  Colors.push_back(kRed);
-      ObjNames.push_back("Hybr201_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("Hybrid2-10"); Colors.push_back(kBlue);
-      ObjNames.push_back("Hybr2015_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("Hybrid2-15"); Colors.push_back(kOrange);
-      ObjNames.push_back("Hybr202_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("Hybrid2-20"); Colors.push_back(kGreen);
-      ObjNames.push_back("Hybr2025_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("Hybrid2-25"); Colors.push_back(kMagenta);
-      MakeROCGeneral (plotObj[2]->InputFile, plotObj[i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_Hybrid_noF"+plotObj[i]->SavePrefix);
-   }
-*/
    for (size_t i = 0; i < plotObj.size(); i++){
       TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
       c1->SetLogy(true);
@@ -1528,53 +1367,13 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
 
          max = (max<histos[histos.size()-1]->GetMaximum())?histos[histos.size()-1]->GetMaximum():max;
       }
-      DrawSuperposedHistos((TH1**) (&histos[0]), legend, "L", "dE/dx (MeV/cm)", "arbitrary units", 0, (plotObj[i]->type==2)?15:8, 5e-7, max*12, true);
-      DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
-      DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
-      SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_MIP");
-      delete c1;
-   }
 
-
-   for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type == 2) continue;
-      TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-      c1->SetLogy(true);
-
-      vector<TH1D*> histos;
-      vector <string> legend;
-      for (size_t j = 0; j < plotObj[i]->StdObjName.size()-1; j++){
-         if (plotObj[i]->StdObjName[j].find(Reject)!=string::npos) continue;
-         if (plotObj[i]->StdObjName[j].find(Select)==string::npos && plotObj[i]->StdObjName[j].find("harm")==string::npos) continue;
-         histos.push_back(plotObj[i]->HProtonHitSO[j]);
-         legend.push_back(plotObj[i]->StdObjLegend[j]);
+      if (histos.size() > 0){
+         DrawSuperposedHistos((TH1**) (&histos[0]), legend, "L", "dE/dx (MeV/cm)", "arbitrary units", 0, (plotObj[i]->type==2)?15:8, 5e-7, max*12, true);
+         DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
+         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
+         SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_MIP");
       }
-      histos[0]->Scale(1.0/histos[0]->Integral());
-      DrawSuperposedHistos((TH1**) (&histos[0]), legend, "L", "dE/dx (MeV/cm)", "arbitrary units", 0, 20, 5e-7, histos[0]->GetMaximum()*1.5, true);
-      DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
-      DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
-      SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_ProtonHitSO");
-      delete c1;
-   }
-
-   for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type == 2) continue;
-      TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-      c1->SetLogy(true);
-
-      vector<TH1D*> histos;
-      vector <string> legend;
-      for (size_t j = 0; j < plotObj[i]->StdObjName.size()-1; j++){
-         if (plotObj[i]->StdObjName[j].find(Reject)!=string::npos) continue;
-         if (plotObj[i]->StdObjName[j].find(Select)==string::npos && plotObj[i]->StdObjName[j].find("harm")==string::npos) continue;
-         histos.push_back(plotObj[i]->HProtonHitPO[j]);
-         legend.push_back(plotObj[i]->StdObjLegend[j]);
-      }
-      histos[0]->Scale(1.0/histos[0]->Integral());
-      DrawSuperposedHistos((TH1**) (&histos[0]), legend, "L", "dE/dx (MeV/cm)", "arbitrary units", 0, 20, 5e-7, histos[0]->GetMaximum()*1.5, true);
-      DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
-      DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
-      SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_ProtonHitPO");
       delete c1;
    }
 
@@ -1596,93 +1395,89 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
          max = histos[histos.size()-1]->GetMaximum()>max?histos[histos.size()-1]->GetMaximum():max;
          min = histos[histos.size()-1]->GetMinimum()>min?histos[histos.size()-1]->GetMinimum():min;
       }
-      DrawSuperposedHistos((TH1**) (&histos[0]), legend, "hist", "Mass (GeV)", "arbitrary units", 0, 3000, min, max*12, true);
-      DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
-      DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
-      SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_HSCPMassOld");
+
+      if (histos.size() > 0){
+         DrawSuperposedHistos((TH1**) (&histos[0]), legend, "hist", "Mass (GeV)", "arbitrary units", 0, 3000, min, max*12, true);
+         DrawLegend ((TObject**) (&histos[0]), legend, "Estimators", "L", 0.8, 0.9, 0.3, 0.05);
+         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
+         SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_HSCPMassOld");
+      }
       delete c1;
    }
 
-   for (size_t i = 0; i < plotObj.size(); i++){
-      if (plotObj[i]->type==2) continue;
+   for (size_t i=0; i < plotObj.size(); i++){
       TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-      TLegend* leg = new TLegend(0.50, 0.80, 0.80, 0.90);
+      c1->SetLogy(true);
+
+      vector<TH1D*> histos;
+      vector<string> legend;
+
+      double max = 0, min = 9999;
+      for (size_t j = 0; j < plotObj[i]->StdObjName.size(); j++){
+         if (plotObj[i]->StdObjName[j].find("harm")!=string::npos || plotObj[i]->StdObjName[j].find(Reject)!=string::npos)
+            continue;
+         histos.push_back (plotObj[i]->HdedxMIP[j]);
+         legend.push_back (plotObj[i]->StdObjLegend[j]);
+
+         max = histos[histos.size()-1]->GetMaximum()>max?histos[histos.size()-1]->GetMaximum():max;
+         min = histos[histos.size()-1]->GetMinimum()>min?histos[histos.size()-1]->GetMinimum():min;
+      }
+      if (histos.size() > 0){
+         DrawSuperposedHistos((TH1**) (&histos[0]), legend, "hist", "I_{as}", "", 0.0, 1.0, min, max*12, false);
+         DrawLegend ((TObject**) (&histos[0]), legend, "Discriminators", "L", 0.8, 0.9, 0.3, 0.05);
+         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
+         SaveCanvas (c1, SaveDir, "Comp_Ias_" + plotObj[i]->SavePrefix + "_MIP");
+      }
+      delete c1;
+   }
+
+   for (size_t i=0; i < plotObj.size(); i++){
+      TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
+      TLegend* leg = new TLegend (0.50, 0.75, 0.80, 0.90);
+      leg->SetHeader ("Discriminator");
       leg->SetFillColor(0);
       leg->SetFillStyle(0);
       leg->SetBorderSize(0);
 
-      vector <string> legend;
-      vector <Color_t> colors;
-      TGraphErrors** g = new TGraphErrors* [2];
-      vector <double> x;
-      vector <double> xErr;
-      vector <double> y0;
-      vector <double> y0Err;
-      vector <double> y1;
-      vector <double> y1Err;
-      for (size_t j = 0; j < plotObj[i]->StdObjName.size()-1; j++){
-         if (plotObj[i]->StdObjName[j].find(Reject)==string::npos && plotObj[i]->StdObjName[j].find(Select)!=string::npos){
-            if (plotObj[i]->StdObjName[j].find("harm")!=string::npos) x.push_back(0.0);
-            else{
-               size_t zeroPos = plotObj[i]->StdObjName[j].find("0") + 1;
-               size_t endPos  = plotObj[i]->StdObjName[j].find("_") - zeroPos;
-               x.push_back(atof(("0."+plotObj[i]->StdObjName[j].substr(zeroPos, endPos)).c_str()));
-            }
-            y0.push_back(plotObj[i]->HProtonHitSO[j]->Integral(0, plotObj[i]->HProtonHitSO[j]->FindBin(2.0))/
-                  plotObj[i]->HProtonHitSO[j]->Integral(0, plotObj[i]->HProtonHitSO[j]->GetNbinsX()+1));
-            y1.push_back(plotObj[i]->HProtonHitPO[j]->Integral(0, plotObj[i]->HProtonHitPO[j]->FindBin(2.0))/
-                  plotObj[i]->HProtonHitPO[j]->Integral(0, plotObj[i]->HProtonHitPO[j]->GetNbinsX()+1));
+      c1->SetLogy(false);
 
-            xErr.push_back(0);
+      vector<TProfile*> histos;
+      vector<string> legend;
+
+      double max = 0, min = 9999;
+      for (size_t j = 0; j < plotObj[i]->StdObjName.size(); j++){
+         if (plotObj[i]->StdObjName[j].find("harm")!=string::npos || plotObj[i]->StdObjName[j].find(Reject)!=string::npos)
+            continue;
+         histos.push_back (plotObj[i]->HdedxVsEtaProfile[j]);
+         legend.push_back (plotObj[i]->StdObjLegend[j]);
+
+         max = histos[histos.size()-1]->GetMaximum()>max?histos[histos.size()-1]->GetMaximum():max;
+         min = histos[histos.size()-1]->GetMinimum()>min?histos[histos.size()-1]->GetMinimum():min;
+      }
+      if (histos.size() > 0){
+         TH1D h ("tmp", "tmp", 1, -4.0, 4.0);
+         h.GetXaxis()->SetTitle("#eta");
+         h.GetYaxis()->SetTitle("mean I_{as}");
+         h.GetYaxis()->SetRangeUser(min, max*1.2);
+         h.Draw();
+
+         Color_t colors [] = {kBlack, kRed, kGreen, kBlue, kMagenta, kCyan, kOrange};
+         for (size_t j=0; j<histos.size(); j++){
+            histos[j]->SetMarkerStyle(21+j);
+            histos[j]->SetMarkerColor(colors[j]);
+            histos[j]->SetLineColor(colors[j]);
+            histos[j]->Draw("same PE1");
+            leg->AddEntry (histos[j], legend[j].c_str(), "L");
          }
+
+         leg->Draw("same");
+         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
+         SaveCanvas (c1, SaveDir, "Comp_Ias_" + plotObj[i]->SavePrefix + "_EtaProfile");
       }
-
-      double MaxY = 0;
-      double MinY = 1e+300;
-      for (size_t j = 0; j < x.size(); j++){
-         MaxY = (MaxY>std::max(y0[j],y1[j]))?MaxY:std::max(y0[j],y1[j]);
-         MinY = (MinY<std::min(y0[j],y1[j]))?MinY:std::min(y0[j],y1[j]);
-
-         y0Err.push_back(0/*sqrt(y0[j])*/);
-         y1Err.push_back(0/*sqrt(y1[j])*/);
-            
-         cerr << "y0[" << j << "] = " << y0[j] << "\t" << "y1[" << j << "] = " << y1[j] << endl;
-      }
-
-      g[0] = new TGraphErrors (x.size(), &x[0], &y0[0], &xErr[0], &y0Err[0]);
-      g[1] = new TGraphErrors (x.size(), &x[0], &y1[0], &xErr[0], &y1Err[0]);
-
-      colors.push_back (kRed);
-      colors.push_back (kBlue);
-
-      legend.push_back ("Strip Charges");
-      legend.push_back ("Pixel Charges");
-
-      if (MinY == 0) MinY = 5e-7;
-
-      TH1D h ("temp", "temp", 1, x[0], x[x.size()-1]*1.1);
-      h.GetXaxis()->SetTitle("hybrid index");
-      h.GetYaxis()->SetTitle("fraction of clusters");
-      h.GetXaxis()->SetRangeUser (x[0], x[x.size()-1]*1.1);
-      h.SetAxisRange (MinY, MaxY*1.2, "Y");
-      h.GetYaxis()->SetTitleOffset(1.35);
-      h.SetStats(0);
-      h.Draw();
-
-      for (unsigned int k = 0; k < 2; k++){
-         g[k]->SetMarkerColor (colors[k]);
-         g[k]->SetLineColor (colors[k]);
-         g[k]->SetMarkerStyle (20);
-         g[k]->Draw("same EP");
-         leg->AddEntry (g[k], legend[k].c_str(), "LP");
-      }
-      leg->Draw();
-      DrawPreliminary ("", 13.0, plotObj[i]->SavePrefix);
-      SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_"+ (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_LowHits");
-      delete c1;
       delete leg;
+      delete c1;
    }
-
+/*
    for (size_t i = 0; i < plotObj.size(); i++){
       if (plotObj[i]->type != 2) continue;
       TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
@@ -1716,7 +1511,7 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
       SaveCanvas (c1, SaveDir, "Comp_Estim_" + Select + "_" + (Reject!=""?string("No_")+Reject+"_":"") + plotObj[i]->SavePrefix + "_HSCPMass");
       delete c1;
-   }
+   }*/
 }
 
 void SuperposeFilesOnDeDxObj (string SaveDir, vector<dEdxPlotObj*> plotObj){
@@ -1841,77 +1636,6 @@ void SuperposeFilesOnDeDxObj (string SaveDir, vector<dEdxPlotObj*> plotObj){
          delete lineProton;
          delete lineDeuteron;
       }
-
-
-      // SPECIAL PLOT REQUESTED BY LOIC -- CAN DELETE AFTERWARDS
-      if (isEstim){
-         c1 = new TCanvas("c1", "c1", 600,600);
-         legend.clear();
-         c1->SetLogy(true);
-         double min = 1005, max = 0;
-         double dEdxK_Data2015 = 2.684; // 2015 Data&MC K
-         double dEdxC_Data2015 = 3.375; // 2015 Data&MC C
-         double dEdxK_Data1 = 2.580; // 2016 Data K
-         double dEdxC_Data1 = 3.922; // 2016 Data C
-         double dEdxK_MC1   = 2.935; // 2016 MC K
-         double dEdxC_MC1   = 3.197; // 2016 MC C
-         for (size_t i=0; i < plotObj.size(); i++){
-	    bool is2016 = (plotObj[i]->FileName.find("2016")!=std::string::npos);
-            if (plotObj[i]->type==2) continue;
-            double dEdxK = plotObj[i]->type==0?dEdxK_Data1:dEdxK_MC1;
-            double dEdxC = plotObj[i]->type==0?dEdxC_Data1:dEdxC_MC1;
-	    if (plotObj[i]->FileName.find("Data")!=std::string::npos){
-		   dEdxK = is2016?dEdxK_Data1:dEdxK_Data2015;
-		   dEdxC = is2016?dEdxC_Data1:dEdxC_Data2015;
-	    }
-            histos.push_back(plotObj[i]->HMass[j]);
-            histos[histos.size()-1]->Reset();
-            for (int x = 1; x <= plotObj[i]->HdedxVsP[j]->GetNbinsX(); x++){
-               if (plotObj[i]->HdedxVsP[j]->GetXaxis()->GetBinCenter(x) > 3.0) continue;
-               for (int y = 1; y <= plotObj[i]->HdedxVsP[j]->GetNbinsY(); y++){
-                  if(plotObj[i]->HdedxVsP[j]->GetYaxis()->GetBinCenter(y)<plotObj[i]->C[plotObj[i]->StdObjName[j]]+(is2016?5.0:3.0))continue;
-                  histos[histos.size()-1]->Fill(GetMass (plotObj[i]->HdedxVsP[j]->GetXaxis()->GetBinCenter(x),
-                                           plotObj[i]->HdedxVsP[j]->GetYaxis()->GetBinCenter(y),
-                                           &dEdxK, &dEdxC),
-                                           plotObj[i]->HdedxVsP[j]->GetBinContent(x,y));
-               }
-            }
-            histos[histos.size()-1]->Scale(1.0/histos[histos.size()-1]->Integral());
-            if (max < histos[histos.size()-1]->GetMaximum()) max = histos[histos.size()-1]->GetMaximum();
-            if (min > histos[histos.size()-1]->GetMinimum()) min = histos[histos.size()-1]->GetMinimum();
-            legend.push_back (plotObj[i]->LegEntry);
-         }
-
-         if (min == 0) min = 1e-7;
-         DrawSuperposedHistos((TH1**) &(histos[0]), legend, "L", "Mass (GeV)", "arbitrary units",
-               0, 5, min, max*12.0);
-         DrawLegend ((TObject**) &(histos[0]), legend, plotObj[0]->StdObjLegend[j], "P", 0.80, 0.90, 0.30, 0.05);
-
-         TLine* lineKaon = new TLine(0.493667, min, 0.493667, max);
-         lineKaon->SetLineWidth(2);
-         lineKaon->SetLineStyle(2);
-         lineKaon->SetLineColor(9);
-         TLine* lineProton = new TLine(0.938272, min, 0.938272, max);
-         lineProton->SetLineWidth(2);
-         lineProton->SetLineStyle(2);
-         lineProton->SetLineColor(9);
-         TLine* lineDeuteron = new TLine(1.88, min, 1.88, max);
-         lineDeuteron->SetLineWidth(2);
-         lineDeuteron->SetLineStyle(2);
-         lineDeuteron->SetLineColor(9);
-
-         lineKaon->Draw("same");
-         lineProton->Draw("same");
-         lineDeuteron->Draw("same");
-
-         DrawPreliminary("", 13.0, "");
-         SaveCanvas(c1, SaveDir, plotObj[0]->StdObjName[j] + "_Comp_Mass_KCData");
-         histos.clear();
-         delete c1;
-         delete lineKaon;
-         delete lineProton;
-         delete lineDeuteron;
-      }
    }
 }
 
@@ -1920,7 +1644,9 @@ void Draw2D (string SaveDir, vector<dEdxPlotObj*> plotObj){
       for (size_t j=0; j < plotObj[i]->StdObjName.size(); j++){
          TCanvas* c1 = new TCanvas("c1", "c1", 600,600);
          c1->SetLogz(true);
-         TH2D h2 ("tmp", "tmp", 1, 0, 5, 1, 0, (plotObj[i]->StdObjName[j].find("Ias")==string::npos)?17:1.2);
+         TH2D h2 ("tmp", "tmp",
+               1, 0, (plotObj[i]->type==0)?10:2400,
+               1, 0, (plotObj[i]->StdObjName[j].find("Ias")==string::npos)?17:1.2);
          h2.SetStats(kFALSE);
          h2.SetStats(kFALSE);
          h2.GetXaxis()->SetTitle("p (GeV)");
@@ -1992,152 +1718,28 @@ void Draw2D (string SaveDir, vector<dEdxPlotObj*> plotObj){
          if (PionLine){ delete PionLine; delete KaonLine; delete ProtonLine; delete DeuteronLine; delete ProtonLineFit; }
          delete c1;
 
-         // REAL K and C :: FOR AN -- LOIC
-         c1 = new TCanvas("c1", "c1", 600,600);
-         c1->SetLogz(true);
-         TH2D h3 ("tmp", "tmp", 1, 0, 5, 1, 0, (plotObj[i]->StdObjName[j].find("Ias")==string::npos)?17:1.2);
-         h3.SetStats(kFALSE);
-         h3.SetStats(kFALSE);
-         h3.GetXaxis()->SetTitle("p (GeV)");
-         h3.GetYaxis()->SetTitle(plotObj[i]->StdObjName[j].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
-         if (plotObj[i]->type != 2){
-            h3.SetAxisRange(0,5,"X");
-            h3.SetAxisRange(0,(plotObj[i]->StdObjName[j].find("Ias")==string::npos)?17:1.2,"Y");
-            h3.GetYaxis()->SetRangeUser(0,(plotObj[i]->StdObjName[j].find("Ias")==string::npos)?17:1.2);
-            h3.GetXaxis()->SetRangeUser(0, 5.0);
-         } else {
-            h3.SetBins(1,0,1200,1,0,(plotObj[i]->StdObjName[j].find("Ias")==string::npos)?30:1.2);
-            h3.SetAxisRange(0,1200,"X");
-            h3.SetAxisRange(0,(plotObj[i]->StdObjName[j].find("Ias")==string::npos)?30:1.2,"Y");
-            h3.GetYaxis()->SetRangeUser(0,(plotObj[i]->StdObjName[j].find("Ias")==string::npos)?30:1.2);
-            h3.GetXaxis()->SetRangeUser(0, 1200.0);
-         }
-         h3.Draw("COLZ");
-         plotObj[i]->HdedxVsP[j]->Draw("same COLZ");
-
-         PionLine      = NULL;
-         KaonLine      = NULL;
-         ProtonLine    = NULL;
-         DeuteronLine  = NULL;
-         ProtonLineFit = NULL;
-
-/*
-            plotObj[i]->HdedxVsP[j]->SetStats(kFALSE);
-            plotObj[i]->HdedxVsP[j]->GetXaxis()->SetTitle("p (GeV)");
-            plotObj[i]->HdedxVsP[j]->GetYaxis()->SetTitle(plotObj[i]->StdObjName[j].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
-            plotObj[i]->HdedxVsP[j]->SetAxisRange(0,5,"X");
-            plotObj[i]->HdedxVsP[j]->SetAxisRange(0,17,"Y");
-            plotObj[i]->HdedxVsP[j]->GetYaxis()->SetRangeUser(0,17);
-            plotObj[i]->HdedxVsP[j]->Draw("COLZ");
-*/
-         if (plotObj[i]->type != 2 && plotObj[i]->StdObjName[j].find("Ias")==string::npos){
-            double dEdxK_Data1 = 2.580; // 2016 Data K
-            double dEdxC_Data1 = 3.922; // 2016 Data C
-            double dEdxK_MC1   = 2.935; // 2016 MC K
-            double dEdxC_MC1   = 3.197; // 2016 MC C
-            TF1* PionLine = GetMassLine(0.140, (plotObj[i]->type == 0)?dEdxK_Data1:dEdxK_MC1, (plotObj[i]->type == 0)?dEdxC_Data1:dEdxC_MC1);
-            PionLine->SetLineColor(1);
-            PionLine->SetLineWidth(2);
-            PionLine->SetRange(PionLine->GetX(15), PionLine->GetX(plotObj[i]->C[plotObj[i]->StdObjName[j]]+0.1));
-
-            TF1* KaonLine = GetMassLine(0.494, (plotObj[i]->type == 0)?dEdxK_Data1:dEdxK_MC1, (plotObj[i]->type == 0)?dEdxC_Data1:dEdxC_MC1);
-            KaonLine->SetLineColor(1);
-            KaonLine->SetLineWidth(2);
-            KaonLine->SetRange(KaonLine->GetX(15), KaonLine->GetX(plotObj[i]->C[plotObj[i]->StdObjName[j]]+0.1));
-
-            TF1* ProtonLine = GetMassLine(0.938, (plotObj[i]->type == 0)?dEdxK_Data1:dEdxK_MC1, (plotObj[i]->type == 0)?dEdxC_Data1:dEdxC_MC1);
-            ProtonLine->SetLineColor(1);
-            ProtonLine->SetLineWidth(2);
-            ProtonLine->SetRange(ProtonLine->GetX(15), ProtonLine->GetX(plotObj[i]->C[plotObj[i]->StdObjName[j]]+0.1));
-
-            TF1* DeuteronLine = GetMassLine(1.88, (plotObj[i]->type == 0)?dEdxK_Data1:dEdxK_MC1, (plotObj[i]->type == 0)?dEdxC_Data1:dEdxC_MC1);
-            DeuteronLine->SetLineColor(1);
-            DeuteronLine->SetLineWidth(2);
-            DeuteronLine->SetRange(DeuteronLine->GetX(15), DeuteronLine->GetX(plotObj[i]->C[plotObj[i]->StdObjName[j]]+0.1));
-
-            TF1* ProtonLineFit = GetMassLine(0.938, (plotObj[i]->type == 0)?dEdxK_Data1:dEdxK_MC1, (plotObj[i]->type == 0)?dEdxC_Data1:dEdxC_MC1);
-            ProtonLineFit->SetLineColor(2);
-            ProtonLineFit->SetLineWidth(2);
-            ProtonLineFit->SetRange(0.6,1.2);
-
-            PionLine->Draw("same");
-            KaonLine->Draw("same");
-            ProtonLine->Draw("same");
-            DeuteronLine->Draw("same");
-            ProtonLineFit->Draw("same");
-         }
-         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
-         SaveCanvas(c1, SaveDir, plotObj[i]->StdObjName[j] + "_" + plotObj[i]->SavePrefix + "_dedxVsP_KCData", true);
-         if (PionLine){ delete PionLine; delete KaonLine; delete ProtonLine; delete DeuteronLine; delete ProtonLineFit; }
-         delete c1;
-
          c1 = new TCanvas("c1", "c1", 600,600);
          c1->SetLogz(true);
          plotObj[i]->HdedxVsEta[j]->SetStats(kFALSE);
-         plotObj[i]->HdedxVsEta[j]->GetXaxis()->SetTitle("Eta");
+         plotObj[i]->HdedxVsEta[j]->GetXaxis()->SetTitle("#eta");
          plotObj[i]->HdedxVsEta[j]->GetYaxis()->SetTitle(plotObj[i]->StdObjName[j].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
-         plotObj[i]->HdedxVsEta[j]->SetAxisRange(-2.1,2.1,"X");
+         plotObj[i]->HdedxVsEta[j]->SetAxisRange(-4.0,4.0,"X");
          plotObj[i]->HdedxVsEta[j]->Draw("COLZ");
          DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
          SaveCanvas(c1, SaveDir, plotObj[i]->StdObjName[j] + "_" + plotObj[i]->SavePrefix + "_Eta2D", true);
          delete c1;
-      }
 
-      for (size_t j=0; j < plotObj[i]->HitObjName.size(); j++){
-         if (plotObj[i]->HitObjName[j].find("SP")==string::npos) continue;
-         plotObj[i]->dEdxTemplate_Pixel[j]->SetName("Charge_Vs_Path");
-         plotObj[i]->dEdxTemplate_Pixel[j]->SaveAs (("dEdxTemplate_" + plotObj[i]->HitObjName[j] + "_" + plotObj[i]->SavePrefix + ".root").c_str());
-         MakeMapPlots (plotObj[i]->dEdxTemplate_Pixel[j], plotObj[i]->HitObjName[j], SaveDir, "Map" + plotObj[i]->SavePrefix);
-/*         
-         TH1D* hit_MIP = (TH1D*) GetObjectFromPath (InputFiles[fileIndex], (ObjName[i]+"_Hit").c_str());
-
-         TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-         c1->SetLogy(true);
-         hit_MIP->SetStats(kFALSE);
-         hit_MIP->GetXaxis()->SetTitle("cluster dE/dx");
-         hit_MIP->GetYaxis()->SetTitle("number of hits");
-         hit_MIP->Draw("hist");
-         DrawPreliminary(extraStringMode1);
-         SaveCanvas (c1, SaveDir, ObjName[i]+"_"+SaveNames[fileIndex]+"_Hit");
+         if (plotObj[i]->StdObjName[j].find("PO")!=string::npos)continue;
+         c1 = new TCanvas ("c1", "c1", 600, 600);
+         c1->SetLogz(true);
+         plotObj[i]->HdedxVsPHoT[j]->SetStats(kFALSE);
+         plotObj[i]->HdedxVsPHoT[j]->GetXaxis()->SetTitle("p (GeV)");
+         plotObj[i]->HdedxVsPHoT[j]->GetYaxis()->SetTitle(plotObj[i]->StdObjName[j].find("Ias")!=std::string::npos?"I_{as}":"dE/dx (MeV/cm)");
+         plotObj[i]->HdedxVsPHoT[j]->GetZaxis()->SetTitle("mean #HoT clusters per track");
+         plotObj[i]->HdedxVsPHoT[j]->Draw("COLZ");
+         DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
+         SaveCanvas(c1, SaveDir, plotObj[i]->StdObjName[j] + "_" + plotObj[i]->SavePrefix + "_HoTProfile", true);
          delete c1;
-*/
-         // all the other graphs -- Charge_Vs_XYNLetc.
-         string topologies [] = {"IB1", "IB2", "OB1", "OB2", "W1A", "W2A", "W3A", "W1B", "W2B", "W3B", "W4", "W5", "W6", "W7", "Pixel"};
-         for (unsigned int g=0;g<15;g++){
-            char Id [255]; sprintf (Id, "%02i", g+1);
-            TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-            plotObj[i]->Charge_Vs_XYH[j][g]->SetStats(kFALSE);
-            plotObj[i]->Charge_Vs_XYH[j][g]->GetXaxis()->SetTitle("local x coordinate");
-            plotObj[i]->Charge_Vs_XYH[j][g]->GetYaxis()->SetTitle("local y coordinate");
-            plotObj[i]->Charge_Vs_XYH[j][g]->SetAxisRange (-7,7,"X");
-            plotObj[i]->Charge_Vs_XYH[j][g]->SetAxisRange (-15,15,"Y");
-            plotObj[i]->Charge_Vs_XYH[j][g]->Draw("COLZ");
-            DrawPreliminary (topologies[g], 13.0, plotObj[i]->LegEntry);
-            SaveCanvas (c1, SaveDir, plotObj[i]->HitObjName[j]+"_"+plotObj[i]->SavePrefix +"_ChargeVsXYH"+string(Id), true);
-            delete c1;
-
-            c1 = new TCanvas ("c1", "c1", 600, 600);
-            plotObj[i]->Charge_Vs_XYHN[j][g]->SetStats(kFALSE);
-            plotObj[i]->Charge_Vs_XYHN[j][g]->GetXaxis()->SetTitle("normalized x coordinate");
-            plotObj[i]->Charge_Vs_XYHN[j][g]->GetYaxis()->SetTitle("normalized y coordinate");
-            plotObj[i]->Charge_Vs_XYHN[j][g]->SetAxisRange (-1.5,1.5,"X");
-            plotObj[i]->Charge_Vs_XYHN[j][g]->SetAxisRange (-1.5,1.5,"Y");
-            plotObj[i]->Charge_Vs_XYHN[j][g]->Draw("COLZ");
-            DrawPreliminary (topologies[g], 13.0, plotObj[i]->LegEntry);
-            SaveCanvas (c1, SaveDir, plotObj[i]->HitObjName[j]+"_"+plotObj[i]->SavePrefix +"_ChargeVsXYHN"+string(Id), true);
-            delete c1;
-
-            c1 = new TCanvas ("c1", "c1", 600, 600);
-            plotObj[i]->Charge_Vs_XYLN[j][g]->SetStats(kFALSE);
-            plotObj[i]->Charge_Vs_XYLN[j][g]->GetXaxis()->SetTitle("normalized x coordinate");
-            plotObj[i]->Charge_Vs_XYLN[j][g]->GetYaxis()->SetTitle("normalized y coordinate");
-            plotObj[i]->Charge_Vs_XYLN[j][g]->SetAxisRange (-1.5,1.5,"X");
-            plotObj[i]->Charge_Vs_XYLN[j][g]->SetAxisRange (-1.5,1.5,"Y");
-            plotObj[i]->Charge_Vs_XYLN[j][g]->Draw("COLZ");
-            DrawPreliminary (topologies[g], 13.0, plotObj[i]->LegEntry);
-            SaveCanvas (c1, SaveDir, plotObj[i]->HitObjName[j]+"_"+plotObj[i]->SavePrefix +"_ChargeVsXYLN"+string(Id), true);
-            delete c1;
-         }
       }
    }
 }
