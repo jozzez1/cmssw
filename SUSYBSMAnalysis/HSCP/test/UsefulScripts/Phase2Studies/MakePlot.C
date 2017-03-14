@@ -267,12 +267,50 @@ void MakePlot()
    plotObj.push_back(new dEdxPlotObj("Histos_Background_200PU.root", "Background (200 PU)", "Background200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
 
 
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_200_NoPU.root", "PPStau, 200 GeV (0 PU)", "PPStau_M200_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
    plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_NoPU.root", "PPStau, 432 GeV (0 PU)", "PPStau_M432_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_651_NoPU.root", "PPStau, 651 GeV (0 PU)", "PPStau_M651_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_871_NoPU.root", "PPStau, 871 GeV (0 PU)", "PPStau_M871_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1218_NoPU.root", "PPStau, 1218 GeV (0 PU)", "PPStau_M1218_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1599_NoPU.root", "PPStau, 1599 GeV (0 PU)", "PPStau_M1599_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
    plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_NoPU.root", "Gluino, 600 GeV (0 PU)", "Gluino_M600_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1000_NoPU.root", "Gluino, 1000 GeV (0 PU)", "Gluino_M1000_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1400_NoPU.root", "Gluino, 1400 GeV (0 PU)", "Gluino_M1400_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1800_NoPU.root", "Gluino, 1800 GeV (0 PU)", "Gluino_M1800_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2200_NoPU.root", "Gluino, 2200 GeV (0 PU)", "Gluino_M2200_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2600_NoPU.root", "Gluino, 2600 GeV (0 PU)", "Gluino_M2600_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
+
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_200_140PU.root", "PPStau, 200 GeV (140 PU)", "PPStau_M200_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
    plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_140PU.root", "PPStau, 432 GeV (140 PU)", "PPStau_M432_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_651_140PU.root", "PPStau, 651 GeV (140 PU)", "PPStau_M651_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_871_140PU.root", "PPStau, 871 GeV (140 PU)", "PPStau_M871_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1218_140PU.root", "PPStau, 1218 GeV (140 PU)", "PPStau_M1218_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1599_140PU.root", "PPStau, 1599 GeV (140 PU)", "PPStau_M1599_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
    plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_140PU.root", "Gluino, 600 GeV (140 PU)", "Gluino_M600_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1000_140PU.root", "Gluino, 1000 GeV (140 PU)", "Gluino_M1000_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1400_140PU.root", "Gluino, 1400 GeV (140 PU)", "Gluino_M1400_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1800_140PU.root", "Gluino, 1800 GeV (140 PU)", "Gluino_M1800_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2200_140PU.root", "Gluino, 2200 GeV (140 PU)", "Gluino_M2200_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2600_140PU.root", "Gluino, 2600 GeV (140 PU)", "Gluino_M2600_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
+
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_200_200PU.root", "PPStau, 200 GeV (200 PU)", "PPStau_M200_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
    plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_200PU.root", "PPStau, 432 GeV (200 PU)", "PPStau_M432_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_651_200PU.root", "PPStau, 651 GeV (200 PU)", "PPStau_M651_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_871_200PU.root", "PPStau, 871 GeV (200 PU)", "PPStau_M871_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1218_200PU.root", "PPStau, 1218 GeV (200 PU)", "PPStau_M1218_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_1599_200PU.root", "PPStau, 1599 GeV (200 PU)", "PPStau_M1599_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
    plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_200PU.root", "Gluino, 600 GeV (200 PU)", "Gluino_M600_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1000_200PU.root", "Gluino, 1000 GeV (200 PU)", "Gluino_M1000_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1400_200PU.root", "Gluino, 1400 GeV (200 PU)", "Gluino_M1400_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_1800_200PU.root", "Gluino, 1800 GeV (200 PU)", "Gluino_M1800_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2200_200PU.root", "Gluino, 2200 GeV (200 PU)", "Gluino_M2200_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_2600_200PU.root", "Gluino, 2600 GeV (200 PU)", "Gluino_M2600_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+
 
    string SaveDir = "pictures_FAST/";
    system (string("rm -rf "+SaveDir+" && mkdir "+SaveDir).c_str());
@@ -352,6 +390,19 @@ void MakePlot()
 // ObjNames.push_back("Ias_SP_in_noC_CCC16_MIP");     LegendLabels.push_back("Ias (new)"); Colors.push_back(kAzure+2);
 // MakeROCGeneral (plotObj[8]->InputFile, plotObj[12]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators");
 */
+   vector <string> ObjNames; vector <string> LegendLabels;                                         vector <Color_t> Colors;
+   ObjNames.push_back("Ias_PO_inc_MIP");     LegendLabels.push_back("Pixel-Only (inc)");           Colors.push_back(kBlack);
+   ObjNames.push_back("Ias_SP_inc_MIP");     LegendLabels.push_back("Strip+Pixel (inc)");          Colors.push_back(kRed);
+   ObjNames.push_back("Ias_PO_MIP");         LegendLabels.push_back("Pixel-Only (layers/disks)");  Colors.push_back(kBlue);
+   ObjNames.push_back("Ias_SP_MIP");         LegendLabels.push_back("Strip+Pixel (layers/disks)"); Colors.push_back(kGreen);
+   ObjNames.push_back("Ias_SP_Ring_MIP");    LegendLabels.push_back("Strip+Pixel (layers/rings)"); Colors.push_back(kCyan);
+   ObjNames.push_back("Ias_SP_PixHOT_MIP");  LegendLabels.push_back("Pix-HoT templates");          Colors.push_back(kMagenta);
+
+   for (unsigned int i=6; i <= 17; i++){
+      MakeROCGeneral (plotObj[3]->InputFile, plotObj[   i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, plotObj[   i]->SavePrefix); // NoPU
+      MakeROCGeneral (plotObj[4]->InputFile, plotObj[12+i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, plotObj[12+i]->SavePrefix); // 140PU
+      MakeROCGeneral (plotObj[5]->InputFile, plotObj[24+i]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, plotObj[24+i]->SavePrefix); // 200PU
+   }
 }
 
 
@@ -1429,9 +1480,10 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       for (size_t j = 0; j < plotObj[i]->StdObjName.size(); j++){
          if (plotObj[i]->StdObjName[j].find("harm")!=string::npos || plotObj[i]->StdObjName[j].find(Reject)!=string::npos)
             continue;
-         histos.push_back ((plotObj[i]->type!=2)
-            ?plotObj[i]->HdedxMIP[j]
-            :plotObj[i]->HdedxVsP[j]->ProjectionY((plotObj[i]->StdObjName[j]+"_py_MIP").c_str()));
+	 histos.push_back (plotObj[i]->HdedxMIP[j]);
+//         histos.push_back ((plotObj[i]->type!=2)
+//            ?plotObj[i]->HdedxMIP[j]
+//            :plotObj[i]->HdedxVsP[j]->ProjectionY((plotObj[i]->StdObjName[j]+"_py_MIP").c_str()));
          legend.push_back (plotObj[i]->StdObjLegend[j]);
 
          if (histos[histos.size()-1]->GetMaximum()>max)
@@ -1446,10 +1498,10 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
          DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
          SaveCanvas (c1, SaveDir, "Comp_Ias_" + plotObj[i]->SavePrefix + "_MIP");
 
-         if (plotObj[i]->type!=2){
-            for (unsigned int i=0; i<histos.size(); i++)
-               histos[i]->~TH1D();
-         }
+//         if (plotObj[i]->type==2){
+//            for (unsigned int i=0; i<histos.size(); i++)
+//               histos[i]->~TH1D();
+//         }
          histos.clear();
       }
       delete c1;

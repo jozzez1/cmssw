@@ -141,7 +141,7 @@ elif sys.argv[1]=='2':
 	#os.system('hadd -f Histos_Data.root Histos_Run*.root')
 
 elif sys.argv[1]=='3':
-        os.system('sh MakePlot.sh')
+        os.system('root -l -b -q MakePlot.C')
 
 else:
    print "Invalid argument"
