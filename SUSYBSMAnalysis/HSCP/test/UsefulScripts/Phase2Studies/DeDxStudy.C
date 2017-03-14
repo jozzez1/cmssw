@@ -637,7 +637,7 @@ void DeDxStudy(string DIRNAME="COMPILE", string INPUT="dEdx.root", string OUTPUT
                          results[R]->HdedxVsPPSHits     ->Fill (track->p(), dedxObj.dEdx(), PSHits);
                          results[R]->HdedxVsP_NPixPSHits->Fill (track->p(), dedxObj.dEdx(), PHits );
                       }
-                      if (!isSignal && track->p() > 5){
+                      if ((!isSignal && track->p() > 5) || (isSignal && track->p() > 45)){
                          results[R]->HdedxVsEtaProfile->Fill(track->eta(), dedxObj.dEdx() );
                          results[R]->HdedxVsEta       ->Fill(track->eta(), dedxObj.dEdx() );
                          results[R]->HdedxMIP         ->Fill(dedxObj.dEdx());

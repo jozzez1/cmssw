@@ -258,9 +258,21 @@ void MakePlot()
 
 
    vector <dEdxPlotObj*> plotObj;
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_NoPU.root",  "MC (MinBias) 0 PU",   "MCMinBiasNoPU",  HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_140PU.root", "MC (MinBias) 140 PU", "MCMinBias140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
-   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_200PU.root", "MC (MinBias) 200 PU", "MCMinBias200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_NoPU.root",  "MinBias (0 PU)",   "MCMinBiasNoPU",  HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_140PU.root", "MinBias (140 PU)", "MCMinBias140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+   plotObj.push_back(new dEdxPlotObj("Histos_MinBias_200PU.root", "MinBias (200 PU)", "MCMinBias200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 0));
+
+   plotObj.push_back(new dEdxPlotObj("Histos_Background_NoPU.root", "Background (0 PU)", "BackgroundNoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+   plotObj.push_back(new dEdxPlotObj("Histos_Background_140PU.root", "Background (140 PU)", "Background140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+   plotObj.push_back(new dEdxPlotObj("Histos_Background_200PU.root", "Background (200 PU)", "Background200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 1));
+
+
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_NoPU.root", "PPStau, 432 GeV (0 PU)", "PPStau_M432_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_NoPU.root", "Gluino, 600 GeV (0 PU)", "Gluino_M600_NoPU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_140PU.root", "PPStau, 432 GeV (140 PU)", "PPStau_M432_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_140PU.root", "Gluino, 600 GeV (140 PU)", "Gluino_M600_140PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_ppstau_432_200PU.root", "PPStau, 432 GeV (200 PU)", "PPStau_M432_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
+   plotObj.push_back(new dEdxPlotObj("Histos_gluino_600_200PU.root", "Gluino, 600 GeV (200 PU)", "Gluino_M600_200PU", HitObjName, StdObjName, HitObjLegend, StdObjLegend, 2));
 
    string SaveDir = "pictures_FAST/";
    system (string("rm -rf "+SaveDir+" && mkdir "+SaveDir).c_str());
@@ -288,10 +300,10 @@ void MakePlot()
    SuperposeFilesOnDeDxObj (SaveDir, plotObj);
    HitPlots (SaveDir, plotObj);
 
-   cerr << "====== TESTC :: Cross-compare estimators ======" << endl;
+   cerr << "====== TESTC :: Cross-compare estimators/discriminators ======" << endl;
    CrossCompareAndControlPlots (SaveDir, plotObj, "SO", "Hybr");
    
-   return ;
+/*
  //  cerr << "====== TESTD :: Systematics study ======" << endl;
  //  SystStudy (SaveDir, plotObj);
 
@@ -317,28 +329,29 @@ void MakePlot()
 //      fprintf (fout, (plotObj[i]->LegEntry + "\tSO MC to Data :: MIP:%.7lf\tProfile:%.7lf\n").c_str(), SFMip, SFProfile);
 //   }
    fclose (fout);
-/*
-   vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
-   ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("I_{h}");  Colors.push_back(kRed);
-   ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");      LegendLabels.push_back("I_{as}"); Colors.push_back(kBlue);
-   MakeROCGeneral (plotObj[2]->InputFile, plotObj[5]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_LOIC");
-
-   ObjNames.clear(); LegendLabels.clear(); Colors.clear();
-   ObjNames.push_back("harm2_SP_in_noC_CCC_noF_MIP");     LegendLabels.push_back("harmonic-2");  Colors.push_back(kRed);
-   ObjNames.push_back("Hybr201_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-10"); Colors.push_back(kRed);
-   ObjNames.push_back("Hybr2015_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-15"); Colors.push_back(kRed);
-   ObjNames.push_back("Hybr202_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-20"); Colors.push_back(kRed);
-   ObjNames.push_back("Hybr2025_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-25"); Colors.push_back(kRed);
+//
+// vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
+// ObjNames.push_back("harm2_SP_in_noC_CCC_MIP");    LegendLabels.push_back("I_{h}");  Colors.push_back(kRed);
+// ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");      LegendLabels.push_back("I_{as}"); Colors.push_back(kBlue);
+// MakeROCGeneral (plotObj[2]->InputFile, plotObj[5]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators_LOIC");
+//
+// ObjNames.clear(); LegendLabels.clear(); Colors.clear();
+// ObjNames.push_back("harm2_SP_in_noC_CCC_noF_MIP");     LegendLabels.push_back("harmonic-2");  Colors.push_back(kRed);
+// ObjNames.push_back("Hybr201_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-10"); Colors.push_back(kRed);
+// ObjNames.push_back("Hybr2015_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-15"); Colors.push_back(kRed);
+// ObjNames.push_back("Hybr202_SP_in_noC_CCC_noF_MIP");   LegendLabels.push_back("hybrid-2-20"); Colors.push_back(kRed);
+// ObjNames.push_back("Hybr2025_SP_in_noC_CCC_noF_MIP");  LegendLabels.push_back("hybrid-2-25"); Colors.push_back(kRed);
+//
+// vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
+// ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-15"); Colors.push_back(kBlack);
+// ObjNames.push_back("Hybr2020_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-20"); Colors.push_back(kRed);
+// ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-25"); Colors.push_back(kBlue);
+// ObjNames.push_back("Hybr2030_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-30"); Colors.push_back(kGreen);
+// ObjNames.push_back("Hybr2035_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-35"); Colors.push_back(kCyan);
+// ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");       LegendLabels.push_back("Ias (old)"); Colors.push_back(kMagenta);
+// ObjNames.push_back("Ias_SP_in_noC_CCC16_MIP");     LegendLabels.push_back("Ias (new)"); Colors.push_back(kAzure+2);
+// MakeROCGeneral (plotObj[8]->InputFile, plotObj[12]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators");
 */
-   vector <string> ObjNames; vector <string> LegendLabels; vector <Color_t> Colors;
-   ObjNames.push_back("Hybr2015_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-15"); Colors.push_back(kBlack);
-   ObjNames.push_back("Hybr2020_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-20"); Colors.push_back(kRed);
-   ObjNames.push_back("Hybr2025_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-25"); Colors.push_back(kBlue);
-   ObjNames.push_back("Hybr2030_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-30"); Colors.push_back(kGreen);
-   ObjNames.push_back("Hybr2035_SP_in_noC_CCC_MIP");  LegendLabels.push_back("Hybrid-2-35"); Colors.push_back(kCyan);
-   ObjNames.push_back("Ias_SP_in_noC_CCC_MIP");       LegendLabels.push_back("Ias (old)"); Colors.push_back(kMagenta);
-   ObjNames.push_back("Ias_SP_in_noC_CCC16_MIP");     LegendLabels.push_back("Ias (new)"); Colors.push_back(kAzure+2);
-   MakeROCGeneral (plotObj[8]->InputFile, plotObj[12]->InputFile, ObjNames, LegendLabels, Colors, SaveDir, "Estimators");
 }
 
 
@@ -1416,24 +1429,35 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
       for (size_t j = 0; j < plotObj[i]->StdObjName.size(); j++){
          if (plotObj[i]->StdObjName[j].find("harm")!=string::npos || plotObj[i]->StdObjName[j].find(Reject)!=string::npos)
             continue;
-         histos.push_back (plotObj[i]->HdedxMIP[j]);
+         histos.push_back ((plotObj[i]->type!=2)
+            ?plotObj[i]->HdedxMIP[j]
+            :plotObj[i]->HdedxVsP[j]->ProjectionY((plotObj[i]->StdObjName[j]+"_py_MIP").c_str()));
          legend.push_back (plotObj[i]->StdObjLegend[j]);
 
-         max = histos[histos.size()-1]->GetMaximum()>max?histos[histos.size()-1]->GetMaximum():max;
-         min = histos[histos.size()-1]->GetMinimum()>min?histos[histos.size()-1]->GetMinimum():min;
+         if (histos[histos.size()-1]->GetMaximum()>max)
+            max = histos[histos.size()-1]->GetMaximum();
+         if (histos[histos.size()-1]->GetMinimum()<min && histos[histos.size()-1]->GetMinimum()>0)
+            min = histos[histos.size()-1]->GetMinimum();
       }
+      if (min == 0.0) min = 1e-1;
       if (histos.size() > 0){
-         DrawSuperposedHistos((TH1**) (&histos[0]), legend, "hist", "I_{as}", "", 0.0, 1.0, min, max*12, false);
-         DrawLegend ((TObject**) (&histos[0]), legend, "Discriminators", "L", 0.8, 0.9, 0.3, 0.05);
+         DrawSuperposedHistos((TH1**) (&histos[0]), legend, "hist", "I_{as}", "", 0.0, 1.0, /*1e-8*/min, /*0.8*/12*max, false);
+         DrawLegend ((TObject**) (&histos[0]), legend, "Discriminators", "L", 0.75, 0.9, 0.3, 0.05);
          DrawPreliminary ("", 13.0, plotObj[i]->LegEntry);
          SaveCanvas (c1, SaveDir, "Comp_Ias_" + plotObj[i]->SavePrefix + "_MIP");
+
+         if (plotObj[i]->type!=2){
+            for (unsigned int i=0; i<histos.size(); i++)
+               histos[i]->~TH1D();
+         }
+         histos.clear();
       }
       delete c1;
    }
 
    for (size_t i=0; i < plotObj.size(); i++){
       TCanvas* c1 = new TCanvas ("c1", "c1", 600, 600);
-      TLegend* leg = new TLegend (0.50, 0.75, 0.80, 0.90);
+      TLegend* leg = new TLegend (0.45, 0.65, 0.95, 0.90);
       leg->SetHeader ("Discriminator");
       leg->SetFillColor(0);
       leg->SetFillStyle(0);
@@ -1451,23 +1475,25 @@ void CrossCompareAndControlPlots (string SaveDir, vector <dEdxPlotObj*> plotObj,
          histos.push_back (plotObj[i]->HdedxVsEtaProfile[j]);
          legend.push_back (plotObj[i]->StdObjLegend[j]);
 
-         max = histos[histos.size()-1]->GetMaximum()>max?histos[histos.size()-1]->GetMaximum():max;
-         min = histos[histos.size()-1]->GetMinimum()>min?histos[histos.size()-1]->GetMinimum():min;
+         if (histos[histos.size()-1]->GetMaximum()>max) max = histos[histos.size()-1]->GetMaximum();
+         if (histos[histos.size()-1]->GetMinimum()<min) min = histos[histos.size()-1]->GetMinimum();
       }
       if (histos.size() > 0){
          TH1D h ("tmp", "tmp", 1, -4.0, 4.0);
+         h.SetStats(kFALSE);
          h.GetXaxis()->SetTitle("#eta");
          h.GetYaxis()->SetTitle("mean I_{as}");
-         h.GetYaxis()->SetRangeUser(min, max*1.2);
+         h.GetYaxis()->SetRangeUser(0.0, 0.45);
          h.Draw();
 
          Color_t colors [] = {kBlack, kRed, kGreen, kBlue, kMagenta, kCyan, kOrange};
+         unsigned int marker_types [] = {20, 21, 22, 23, 33, 34, 29};
          for (size_t j=0; j<histos.size(); j++){
-            histos[j]->SetMarkerStyle(21+j);
+            histos[j]->SetMarkerStyle(marker_types[j]);
             histos[j]->SetMarkerColor(colors[j]);
             histos[j]->SetLineColor(colors[j]);
             histos[j]->Draw("same PE1");
-            leg->AddEntry (histos[j], legend[j].c_str(), "L");
+            leg->AddEntry (histos[j], legend[j].c_str(), "LP");
          }
 
          leg->Draw("same");
