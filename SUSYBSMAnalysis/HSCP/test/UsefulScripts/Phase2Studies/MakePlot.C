@@ -1374,7 +1374,7 @@ void MakeROCGeneral (TFile* InputFile1, TFile* InputFile2, vector<string> HistoN
       h.GetXaxis()->SetNdivisions(5);
       h.GetYaxis()->SetTitle("signal efficiency");
       h.GetYaxis()->SetNdivisions(5);
-      h.SetAxisRange (0.65,1.0,"Y");
+      h.SetAxisRange (0.00,1.0,"Y");
       h.SetStats(0);
       h.Draw();
       TGraphErrors** ROC = new TGraphErrors* [HistoNames.size()];

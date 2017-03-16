@@ -6,57 +6,57 @@ import SUSYBSMAnalysis.HSCP.LaunchOnCondor as LaunchOnCondor
 removeOld = False
 
 datasets     = [
-##  CALIBRATION
-#   '/MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-#   '/MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-#   '/MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-#
-##  BACKGROUND SAMPLES
-#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-#   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-#
-#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
-#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-#   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
-#
-##  SIGNAL -- PPSTAU
-#   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#
-#   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#
+#  CALIBRATION
+   '/MinBias_noPU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/MinBias_140PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/MinBias_200PU_TuneCUETP8M1_14TeV-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+
+#  BACKGROUND SAMPLES
+   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+   '/DYJetsToLL_M-50_TuneCUETP8M1_14TeV-madgraphMLM-pythia8_ext1/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+
+   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v1/GEN-SIM-RECO',
+   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+   '/TTTo2L2Nu_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1_ext1-v1/GEN-SIM-RECO',
+
+#  SIGNAL -- PPSTAU
+   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+
+   '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+
    '/HSCPppstau_M_200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPppstau_M_432_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPppstau_M_651_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPppstau_M_871_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPppstau_M_1218_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPppstau_M_1599_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#
-##  SIGNAL -- GLUINO
-#   '/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
-#   '/HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
-#
-#   '/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
-#   '/HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
-#   '/HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
-#
+
+#  SIGNAL -- GLUINO
+   '/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
+   '/HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-NoPU_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
+
+   '/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_1800_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
+   '/HSCPgluino_M_2200_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
+   '/HSCPgluino_M_2600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU140_90X_upgrade2023_realistic_v1-v3/GEN-SIM-RECO',
+
    '/HSCPgluino_M_600_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPgluino_M_1000_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
    '/HSCPgluino_M_1400_TuneCUETP8M1_14TeV_pythia8/PhaseIIFall16DR82-PU200_90X_upgrade2023_realistic_v1-v2/GEN-SIM-RECO',
