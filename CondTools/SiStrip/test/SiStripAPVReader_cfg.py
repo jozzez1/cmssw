@@ -18,11 +18,12 @@ process.maxEvents = cms.untracked.PSet(
 
 process.poolDBESSource = cms.ESSource("PoolDBESSource",
     timetype = cms.untracked.string('runnumber'),
-    connect = cms.string('sqlite_file:Gains_G1_279596_Sqlite.db'),
+#    connect = cms.string('sqlite_file:Gains_G1_279596_Sqlite.db'),
+    connect = cms.string('sqlite_file:testG1_run280492.db'),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('SiStripApvGainRcd'),
-        tag = cms.string('SiStripApvGainRcd_v1_hltvalidation')
-        #tag = cms.string('SiStripApvGain_GR10_v1_hlt')
+#        tag = cms.string('SiStripApvGainRcd_v1_hltvalidation')
+        tag = cms.string('SiStripApvGain_GR10_v1_hlt')
     ))
 )
 
@@ -30,7 +31,8 @@ process.es_prefer = cms.ESPrefer('PoolDBESSource','poolDBESSource')
 
 process.APVGainReader = cms.EDAnalyzer("SiStripApvGainReader")
 process.APVGainReader.printdebug  = cms.untracked.bool(True)
-process.APVGainReader.outputFile  = cms.untracked.string('OldGains.log')
+#process.APVGainReader.outputFile  = cms.untracked.string('OldGains.log')
+process.APVGainReader.outputFile  = cms.untracked.string('NewGains.log')
 process.APVGainReader.gainType    = cms.untracked.uint32(0)
 
 process.p1 = cms.Path(process.APVGainReader)
