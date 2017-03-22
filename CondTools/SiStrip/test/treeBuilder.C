@@ -68,14 +68,16 @@ void treeBuilder (const char* inLogName, const char* treeName, const char* fileN
         numberString = tokenizer.tokenize(tmp);
         
         detid = (uint32_t) atol (numberString[0].c_str());
-        std::cout << detid << std::endl;
+        std::cout << detid;
         for (unsigned int i=1; i<numberString.size(); i++){
             gain = (double) atof (numberString[i].c_str());
+            std::cout << "\t" << numberString[i];
 
             t->Fill();
             ++index;
             ++ApvId;
         }
+        std::cout << std::endl;
     } while (!feof(inLogfile));
 
     outfile->Write();
