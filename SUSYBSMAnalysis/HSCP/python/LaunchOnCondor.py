@@ -43,6 +43,11 @@ Jobs_CRABname      = Jobs_CRABexe
 Jobs_CRABInDBS     = "global"
 Jobs_CRABUnitPerJob = 10
 
+# for slurm, set them to whatever you want to suit your job best
+Jobs_Requeue     = True
+Jobs_Memory      = '2000'
+Jobs_Time        = '120:00:00'
+
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
@@ -115,8 +120,11 @@ def CreateTheShellFile(argv):
 	global Jobs_InitCmds
 	global Jobs_FinalCmds
         global absoluteShellPath
+	global Jobs_Memory
+	global Jobs_Time
+	global Jobs_Requeue
         if(subTool=='crab'):return
-
+        LogFileName = Jobs_Index+Jobs_Name
         Path_Log   = Farm_Directories[2]+Jobs_Index+Jobs_Name
         Path_Shell = Farm_Directories[1]+Jobs_Index+Jobs_Name+'.sh'
         function_argument=''
@@ -130,6 +138,22 @@ def CreateTheShellFile(argv):
 	shell_file=open(Path_Shell,'w')
 	shell_file.write('#! /bin/sh\n')
 	shell_file.write(CopyRights + '\n')
+	if subTool == 'slurm':
+	    shell_file.write('#SBATCH --job-name=%s_job\n' % Path_Shell)
+	    #shell_file.write('#SBATCH --output=%s.log\n' % Path_Log)
+	    #shell_file.write('#SBATCH --error=%s.err\n' % Path_Log)
+	    shell_file.write('#SBATCH --output=/dev/null\n')
+	    shell_file.write('#SBATCH --error=/dev/null\n')
+	    shell_file.write('#SBATCH --ntasks=1\n')
+	    shell_file.write('#SBATCH --mem-per-cpu=%s\n' % Jobs_Memory)
+	    shell_file.write('#SBATCH --time=%s\n' % Jobs_Time)
+	    if Jobs_Requeue:
+	        shell_file.write('#SBATCH --requeue\n')
+	    #shell_file.write('\nsrun sh -c \'\n\n')
+            shell_file.write('cd "${LOCALSCRATCH}"\n')
+            shell_file.write('exec 1> %s.log 2> %s.err\n' % (LogFileName, LogFileName))
+
+
         shell_file.write('pwd\n')
         if 'cis.gov.pl' in hostname:
             shell_file.write('source /cvmfs/cms.cern.ch/cmsset_default.sh\n')
@@ -214,8 +238,13 @@ def CreateTheShellFile(argv):
 		shell_file.write(Jobs_FinalCmds[i]+'\n')
         if Jobs_RunHere==0:
            outDir = Farm_Directories[3]
-           if(not os.path.isabs(Path_Shell)): outDir = os.getcwd()+'/'+outDir;
+           if(not os.path.isabs(outDir)): outDir = os.getcwd()+'/'+outDir;
  	   shell_file.write('mv '+ Jobs_Name+'* '+outDir+'\n')
+	if subTool=='slurm':
+           logsDir = Farm_Directories[2]
+           if(not os.path.isabs(logsDir)): logsDir = os.getcwd()+'/'+logsDir;
+ 	   shell_file.write('mv %s.err %s.log %s \n' % (LogFileName, LogFileName, logsDir))
+	#   shell_file.write('\n\'\n')
 	shell_file.close()
 	os.system("chmod 777 "+Path_Shell)
 
@@ -300,6 +329,9 @@ def CreateTheCmdFile():
 	   else: 		                                                    cmd_file.write('requirements            = (Memory > 200)\n')
 	   cmd_file.write('should_transfer_files   = YES\n')
 	   cmd_file.write('when_to_transfer_output = ON_EXIT\n')
+        elif subTool=='slurm':
+	   cmd_file.write('#!/bin/bash\n')
+	   cmd_file.write(CopyRights + '\n')
 	else:
  	   cmd_file.write(CopyRights + '\n')
 	cmd_file.close()
@@ -336,6 +368,8 @@ def AddJobToCmdFile():
                 crabParamPath   = Farm_Directories[1]+'crabParam_'+Jobs_Index+Jobs_Name+'_cfg.py'
                 CreateCrabConfig(crabWorkDirPath, crabConfigPath, crabExePath, crabParamPath)
                 cmd_file.write("crab submit -c " + crabConfigPath + "\n")
+        elif subTool=='slurm':
+                cmd_file.write('sbatch --partition=cp3 --qos=cp3 --wckey=cms %s\n'      % Path_Shell) 
         else:
         	cmd_file.write('\n')
 	        cmd_file.write('Executable              = %s\n'     % Path_Shell)
@@ -386,6 +420,7 @@ def SendCluster_Create(FarmDirectory, JobName):
         if(subTool==''):
   	   if(  not commands.getstatusoutput("which bjobs")[1].startswith("which:")): subTool = 'bsub'
            elif( not commands.getstatusoutput("which qsub")[1].startswith("which:")): subTool = 'qsub'
+           elif( not commands.getstatusoutput("which srun")[1].startswith("which:")): subTool = 'slurm'
            else:                                                                   subTool = 'condor'
         if(Jobs_Queue.find('crab')>=0):                                            subTool = 'crab'
 
@@ -421,7 +456,7 @@ def SendCluster_Submit():
         global Jobs_Count
         global Path_Cmd
 
-	if subTool=='bsub' or subTool=='qsub': os.system("sh " + Path_Cmd)
+	if   subTool=='bsub' or subTool=='qsub' or subTool=='slurm': os.system("sh " + Path_Cmd)
         elif subTool=='crab':                  os.system("sh " + Path_Cmd)
 	else:          	       	               os.system("condor_submit " + Path_Cmd)  
 

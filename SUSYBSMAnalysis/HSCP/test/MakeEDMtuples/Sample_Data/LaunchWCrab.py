@@ -12,7 +12,7 @@ import collections
 PrimaryDatasetsToMatch = "/*/Run2016*-PromptReco-v*/AOD"
 GlobalTag              = "80X_dataRun2_Prompt_v8"
 StorageSite            = 'T2_BE_UCL'
-AllLumisFile           = "lumiToProcess.txt"
+AllLumisFile           = "FinalBatch.json"
 StorageDir             = "/storage/data/cms/store/user/jozobec"
 LumisPerJob            = 5
 

@@ -124,7 +124,7 @@ void makeFigure(string outfile, TH1* frame, string chambersList){
           double* yVal          = graph->GetY();
           for (unsigned int x=0; x<graph->GetN();x++){
              const char* runString = frame->GetXaxis()->GetBinLabel(frame->FindBin(xpoints[x]));
-	     if (yErr[x] > 5.0 || std::fabs(yVal[x]) > 25.0) printf ("%s: %lf +- %lf\n", runString, yVal[x], yErr[x]);
+	     if (yErr[x] > 10.0 || std::fabs(yVal[x]) > 25.0) printf ("%s: %lf +- %lf\n", runString, yVal[x], yErr[x]);
           }}
           graph->SetMarkerStyle(20);
           graph->SetMarkerColor(gStyle->GetColorPalette(int(c*(255.0/chambersToDraw.size()))));
