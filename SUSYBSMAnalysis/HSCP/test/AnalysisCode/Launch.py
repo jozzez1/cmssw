@@ -12,7 +12,7 @@ import time
 LaunchOnCondor.Jobs_InitCmds       = ['ulimit -c 0;']  #disable production of core dump in case of job crash
 LaunchOnCondor.Jobs_Queue = '8nh'
 
-UseRemoteSamples          = True
+UseRemoteSamples          = False#True
 RemoteStorageDir          = '/storage/data/cms/store/user/jozobec/HSCP2016/'
 RemoteServer              = 'ingrid-se03.cism.ucl.ac.be'
 #RemoteStorageDir          = '/store/group/phys_exotica/hscp/'
@@ -71,7 +71,7 @@ if sys.argv[1]=='1':
         print 'ANALYSIS'
         FarmDirectory = "FARM"
         JobName = "HscpAnalysis"
-        LaunchOnCondor.Jobs_RunHere = 1
+        LaunchOnCondor.Jobs_RunHere = 0
         LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
         f= open('Analysis_Samples.txt','r')
         index = -1
@@ -81,14 +81,16 @@ if sys.argv[1]=='1':
            vals=line.split(',')
            if((vals[0].replace('"','')) in CMSSW_VERSION):
               for Type in AnalysesToRun:
-                 if(UseRemoteSamples and int(vals[1])==0 and vals[3].find('2016') != -1):
-                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGESERVER='+RemoteServer, 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
+                 #LaunchOnCondor.Jobs_FinalCmds = ['mv *.root %s/src/SUSYBSMAnalysis/HSCP/test/AnalysisCode/Results/Type%i/' % (os.environ['CMSSW_BASE'], Type)]
+                 LaunchOnCondor.Jobs_FinalCmds = ['cp -r Results %s/src/SUSYBSMAnalysis/HSCP/test/AnalysisCode/ && rm -rf Results' % (os.environ['CMSSW_BASE'])]
+                 if(UseRemoteSamples):
+                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGESERVER='+RemoteServer, 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '//store/')]
                  else: LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0']
                  if(int(vals[1])>=2 and skipSamples(Type, vals[2])==True):continue
 #                 if(int(vals[1])==0):continue
                  LaunchOnCondor.SendCluster_Push(["FWLITE", os.getcwd()+"/Analysis_Step1_EventLoop.C", '"ANALYSE_'+str(index)+'_to_'+str(index)+'"'  , Type, vals[2].rstrip() ])
         f.close()
-#        LaunchOnCondor.SendCluster_Submit()
+        LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='2':
         print 'MERGING FILE AND PREDICTING BACKGROUNDS'  

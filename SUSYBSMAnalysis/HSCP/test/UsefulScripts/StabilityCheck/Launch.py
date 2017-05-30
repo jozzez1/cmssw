@@ -10,7 +10,7 @@ import time
 
 LaunchOnCondor.Jobs_InitCmds       = ['ulimit -c 0;']  #disable production of core dump in case of job crash
 
-UseRemoteSamples                   = True
+UseRemoteSamples                   = False
 RemoteStorageDir                   = '/storage/data/cms/store/user/jozobec/HSCP2016/'
 #RemoteStorageDir                   = '/store/group/phys_exotica/hscp/'
 

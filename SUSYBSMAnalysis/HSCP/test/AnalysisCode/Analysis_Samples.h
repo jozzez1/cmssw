@@ -102,7 +102,14 @@ class stSample{
 
 void GetSampleDefinition(std::vector<stSample>& samples, std::string sampleTxtFile="Analysis_Samples.txt"){
       FILE* pFile = fopen(sampleTxtFile.c_str(),"r");
-         if(!pFile){printf("Can't open %s\n","Analysis_Samples.txt"); return;}
+         if(!pFile){
+		printf("Can't open %s\n","Analysis_Samples.txt,\nattempting to open from default explicit path ...\n");
+		char* cmssw_base   = getenv ("CMSSW_BASE");
+		char samples_path [200];
+		sprintf (samples_path, "%s/src/SUSYBSMAnalysis/HSCP/test/AnalysisCode/Analysis_Samples.txt", cmssw_base);
+		pFile = fopen (samples_path, "r");
+		if (!pFile){printf("Still cannot open Analysis_Samples.txt ... giving up!\n"); return;}
+	 }
          stSample newSample;      
          while(newSample.readFromFile(pFile)!=EOF){samples.push_back(newSample);}
       fclose(pFile);

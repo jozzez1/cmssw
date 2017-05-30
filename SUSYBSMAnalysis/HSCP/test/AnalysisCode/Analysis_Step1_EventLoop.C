@@ -1059,20 +1059,21 @@ void Analysis_Step1_EventLoop(char* SavePath)
 
 std::cout<<"D\n";
 
-
+      char basepath [200]; sprintf (basepath, "%s/src/SUSYBSMAnalysis/HSCP/test/AnalysisCode/", getenv("CMSSW_BASE"));
+      string analysis_path (basepath);
       if(isData){ 
          dEdxSF [0] = 1.00000;
          dEdxSF [1] = (is2016)?1.41822:1.21836;
-         dEdxTemplates = loadDeDxTemplate((!is2016)?"../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root":"../../data/Data13TeV16_dEdxTemplate.root", true);
+         dEdxTemplates = loadDeDxTemplate((!is2016)?(analysis_path+"../../data/Data13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root"):(analysis_path+"../../data/Data13TeV16_dEdxTemplate.root"), true);
       }else{  
          dEdxSF [0] = (is2016)?1.09711:1.09708;
          dEdxSF [1] = (is2016)?1.09256:1.01875;
-         dEdxTemplates = loadDeDxTemplate((!is2016)?"../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root":"../../data/MC13TeV16_dEdxTemplate.root", true);
+         dEdxTemplates = loadDeDxTemplate((!is2016)?(analysis_path+"../../data/MC13TeV_Deco_SiStripDeDxMip_3D_Rcd_v2_CCwCI.root"):(analysis_path+"../../data/MC13TeV16_dEdxTemplate.root"), true);
       }
 
 std::cout<<"E\n";
 
-      if(isData){    trackerCorrector.LoadDeDxCalibration("../../data/Data13TeVGains_v2.root"); 
+      if(isData){    trackerCorrector.LoadDeDxCalibration(analysis_path+"../../data/Data13TeVGains_v2.root"); 
       }else{ trackerCorrector.TrackerGains = NULL; //FIXME check gain for MC
       }
 
@@ -1124,9 +1125,9 @@ std::cout<<"F\n";
       double* MaxMass_SystHUp   = new double[CutPt.size()];
       double* MaxMass_SystHDown = new double[CutPt.size()];
 
-      moduleGeom::loadGeometry("../../data/CMS_GeomTree.root");
+      moduleGeom::loadGeometry(analysis_path+"../../data/CMS_GeomTree.root");
       muonTimingCalculator tofCalculator;
-      tofCalculator.loadTimeOffset("../../data/MuonTimeOffset.txt");
+      tofCalculator.loadTimeOffset(analysis_path+"../../data/MuonTimeOffset.txt");
       unsigned int CurrentRun = 0;
 
 

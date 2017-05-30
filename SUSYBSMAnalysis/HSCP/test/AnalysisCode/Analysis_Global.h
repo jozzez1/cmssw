@@ -203,7 +203,7 @@ void InitBaseDirectory(){
    // if we give no path to remote storage site, BaseDirectory is then set via hostname
    }else if(host.find("ucl.ac.be")!=std::string::npos){
       //BaseDirectory = "/storage/data/cms/users/quertenmont/HSCP/CMSSW_4_2_8/12_08_16/"; //for run1
-      BaseDirectory = "/nfs/user/quertenmont/HSCP/2015/"; //for run2
+      BaseDirectory = "/storage/data/cms/store/user/jozobec/HSCP2016/"; //for run2
    }else if(host.find("cern.ch")!=std::string::npos){
       //BaseDirectory = "rfio:/castor/cern.ch/user/r/rybinska/HSCPEDMFiles/";
       //BaseDirectory = "root://eoscms//eos/cms/store/cmst3/user/querten/12_08_30_HSCP_EDMFiles/";    //for run1
@@ -211,11 +211,11 @@ void InitBaseDirectory(){
    }else if(host.find("fnal.gov")!=std::string::npos){
      BaseDirectory = "dcache:/pnfs/cms/WAX/11/store/user/lpchscp/2012HSCPEDMFiles/"; //for run1
    }else if(host.find("ingrid-ui")!=std::string::npos){
-      BaseDirectory = "/storage/data/cms/store/user/querten/HSCP/2015/"; // run2 ingrid
+      BaseDirectory = "/storage/data/cms/store/user/jozobec/HSCP2016/"; // run2 ingrid
    }else if(host.find(".cis.gov.pl")!=std::string::npos){
       BaseDirectory = "root://se.cis.gov.pl//cms/store/user/fruboes/HSCP/15_03_25_HSCP_Run2EDMFiles/"; // run2 Swierk
    }else{
-      BaseDirectory = "dcache:/pnfs/cms/WAX/11/store/user/venkat12/2012Data/";  //for run1
+      BaseDirectory = "/storage/data/cms/store/user/jozobec/HSCP2016/";  //for run1
       printf("YOUR MACHINE (%s) IS NOT KNOWN --> please add your machine to the 'InitBaseDirectory' function of 'Analysis_Global.h'\n", host.c_str());
       printf("HOST=%s  USER=%s\n",host.c_str(), analyst.c_str());
       printf("In the mean time, the directory containing the HSCP EDM file is assumed to be %s\n",BaseDirectory.c_str());
