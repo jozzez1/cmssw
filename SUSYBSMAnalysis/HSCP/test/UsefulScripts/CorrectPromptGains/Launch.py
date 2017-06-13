@@ -5,8 +5,10 @@ import os,sys,time
 import collections # kind of map
 
 gains        = "/afs/cern.ch/cms/tracker/sistrvalidation/WWW/CalibrationValidation/ParticleGain"
-whitelist    = [272760, 273592, 274094, 274198, 274387, 274421, 275282, 275370, 275376, 276097, 276244, 276542, 276585, 276659]
-blacklist    = [273402, 273592]
+#whitelist    = [272760, 273592, 274094, 274198, 274387, 274421, 275282, 275370, 275376, 276097, 276244, 276542, 276585, 276659]
+#blacklist    = [273402, 273592]
+whitelist    = [278406, 278509, 278769, 279715, 279966, 280242, 281975, 283043, 285090, 285368]
+blacklist    = [283877, 285090, 285216]
 useWhitelist = True
 useBlacklist = False
 
@@ -58,7 +60,8 @@ def GetAvailableGains ():
     for directory in os.listdir(gains):
         if not os.path.isdir ("%s/%s" % (gains, directory)): continue
         if directory.find("run") == -1 and directory.find("Run") == -1: continue
-        if directory.find("PCL") == -1: continue
+        if directory.find("Aag") >= 0: continue
+        if directory.find("PCL") == -1 and directory.find("CalibTree") == -1: continue
         if len(os.listdir("%s/%s/plots_gain" % (gains, directory))) == 1: continue
         if not os.path.isfile("%s/%s/sqlite/Gains.root" % (gains, directory)): continue
         toManipulate = directory.split("_")
@@ -122,4 +125,5 @@ if sys.argv[1] == '1':
 if sys.argv[1] == '2':
     os.system('rm -rf Gains Data13TeVGains_v2.root')
     os.system('sh CombineGains.sh')
-    os.system('hadd -f Data13TeVGains_v2.root Gains2015.root Gains/*.root')
+    os.system('root -l -b -q ReorganizeGains.C+')
+    os.system('hadd -f Data13TeVGains_v2.root Gains/*.root')
