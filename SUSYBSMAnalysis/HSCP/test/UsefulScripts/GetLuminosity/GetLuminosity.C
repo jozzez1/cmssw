@@ -58,7 +58,7 @@ void GetLuminosity()
 
    std::vector<stRun*> RunMap;
    GetLumiBlocks_Core(inputFiles, RunMap);
-   DumpJson(RunMap, "out.json");
+   DumpJson(RunMap, "FinalBatch.json");
 
 //   std::vector<stRun*> RunMapBefRPC;
 //   RemoveRunsAfter(165970, RunMap, RunMapBefRPC);
