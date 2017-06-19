@@ -123,7 +123,7 @@ if sys.argv[1] == '1':
     WriteTXT ("gains.txt", promptGains)
 
 if sys.argv[1] == '2':
-    os.system('rm -rf Gains Data13TeVGains_v2.root')
+    os.system('rm -rf Gains')
     os.system('sh CombineGains.sh')
     os.system('root -l -b -q ReorganizeGains.C+')
-    os.system('hadd -f Data13TeVGains_v2.root Gains/*.root')
+    os.system('hadd -f Stuff.root Gains/*.root')
