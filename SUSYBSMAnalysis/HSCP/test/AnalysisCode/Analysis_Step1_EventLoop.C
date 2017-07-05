@@ -66,7 +66,6 @@ bool PassTrigger(const fwlite::ChainEvent& ev, bool isData, bool isCosmic=false,
 bool   PassPreselection(const susybsm::HSCParticle& hscp, const DeDxHitInfo* dedxHits, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, const reco::MuonTimeExtra* dttof, const reco::MuonTimeExtra* csctof, const fwlite::ChainEvent& ev, stPlots* st=NULL, const double& GenBeta=-1, bool RescaleP=false, const double& RescaleI=0.0, const double& RescaleT=0.0);
 bool PassSelection(const susybsm::HSCParticle& hscp,  const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, const fwlite::ChainEvent& ev, const int& CutIndex=0, stPlots* st=NULL, const bool isFlip=false, const double& GenBeta=-1, bool RescaleP=false, const double& RescaleI=0.0, const double& RescaleT=0.0);
 void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, stPlots* st=NULL);
-//void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, stPlots* st=NULL, double mvavalues[] = NULL); //KENJI Modify this to have MVAvals.
 double SegSep(const susybsm::HSCParticle& hscp, const fwlite::ChainEvent& ev, double& minPhi, double& minEta);
 double RescaledPt(const double& pt, const double& eta, const double& phi, const int& charge);
 int  muonStations(const reco::HitPattern& hitPattern);
@@ -142,7 +141,7 @@ void Analysis_Step1_EventLoop(string MODE="COMPILE", int TypeMode_=0, string Inp
     TypeMode       = TypeMode_;
     
     //AnalysisType dependent cuts
-    if(TypeMode<2 || TypeMode == 6){ //KENJI
+    if(TypeMode<2 || TypeMode == 6){
         GlobalMinNDOF      = 0;
         GlobalMinTOF       = 0;
     }else if(TypeMode==3){
@@ -169,12 +168,12 @@ void Analysis_Step1_EventLoop(string MODE="COMPILE", int TypeMode_=0, string Inp
     CutPt     .push_back(GlobalMinPt);   CutI       .push_back(GlobalMinIs);  CutTOF     .push_back(GlobalMinTOF);
     CutPt_Flip.push_back(GlobalMinPt);   CutI_Flip  .push_back(GlobalMinIs);  CutTOF_Flip.push_back(GlobalMinTOF);
     
-    if(TypeMode<2||TypeMode==6){ //KENJI
+    if(TypeMode<2||TypeMode==6){
         for(double Pt =GlobalMinPt+5 ; Pt <200;Pt+=5){
             for(double I  =GlobalMinIs+0.025  ; I  <0.45 ;I+=0.025){
                 CutPt .push_back(Pt);   CutI  .push_back(I);  CutTOF.push_back(-1);
             }}
-    }else if(TypeMode==2||TypeMode==7){ //KENJI
+    }else if(TypeMode==2||TypeMode==7){
         for(double Pt =GlobalMinPt+5 ; Pt <120;  Pt+=5){
             if(Pt>80 && ((int)Pt)%10!=0)continue;
             for(double I  =GlobalMinIs +0.025; I  <0.40;  I+=0.025){
@@ -368,7 +367,7 @@ bool isSemiCosmicSB = false;
 bool PassPreselection(const susybsm::HSCParticle& hscp, const DeDxHitInfo* dedxHits,  const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, const reco::MuonTimeExtra* dttof, const reco::MuonTimeExtra* csctof, const fwlite::ChainEvent& ev, stPlots* st, const double& GenBeta, bool RescaleP, const double& RescaleI, const double& RescaleT)
 {
     if(TypeMode==1 && !(hscp.type() == HSCParticleType::trackerMuon || hscp.type() == HSCParticleType::globalMuon))return false;
-    if( (TypeMode==2 || TypeMode==4 || TypeMode == 7) && hscp.type() != HSCParticleType::globalMuon)return false; //KENJI
+    if( (TypeMode==2 || TypeMode==4 || TypeMode == 7) && hscp.type() != HSCParticleType::globalMuon)return false;
     
     reco::TrackRef   track;
     reco::MuonRef muon = hscp.muonRef();
@@ -808,8 +807,8 @@ bool PassSelection(const susybsm::HSCParticle& hscp,  const reco::DeDxData* dedx
         if(GenBeta>=0)st->Beta_SelectedI->Fill(CutIndex, GenBeta, Event_Weight);
     }
     
-    if((TypeMode>1  && TypeMode!=5 && TypeMode!=6) && !isFlip && MuonTOF+RescaleT<TOFCut)return false; //KENJI
-    if((TypeMode>1  && TypeMode!=5 && TypeMode!=6) && isFlip && MuonTOF+RescaleT>TOFCut)return false;//KENJI
+    if((TypeMode>1  && TypeMode!=5 && TypeMode!=6) && !isFlip && MuonTOF+RescaleT<TOFCut)return false;
+    if((TypeMode>1  && TypeMode!=5 && TypeMode!=6) && isFlip && MuonTOF+RescaleT>TOFCut)return false;
     
     if(st){st->TOF  ->Fill(CutIndex,Event_Weight);
         if(GenBeta>=0)st->Beta_SelectedT->Fill(CutIndex, GenBeta, Event_Weight);
@@ -834,7 +833,7 @@ bool PassSelection(const susybsm::HSCParticle& hscp,  const reco::DeDxData* dedx
 
 
 // all code for the filling of the ABCD related histograms --> this information will be used later in Step4 for the actual datadriven prediction
-void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, stPlots* st){ //KENJI
+void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, const reco::DeDxData* dedxSObj, const reco::DeDxData* dedxMObj, const reco::MuonTimeExtra* tof, stPlots* st){
     
     //cout << "Entered Fill Control and Prediction Func" << endl;
     
@@ -933,18 +932,16 @@ void Analysis_FillControlAndPredictionHist(const susybsm::HSCParticle& hscp, con
         }
     }
     
-    //cout << "Entering CutIndex Loop" << endl;
-    //cout << "Cutindex size = " << CutPt.size() << endl;
-    //////KENJI///////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////
     for(unsigned int CutIndex=0;CutIndex<CutPt.size();CutIndex++){
         if(MuonTOF<GlobalMinTOF) continue;
         if(TypeMode==5 && isCosmicSB)continue;
         bool PassPtCut  = track->pt()>=CutPt[CutIndex];
         bool PassICut   = (Is>=CutI[CutIndex]);
         bool PassTOFCut = MuonTOF>=CutTOF[CutIndex];
-        //cout << CutIndex << " done getting bools: Pt " << PassPtCut << " I " << PassICut << " TOF: " << PassTOFCut << endl;
+        
         if(       PassTOFCut &&  PassPtCut &&  PassICut){   //Region D
-            //cout << "RegionD" << endl;
             st->H_D      ->Fill(CutIndex,                Event_Weight);
             if(bin>-1 && bin<MaxPredBins) st->H_D_Binned[bin]->Fill(CutIndex,                Event_Weight);
             st->RegionD_P  ->Fill(CutIndex,track->p(),     Event_Weight);
@@ -1073,10 +1070,11 @@ void Analysis_Step1_EventLoop(char* SavePath)
     //Initialize histo common to all samples
     InitHistos(NULL);
     
-    //Initialize the MVA readers //KENJI
-    
-    //KENJI //////////////// ADD MVAs
-    //vector<bool> ReaderExists;
+    //Initialize the MVA readers //
+    //Must be in the same order that was used
+    //in creating the weight files
+    /////////////////////////////////////////
+   
     for( int iReader = 0; iReader < 6; iReader++){
         if(TypeMode == 6){
             ReaderExists[iReader] = MVAWeightexists(MVAtype6class[iReader]);
@@ -1110,9 +1108,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
     ReadMLPPPStauType7 mvaPPStauType7(names2);
     ReadMLPDYQ3Type7 mvaDYQ3Type7(names2);
     ReadMLPDYQ6Type7 mvaDYQ6Type7(names2);
-    
-    
-    
+     
     ////////////////////////////////////////////
     
     for(unsigned int s=0;s<samples.size();s++){
@@ -1193,7 +1189,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
         double* MaxMass_SystHUp   = new double[CutPt.size()];
         double* MaxMass_SystHDown = new double[CutPt.size()];
         
-        //KENJI///////////////////
+        //MVAcode///////////////////
         const int Cutsize = CutPt.size();
         double MaxMVA[Cutsize][6];
         /////////////////////////
@@ -1399,7 +1395,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                     if(track.isNull())continue;
                     
                     //require a track segment in the muon system
-                    if(TypeMode>1 && TypeMode!=5 && TypeMode!=6 && (muon.isNull() || !muon->isStandAloneMuon()))continue; //KENJI
+                    if(TypeMode>1 && TypeMode!=5 && TypeMode!=6 && (muon.isNull() || !muon->isStandAloneMuon()))continue;
                     
                     //Apply a scale factor to muon only analysis to account for differences seen in data/MC preselection efficiency
                     //For eta regions where Data > MC no correction to be conservative
@@ -1421,7 +1417,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                     const reco::MuonTimeExtra* tof = NULL;
                     const reco::MuonTimeExtra* dttof = NULL;
                     const reco::MuonTimeExtra* csctof = NULL;
-                    if(TypeMode>1 && TypeMode!=5 && TypeMode!=6 && !hscp.muonRef().isNull()){ //KENJI
+                    if(TypeMode>1 && TypeMode!=5 && TypeMode!=6 && !hscp.muonRef().isNull()){
                         if(isMC){
                             tof  = &TOFCollH->get(hscp.muonRef().key()); dttof = &TOFDTCollH->get(hscp.muonRef().key());  csctof = &TOFCSCCollH->get(hscp.muonRef().key());
                         }else{
@@ -1489,7 +1485,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                          }
                          */
                         
-                        ////KENJI///////////
+                        ////MVAcode///////////
                         vector<double> mvaValsyst;
                         mvaValsyst.resize(6,-1.0);
                         
@@ -1514,7 +1510,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                                     HSCPTk_SystP[CutIndex] = true;
                                     if(Mass>MaxMass_SystP[CutIndex]) MaxMass_SystP[CutIndex]=Mass;
                                     SamplePlots->Mass_SystP->Fill(CutIndex, Mass,Event_Weight);
-                                    //KENJI Add MVA //////////////
+                                    //Add MVA //////////////
                                     if(TypeMode == 6){
                                         mvainput.resize(3);
                                         mvainput[0] = track->p()*PRescale;
@@ -1573,7 +1569,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                             if(tof && dedxMObj)MassComb=GetMassFromBeta(track->p(), (GetIBeta(dedxMObj->dEdx(),!isData) + (1/tof->inverseBeta()))*0.5);
                             else if(dedxMObj) MassComb = Mass;
                             if(tof) MassComb=MassTOF;
-                            //KENJI/////////////////////////////////
+                            //MVAcode/////////////////////////////////
                             mvainput.clear();
                             mvaValsyst.clear();
                             mvaValsyst.resize(6,-1.0);
@@ -1583,7 +1579,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                                     HSCPTk_SystI[CutIndex] = true;
                                     if(Mass>MaxMass_SystI[CutIndex]) MaxMass_SystI[CutIndex]=Mass;
                                     SamplePlots->Mass_SystI->Fill(CutIndex, Mass,Event_Weight);
-                                    //KENJI/////////////////////////////////
+                                    //MVAcode/////////////////////////////////
                                     if(TypeMode == 6){
                                         mvainput.resize(3);
                                         mvainput[0] = track->p();
@@ -1675,7 +1671,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                                     HSCPTk_SystT[CutIndex] = true;
                                     if(Mass>MaxMass_SystT[CutIndex]) MaxMass_SystT[CutIndex]=Mass;
                                     SamplePlots->Mass_SystT->Fill(CutIndex, Mass,Event_Weight);
-                                    //KENJI //////////////////////////////////////////////////////
+                                    //MVA code //////////////////////////////////////////////////////
                                     
                                     if(TypeMode == 7){
                                         mvainput.resize(4);
@@ -1722,7 +1718,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                                     HSCPTk_SystPU[CutIndex] = true;
                                     if(Mass>MaxMass_SystPU[CutIndex]) MaxMass_SystPU[CutIndex]=Mass;
                                     SamplePlots->Mass_SystPU->Fill(CutIndex, Mass,Event_Weight*PUSystFactor);
-                                    //KENJI/////////////////////////////////
+                                    //MVA code/////////////////////////////////
                                     if(TypeMode == 6){
                                         mvainput.resize(3);
                                         mvainput[0] = track->p();
@@ -1773,7 +1769,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                                 }
                             }
                         }
-                        //KENJI ///////////////////////////////////////////////////////////
+                        /////////////////////////////////////////////////////////////
                         //compute systematics due to combined effects in the MVA inputs
                         if(PassPreselection( hscp,  dedxHits, dedxSObj, dedxMObj, tof, dttof, csctof, ev,  NULL, -1,   0, 0, 0)){
                             if(TypeMode==5 && isSemiCosmicSB)continue;
@@ -1841,7 +1837,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                     
                     //cout << "calculating MVA values for HSCP candidate" << endl;
                     //fill the ABCD histograms and a few other control plots
-                    ////KENJI /////////////////////////////////////
+                    /////////////////////////////////////////
                     // assign the non systematic MVA values for the HSCP candidate //////////
                     vector<double> mvainput;
                     double mva_value[6] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
@@ -1886,7 +1882,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                     }
                     //cout << "Done with MVA calc" << endl;
                     /////////////////////////////////////
-                    //KENJI
+                    //
                     //cout << "Filling ABCD histos and control plots" << endl;
                     //fill the ABCD histograms and a few other control plots
                   
@@ -1959,7 +1955,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                         if(MassUp>MaxMass_SystHUp[CutIndex]) MaxMass_SystHUp[CutIndex]=Mass;
                         if(MassDown>MaxMass_SystHDown[CutIndex]) MaxMass_SystHDown[CutIndex]=Mass;
                         
-                        //Kenji /////////////////////////////////////
+                        //MVAcode /////////////////////////////////////
                         //Fill the MVA histograms
                         for( int ihist = 0; ihist < 6; ihist++){
                             if(ReaderExists[ihist]){
@@ -1991,7 +1987,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                         SamplePlots->MassComb_SystHUp  ->Fill(CutIndex, MassUpComb, Event_Weight);
                         SamplePlots->MassComb_SystHDown->Fill(CutIndex, MassDownComb, Event_Weight);
                         
-                        //KENJI/////////////////////////
+                        //MVAcode/////////////////////////
                         vector<double> mvainputHup;
                         vector<double> mvainputHdown;
                         double mva_valueHup[6] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
@@ -2100,7 +2096,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                         
                     } //end of Cut loop
                     //std::cout << "PassNonTrivialSelection = " << PassNonTrivialSelection << std::endl;
-                    //FILL HSCP Candidate Tree ///KENJI
+                    //FILL HSCP Candidate Tree
                     //cout << "done with CutIndex loop" << endl;
                     
                     if(PassNonTrivialSelection){
@@ -2115,7 +2111,7 @@ void Analysis_Step1_EventLoop(char* SavePath)
                     if(HSCPTk[CutIndex]){
                         SamplePlots->HSCPE             ->Fill(CutIndex,Event_Weight);
                         SamplePlots->MaxEventMass      ->Fill(CutIndex,MaxMass[CutIndex], Event_Weight);
-                        /////Kenji///////////////
+                        /////MVA code///////////////
                         for( int ihist = 0; ihist < 6; ihist++){
                             if( ReaderExists[ihist]){
                                 SamplePlots->MVA_Max[ihist] ->Fill(CutIndex,MaxMVA[CutIndex][ihist], Event_Weight);
