@@ -22,8 +22,30 @@ struct stPlots {
    float        Tree_dR;
    float        Tree_eta;
    float        Tree_phi;
-
-
+    ///KENJI /////////////////
+    float        Tree_etaErr;
+    float        Tree_Ih;
+    float        Tree_P;
+    int          Tree_charge;
+    float        Tree_GluinoMVA;
+    float        Tree_StopMVA;
+    float        Tree_GMSBStauMVA;
+    float        Tree_PPStauMVA;
+    float        Tree_DYQ3MVA;
+    float        Tree_DYQ6MVA;
+    //////////////////////////
+    //KENJI
+    TH2F* MVA[6];
+    TH2F* MVA_SystP[6];
+    TH2F* MVA_SystI[6];
+    TH2F* MVA_SystT[6];
+    TH2F* MVA_SystPU[6];
+    TH2F* MVA_SystHUp[6];
+    TH2F* MVA_SystHDown[6];
+    TH2F* MVA_SystComb[6];
+    
+    TH2F* MVA_Max[6];
+    /////////////////////////////////////////
 
    TH2F*  Mass;
    TH2F*  MassTOF;
@@ -258,6 +280,13 @@ struct stPlots {
   TH1D*  Hist_Is  ;
   TH1D*  Hist_TOF;
 
+    //KENJI/////////////
+    TH3D* Pred_MVAP;
+    
+    TH3D* Pred_EtaI;
+    TH3D* Pred_EtaTOF;
+    ////////////////////
+    
   TH3D*  Pred_EtaP ;
   TH2D*  Pred_I    ;
   TH2D*  Pred_TOF  ;
@@ -391,6 +420,54 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    Name = "HSCPE_SystHUp";    st.HSCPE_SystHUp  = new TH1F(Name.c_str(), Name.c_str(),  NCuts, 0,  NCuts);    st.HSCPE_SystHUp    ->Sumw2();
    Name = "HSCPE_SystHDown";    st.HSCPE_SystHDown  = new TH1F(Name.c_str(), Name.c_str(),  NCuts, 0,  NCuts);    st.HSCPE_SystHDown    ->Sumw2();
 
+    //KENJI ////////////////
+    string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"};
+    string MVAhistname_systP[6] = {"GlunioMVA_SystP","StopMVA_SystP","GMSBStauMVA_SystP","PPStauMVA_SystP","DYQ3MVA_SystP","DYQ6MVA_SystP"};
+    string MVAhistname_systI[6] = {"GlunioMVA_SystI","StopMVA_SystI","GMSBStauMVA_SystI","PPStauMVA_SystI","DYQ3MVA_SystI","DYQ6MVA_SystI"};
+    string MVAhistname_systT[6] = {"GlunioMVA_SystT","StopMVA_SystT","GMSBStauMVA_SystT","PPStauMVA_SystT","DYQ3MVA_SystT","DYQ6MVA_SystT"};
+    string MVAhistname_systPU[6] = {"GlunioMVA_SystPU","StopMVA_SystPU","GMSBStauMVA_SystPU","PPStauMVA_SystPU","DYQ3MVA_SystPU","DYQ6MVA_SystPU"};
+    string MVAhistname_systHUp[6] = {"GlunioMVA_SystHUp","StopMVA_SystHUp","GMSBStauMVA_SystHUp","PPStauMVA_SystHUp","DYQ3MVA_SystHUp","DYQ6MVA_SystHUp"};
+    string MVAhistname_systHDown[6] = {"GlunioMVA_SystHDown","StopMVA_SystHDown","GMSBStauMVA_SystHDown","PPStauMVA_SystHDown","DYQ3MVA_SystHDown","DYQ6MVA_SystHDown"};
+    string MVAhistname_systComb[6] = {"GlunioMVA_SystComb","StopMVA_SystComb","GMSBStauMVA_SystComb","PPStauMVA_SystComb","DYQ3MVA_SystComb","DYQ6MVA_SystComb"};
+    
+    for(int ihist = 0; ihist < 6; ihist++){
+        Name = MVAhistname[ihist];
+        st.MVA[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA[ihist]->Sumw2();
+        
+        Name = MVAhistname_systP[ihist];
+        st.MVA_SystP[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystP[ihist]->Sumw2();
+        
+        Name = MVAhistname_systI[ihist];
+        st.MVA_SystI[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystI[ihist]->Sumw2();
+        
+        Name = MVAhistname_systT[ihist];
+        st.MVA_SystT[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystT[ihist]->Sumw2();
+        
+        Name = MVAhistname_systPU[ihist];
+        st.MVA_SystPU[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystPU[ihist]->Sumw2();
+        
+        Name = MVAhistname_systHUp[ihist];
+        st.MVA_SystHUp[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystHUp[ihist]->Sumw2();
+        
+        Name = MVAhistname_systHDown[ihist];
+        st.MVA_SystHDown[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystHDown[ihist]->Sumw2();
+        
+        Name = MVAhistname_systComb[ihist];
+        st.MVA_SystComb[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+        st.MVA_SystComb[ihist]->Sumw2();
+        
+        Name = MVAhistname[ihist]+"Max";
+        st.MVA_Max[ihist] = new TH2F(Name.c_str(), Name.c_str(), NCuts, 0, NCuts, MVANBins, 0, MVAHistoUpperBound );
+    }
+    /////////////////////////////////////////////
+    
    Name = "Mass";     st.Mass     = new TH2F(Name.c_str(), Name.c_str(),NCuts,0,NCuts, MassNBins, 0, MassHistoUpperBound);   st.Mass    ->Sumw2();
    Name = "MassTOF";  st.MassTOF  = new TH2F(Name.c_str(), Name.c_str(),NCuts,0,NCuts, MassNBins, 0, MassHistoUpperBound);   st.MassTOF ->Sumw2();
    Name = "MassComb"; st.MassComb = new TH2F(Name.c_str(), Name.c_str(),NCuts,0,NCuts, MassNBins, 0, MassHistoUpperBound);   st.MassComb->Sumw2();
@@ -618,13 +695,21 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    Name = "Hist_Pt"; st.Hist_Pt = new TH1D(Name.c_str(), Name.c_str() ,200,0,PtHistoUpperBound); st.Hist_Pt->Sumw2();
    Name = "Hist_TOF"; st.Hist_TOF = new TH1D(Name.c_str(), Name.c_str() ,200,-10,20); st.Hist_TOF->Sumw2();
    //The following are only used to create the predicted mass spectrum.  Memory intensive so don't initialize for analyses not doing mass fits
-   if(TypeMode<3) {
+   if(TypeMode<3||TypeMode > 5) { //KENJI
      Name = "Pred_I"; st.Pred_I = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 400,0,dEdxM_UpLim); st.Pred_I->Sumw2();
      Name = "Pred_EtaB"; st.Pred_EtaB = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60,-3,3); st.Pred_EtaB->Sumw2();
      Name = "Pred_EtaS"; st.Pred_EtaS = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60,-3,3); st.Pred_EtaS->Sumw2();
      Name = "Pred_EtaS2"; st.Pred_EtaS2 = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60,-3,3); st.Pred_EtaS2->Sumw2();
      Name = "Pred_EtaP"; st.Pred_EtaP = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 200,GlobalMinPt,PtHistoUpperBound); st.Pred_EtaP->Sumw2();
      Name = "Pred_TOF"; st.Pred_TOF = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts,   200,GlobalMinTOF,5); st.Pred_TOF->Sumw2();
+       
+       ////KENJI ////////////////
+       
+       Name = "Pred_EtaI"; st.Pred_EtaI = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 400,0,dEdxM_UpLim); st.Pred_EtaI->Sumw2();
+       Name = "Pred_EtaTOF"; st.Pred_EtaTOF = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 200,GlobalMinTOF,5); st.Pred_EtaTOF->Sumw2();
+       
+       
+       ///////////////////////////
    }
 
    Name = "RegionD_I"; st.RegionD_I = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 400,0,dEdxM_UpLim); st.RegionD_I->Sumw2();
@@ -653,7 +738,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    }
 
    //The following are only used to create the predicted mass spectrum.  Memory intensive so don't initialize for analyses not doing mass fits
-   if(TypeMode<3) {
+    if(TypeMode<3||TypeMode > 5) { //KENJI
      Name = "Pred_I_Flip"; st.Pred_I_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 400,0,dEdxM_UpLim); st.Pred_I_Flip->Sumw2();
      Name = "Pred_EtaB_Flip"; st.Pred_EtaB_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 50,-3,3); st.Pred_EtaB_Flip->Sumw2();
      Name = "Pred_EtaS_Flip"; st.Pred_EtaS_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 50,-3,3); st.Pred_EtaS_Flip->Sumw2();
@@ -719,6 +804,18 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    st.Tree->Branch("eta"     ,&st.Tree_eta       ,"eta/F");
    st.Tree->Branch("phi"     ,&st.Tree_phi       ,"phi/F");
 
+    //KENJI //////////////////
+    st.Tree->Branch("etaErr"  ,&st.Tree_etaErr     ,"etaErr/F");
+    st.Tree->Branch("Ih"      ,&st.Tree_Ih        ,"Ih/F");
+    st.Tree->Branch("P"       ,&st.Tree_P         ,"P/F");
+    st.Tree->Branch("charge"  ,&st.Tree_charge    ,"charge/I");
+    st.Tree->Branch("GluinoMVA",&st.Tree_GluinoMVA,"GluinoMVA/F");
+    st.Tree->Branch("StopMVA" ,&st.Tree_StopMVA   ,"StopMVA/F");
+    st.Tree->Branch("GMSBStauMVA",&st.Tree_GMSBStauMVA,"GMSBStauMVA/F");
+    st.Tree->Branch("PPStauMVA",&st.Tree_PPStauMVA,"PPStauMVA/F");
+    st.Tree->Branch("DYQ3MVA" ,&st.Tree_DYQ3MVA   ,"DYQ3MVA/F");
+    st.Tree->Branch("DYQ6MVA" ,&st.Tree_DYQ6MVA   ,"DYQ6MVA/F");
+    //////////////////
 
    HistoFile->cd();
 }
@@ -773,6 +870,28 @@ bool stPlots_InitFromFile(TFile* HistoFile, stPlots& st, std::string BaseName)
    st.HSCPE_SystHUp     = (TH1F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/HSCPE_SystHUp");
    st.HSCPE_SystHDown   = (TH1F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/HSCPE_SystHDown");
 
+    ////////////KENJI
+    string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"};
+    string MVAhistname_systP[6] = {"GlunioMVA_SystP","StopMVA_SystP","GMSBStauMVA_SystP","PPStauMVA_SystP","DYQ3MVA_SystP","DYQ6MVA_SystP"};
+    string MVAhistname_systI[6] = {"GlunioMVA_SystI","StopMVA_SystI","GMSBStauMVA_SystI","PPStauMVA_SystI","DYQ3MVA_SystI","DYQ6MVA_SystI"};
+    string MVAhistname_systT[6] = {"GlunioMVA_SystT","StopMVA_SystT","GMSBStauMVA_SystT","PPStauMVA_SystT","DYQ3MVA_SystT","DYQ6MVA_SystT"};
+    string MVAhistname_systPU[6] = {"GlunioMVA_SystPU","StopMVA_SystPU","GMSBStauMVA_SystPU","PPStauMVA_SystPU","DYQ3MVA_SystPU","DYQ6MVA_SystPU"};
+    string MVAhistname_systHUp[6] = {"GlunioMVA_SystHUp","StopMVA_SystHUp","GMSBStauMVA_SystHUp","PPStauMVA_SystHUp","DYQ3MVA_SystHUp","DYQ6MVA_SystHUp"};
+    string MVAhistname_systHDown[6] = {"GlunioMVA_SystHDown","StopMVA_SystHDown","GMSBStauMVA_SystHDown","PPStauMVA_SystHDown","DYQ3MVA_SystHDown","DYQ6MVA_SystHDown"};
+    string MVAhistname_systComb[6] = {"GlunioMVA_SystComb","StopMVA_SystComb","GMSBStauMVA_SystComb","PPStauMVA_SystComb","DYQ3MVA_SystComb","DYQ6MVA_SystComb"};
+    for( int ihist = 0; ihist < 6; ihist++){
+        st.MVA[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname[ihist]);
+        st.MVA_SystP[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systP[ihist]);
+        st.MVA_SystI[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systI[ihist]);
+        st.MVA_SystT[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systT[ihist]);
+        st.MVA_SystPU[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systPU[ihist]);
+        st.MVA_SystHUp[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systHUp[ihist]);
+        st.MVA_SystHDown[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systHDown[ihist]);
+        st.MVA_SystComb[ihist] = (TH2F*)GetObjectFromPath(st.Directory, HistoFile, BaseName + "/" + MVAhistname_systComb[ihist]);
+        st.MVA_Max[ihist] = (TH2F*)GetObjectFromPath(st.Directory,HistoFile,BaseName+"/"+MVAhistname[ihist]+"Max");
+    }
+    //////////////
+    
    st.Mass              = (TH2F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/Mass");
    st.MassTOF           = (TH2F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/MassTOF");
    st.MassComb          = (TH2F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/MassComb");
@@ -967,7 +1086,7 @@ void stPlots_Clear(stPlots* st, bool WriteFirst=false)
 }
 
 // add one candidate to the bookeeping tree --> the event must be saved in the tree if you want to find it back with the DumpInfo.C code later on
-void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigned int Hscp, double Pt, double I, double TOF, double Mass, double dZ, double dXY, double dR, double eta, double phi, int MaxEntry=20000){
+void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigned int Hscp, double Pt, double I, double TOF, double Mass, double dZ, double dXY, double dR, double eta, double phi, double dedx, double P, int charge, double etaErr, double Gluino_mva, double Stop_mva, double GMSBStau_mva, double PPStau_mva, double DYQ3_mva, double DYQ6_mva, int MaxEntry=20000){ //KENJI
    if(MaxEntry>0 && st->Tree->GetEntries()>=MaxEntry)return;
    st->Tree_Run   = Run;
    st->Tree_Event = Event;
@@ -981,6 +1100,18 @@ void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigne
    st->Tree_dR    = dR;
    st->Tree_eta    = eta;
    st->Tree_phi    = phi;
+    //KENJI ////////////////////
+    st->Tree_etaErr = etaErr;
+    st->Tree_Ih     = dedx;
+    st->Tree_P      = P;
+    st->Tree_charge = charge;
+    st->Tree_GluinoMVA = Gluino_mva;
+    st->Tree_StopMVA = Stop_mva;
+    st->Tree_GMSBStauMVA = GMSBStau_mva;
+    st->Tree_PPStauMVA = PPStau_mva;
+    st->Tree_DYQ3MVA = DYQ3_mva;
+    st->Tree_DYQ6MVA = DYQ6_mva;
+    /////////////////////////
    st->Tree->Fill();
 }
 
@@ -1682,7 +1813,8 @@ void stPlots_DrawComparison(std::string SavePath, std::string LegendTitle, unsig
          Histos[3] = (TH1*)st[i]->Beta_PreselectedC;                                         legend.push_back("Preselected");
          Histos[4] = (TH1*)st[i]->Beta_SelectedP->ProjectionY("A",CutIndex_+1,CutIndex_+1);    legend.push_back("p_{T}>Cut");
          Histos[5] = (TH1*)st[i]->Beta_SelectedI->ProjectionY("B",CutIndex_+1,CutIndex_+1);    legend.push_back("I  >Cut");
-         if(!(TypeMode==0 || TypeMode==5)){Histos[6] = (TH1*)st[i]->Beta_SelectedT->ProjectionY("C",CutIndex_+1,CutIndex_+1);    legend.push_back("ToF>Cut");}
+          //KENJI
+         if(!(TypeMode==0 || TypeMode==5 || TypeMode==6)){Histos[6] = (TH1*)st[i]->Beta_SelectedT->ProjectionY("C",CutIndex_+1,CutIndex_+1);    legend.push_back("ToF>Cut");}
          DrawSuperposedHistos((TH1**)Histos, legend,"HIST E1",  "#beta", "# HSCP", 0,0, -10, -10);
          DrawLegend((TObject**)Histos,legend,"","P", 0.65, 0.88, 0.20, 0.025);
          c1->SetLogy(true);

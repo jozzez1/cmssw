@@ -18,17 +18,21 @@ std::string ReplacePartOfString (std::string s, std::string a, std::string b){
    return toReturn;
 }
 
-// return the TypeMode from a string inputPattern
+//KENJI
 int TypeFromPattern(const std::string& InputPattern){
-   if(InputPattern.find("Type0",0)<std::string::npos){       return 0;
-   }else if(InputPattern.find("Type1",0)<std::string::npos){ return 1;
-   }else if(InputPattern.find("Type2",0)<std::string::npos){ return 2;
-   }else if(InputPattern.find("Type3",0)<std::string::npos){ return 3;
-   }else if(InputPattern.find("Type4",0)<std::string::npos){ return 4;
-   }else if(InputPattern.find("Type5",0)<std::string::npos){ return 5;
-   }else{                                                    return 6;
-   }
+  if(InputPattern.find("Type0",0)<std::string::npos){       return 0;
+  }else if(InputPattern.find("Type1",0)<std::string::npos){ return 1;
+  }else if(InputPattern.find("Type2",0)<std::string::npos){ return 2;
+  }else if(InputPattern.find("Type3",0)<std::string::npos){ return 3;
+  }else if(InputPattern.find("Type4",0)<std::string::npos){ return 4;
+  }else if(InputPattern.find("Type5",0)<std::string::npos){ return 5;
+  }else if(InputPattern.find("Type6",0)<std::string::npos){ return 6;
+  }else if(InputPattern.find("Type7",0)<std::string::npos){ return 7;
+  }else{                                                    return 8;
+  }
+
 }
+
 
 // define the legend corresponding to a Type
 std::string LegendFromType(const std::string& InputPattern){
@@ -39,6 +43,9 @@ std::string LegendFromType(const std::string& InputPattern){
       case 3:  return std::string("Muon - Only"); break;
       case 4:  return std::string("|Q|>1e"); break;
       case 5:  return std::string("|Q|<1e"); break;
+       case 6: return std::string("Tracker - Only MVA"); break;
+       case 7:  return std::string("Tracker + TOF MVA" ); break;
+
       default : std::string("unknown");
    }
    return std::string("unknown");
@@ -1443,4 +1450,11 @@ void printClusterCleaningMessage (uint8_t exitCode){
       default: std::cout << "Unknown exit code!"<< std::endl;
    }
 }
+
+//KENJI
+bool MVAWeightexists(const std::string& name) {
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
+}
+
 #endif

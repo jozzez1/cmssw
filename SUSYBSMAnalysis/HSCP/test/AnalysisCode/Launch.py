@@ -13,12 +13,12 @@ LaunchOnCondor.Jobs_InitCmds       = ['ulimit -c 0;']  #disable production of co
 LaunchOnCondor.Jobs_Queue = '8nh'
 
 UseRemoteSamples          = True
-RemoteStorageDir          = '/storage/data/cms/store/user/jozobec/HSCP2016/'
-RemoteServer              = 'ingrid-se03.cism.ucl.ac.be'
+RemoteStorageDir          = '/store/user/lpchscp/noreplica/'
+RemoteServer              = 'cmseos.fnal.gov'
 #RemoteStorageDir          = '/store/group/phys_exotica/hscp/'
 
 #the vector below contains the "TypeMode" of the analyses that should be run
-AnalysesToRun = [0,2]#,4]#,3,5]
+AnalysesToRun = [6,7]#,4]#,3,5]
 
 CMSSW_74X_VERSION = '7_4_14'
 base80X = os.environ['CMSSW_BASE']
@@ -66,8 +66,8 @@ def initProxy():
 
 
 if sys.argv[1]=='1':	
-        if UseRemoteSamples:
-           initProxy()
+        #if UseRemoteSamples:
+        #      initProxy()
         print 'ANALYSIS'
         FarmDirectory = "FARM"
         JobName = "HscpAnalysis"
@@ -81,19 +81,19 @@ if sys.argv[1]=='1':
            vals=line.split(',')
            if((vals[0].replace('"','')) in CMSSW_VERSION):
               for Type in AnalysesToRun:
-                 if(UseRemoteSamples and int(vals[1])==0 and vals[3].find('2016') != -1):
-                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/x509_user_proxy/x509_proxy; voms-proxy-init --noregen;', 'export REMOTESTORAGESERVER='+RemoteServer, 'export REMOTESTORAGEPATH='+RemoteStorageDir.replace('/storage/data/cms/store/', '/store/')]
+                 if(UseRemoteSamples):
+                    LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0', 'export HOME=%s' % os.environ['HOME'], 'export X509_USER_PROXY=$HOME/myproxy; voms-proxy-info --all --chain;', 'export REMOTESTORAGESERVER='+RemoteServer, 'export REMOTESTORAGEPATH='+RemoteStorageDir]
                  else: LaunchOnCondor.Jobs_InitCmds = ['ulimit -c 0']
                  if(int(vals[1])>=2 and skipSamples(Type, vals[2])==True):continue
-#                 if(int(vals[1])==0):continue
                  LaunchOnCondor.SendCluster_Push(["FWLITE", os.getcwd()+"/Analysis_Step1_EventLoop.C", '"ANALYSE_'+str(index)+'_to_'+str(index)+'"'  , Type, vals[2].rstrip() ])
         f.close()
-#        LaunchOnCondor.SendCluster_Submit()
+        LaunchOnCondor.SendCluster_Submit()
 
 elif sys.argv[1]=='2':
         print 'MERGING FILE AND PREDICTING BACKGROUNDS'  
         FarmDirectory = "FARM"
         JobName = "HscpPred"
+        LaunchOnCondor.Jobs_Queue   = '2nd'
         LaunchOnCondor.Jobs_RunHere = 1
         LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
         for Type in AnalysesToRun:
@@ -135,7 +135,7 @@ elif sys.argv[1]=='4':
         print 'LIMIT COMPUTATION (ONLY)'
         FarmDirectory = "FARM"
         JobName = "HscpLimits"
-        LaunchOnCondor.Jobs_Queue   = '8nh'
+        LaunchOnCondor.Jobs_Queue   = '1nh'
         LaunchOnCondor.Jobs_RunHere = 1
         LaunchOnCondor.SendCluster_Create(FarmDirectory, JobName)
 

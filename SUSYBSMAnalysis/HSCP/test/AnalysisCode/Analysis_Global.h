@@ -33,6 +33,29 @@
 #include "TRandom3.h"
 #include "TTree.h"
 
+//KENJI /////////////
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodCuts.h"
+
+#include <ctime>
+
+#include "weights/GluinoMVAmapping_type6.class.C"
+#include "weights/StopMVAmapping_type6.class.C"
+#include "weights/GMSBStauMVAmapping_type6.class.C"
+#include "weights/PPStauMVAmapping_type6.class.C"
+#include "weights/DYQ3MVAmapping_type6.class.C"
+#include "weights/DYQ6MVAmapping_type6.class.C"
+
+#include "weights/GluinoMVAmapping_type7.class.C"
+#include "weights/StopMVAmapping_type7.class.C"
+#include "weights/GMSBStauMVAmapping_type7.class.C"
+#include "weights/PPStauMVAmapping_type7.class.C"
+#include "weights/DYQ3MVAmapping_type7.class.C"
+#include "weights/DYQ6MVAmapping_type7.class.C"
+
+///////////////////
+
 //double IntegratedLuminosity13TeV               = 72.63; //pb
 //double IntegratedLuminosity13TeV               = 84.557; //pb
 double IntegratedLuminosity13TeV15             = 2490.518; //2439.264; //pb
@@ -81,6 +104,11 @@ double             PtHistoUpperBound   = 1200;
 double             MassHistoUpperBound = 3000;
 int                MassNBins           = 300;
 double             IPbound             = 1.0;
+
+// binning for MVA distributions ///KENJI //////
+double MVAHistoUpperBound = 2.0;
+int MVANBins = 400;
+//////////////////////////////////////////
 
 // Thresholds for candidate preselection --> note that some of the followings can be replaced at the beginning of Analysis_Step1_EventLoop function
 double             GlobalMaxEta       =   2.1;    // cut on inner tracker track eta
@@ -164,6 +192,33 @@ double             minSegEtaSep    =  0.1;   //Minimum eta separation between SA
 const int          DzRegions       =  6;     //Number of different Dz side regions used to make cosmic background prediction
 int                minMuStations   =  2;
 
+///KENJI/////////////////////////////////
+// Location of the various MVA mappings
+// NOTE: DO NOT change the order of the MVAs. Analysis Global, Step1, and PlotStructure all have the order set as:
+// [0] = Gluino, [1] = Stop, [2] = GMSBStau, [3] = PPStau, [4] = Q3, [5] = Q6.
+// This is all hard coded in for now but could be rewritten later to be more flexible.
+
+//Tracker only w/MVA  //KENJI
+string MVAtype6[6] ={"weights/GluinoMVAmapping_type6.xml", "weights/StopMVAmapping_type6.xml","weights/GMSBStauMVAmapping_type6.xml","weights/PPStauMVAmapping_type6.xml","weights/DYQ3MVAmapping_type6.xml","weights/DYQ6MVAmapping_type6.xml"};
+
+//Tracker+TOF w/MVA //KENJI
+string MVAtype7[6] ={"weights/GluinoMVAmapping_type7.xml", "weights/StopMVAmapping_type7.xml","weights/GMSBStauMVAmapping_type7.xml","weights/PPStauMVAmapping_type7.xml","weights/DYQ3MVAmapping_type7.xml","weights/DYQ6MVAmapping_type7.xml"};
+
+
+//need to add these ass headers
+//Tracker only w/MVA  //KENJI
+string MVAtype6class[6] ={"weights/GluinoMVAmapping_type6.class.C", "weights/StopMVAmapping_type6.class.C","weights/GMSBStauMVAmapping_type6.class.C","weights/PPStauMVAmapping_type6.class.C","weights/DYQ3MVAmapping_type6.class.C","weights/DYQ6MVAmapping_type6.class.C"};
+
+//Tracker+TOF w/MVA //KENJI
+string MVAtype7class[6] ={"weights/GluinoMVAmapping_type7.class.C", "weights/StopMVAmapping_type7.class.C","weights/GMSBStauMVAmapping_type7.class.C","weights/PPStauMVAmapping_type7.class.C","weights/DYQ3MVAmapping_type7.class.C","weights/DYQ6MVAmapping_type7.class.C"};
+
+vector<string> mvanames = {"mvaGluino", "mvaStop", "mvaGMSBStau", "mvaPPStau","mvaDYQ3","mvaDYQ6"};
+
+int Nmva = mvanames.size();
+
+bool ReaderExists[6] = {false,false,false,false,false,false};
+//////////////////////////////////////////////////////////////
+
 
 //for initializing PileupReweighting utility.
 const   float TrueDist2012_f[100] = {6.53749e-07 ,1.73877e-06 ,4.7972e-06 ,1.57721e-05 ,2.97761e-05 ,0.000162201 ,0.000931952 ,0.00272619 ,0.0063166 ,0.0128901 ,0.0229009 ,0.0355021 ,0.045888 ,0.051916 ,0.0555598 ,0.0580188 ,0.059286 ,0.0596022 ,0.059318 ,0.0584214 ,0.0570249 ,0.0553875 ,0.0535731 ,0.0512788 ,0.0480472 ,0.0436582 ,0.0382936 ,0.0323507 ,0.0262419 ,0.0203719 ,0.0151159 ,0.0107239 ,0.00727108 ,0.00470101 ,0.00288906 ,0.00168398 ,0.000931041 ,0.000489695 ,0.000246416 ,0.00011959 ,5.65558e-05 ,2.63977e-05 ,1.23499e-05 ,5.89242e-06 ,2.91502e-06 ,1.51247e-06 ,8.25545e-07 ,4.71584e-07 ,2.79203e-07 ,1.69571e-07 ,1.04727e-07 ,6.53264e-08 ,4.09387e-08 ,2.56621e-08 ,1.60305e-08 ,9.94739e-09 ,6.11516e-09 ,3.71611e-09 ,2.22842e-09 ,1.3169e-09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  // MB xsec = 69.3mb
@@ -207,7 +262,8 @@ void InitBaseDirectory(){
    }else if(host.find("cern.ch")!=std::string::npos){
       //BaseDirectory = "rfio:/castor/cern.ch/user/r/rybinska/HSCPEDMFiles/";
       //BaseDirectory = "root://eoscms//eos/cms/store/cmst3/user/querten/12_08_30_HSCP_EDMFiles/";    //for run1
-      BaseDirectory = "root://eoscms//eos/cms/store/cmst3/user/querten/15_03_25_HSCP_Run2EDMFiles/";  //for run2
+      //BaseDirectory = "root://eoscms//eos/cms/store/cmst3/user/querten/15_03_25_HSCP_Run2EDMFiles/";  //for run2
+       BaseDirectory = "root://cmseos.fnal.gov//store/user/lpchscp/noreplica/";
    }else if(host.find("fnal.gov")!=std::string::npos){
      BaseDirectory = "dcache:/pnfs/cms/WAX/11/store/user/lpchscp/2012HSCPEDMFiles/"; //for run1
    }else if(host.find("ingrid-ui")!=std::string::npos){
