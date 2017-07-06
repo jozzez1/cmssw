@@ -73,7 +73,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
     TFile* InputFile = new TFile(Input.c_str(), "UPDATE");
     TypeMode = TypeFromPattern(InputPattern);
     
-    // define MVA variables //////////////////////// KENJI
+    // define MVA variables ////////////////////////
     double mvavalues[6] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
     
     
@@ -115,9 +115,8 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
     
     //Do two loops, one for the actual background prediction and one for the
     //region with TOF<1
-    unsigned int Smax = 2;  //KENJI
-    if(TypeMode > 5){Smax = 1;}  //KENJI -> need to add the flip portion eventually
-    for(unsigned int S=0; S<Smax; S++) { //KENJI
+    unsigned int Smax = 2; 
+    for(unsigned int S=0; S<Smax; S++) {
         string Suffix="";
         if(S==1) Suffix="_Flip";
         
@@ -245,7 +244,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
             TH2D*  Pred_MassComb  = (TH2D*)GetObjectFromPath(directory, ("MassComb" + Suffix).c_str())->Clone(("Pred_MassComb" + Suffix).c_str()); Pred_MassComb->Reset();
             TH2D*  Pred_P         = (TH2D*)GetObjectFromPath(directory, ("RegionD_P" + Suffix).c_str())->Clone(("Pred_P" + Suffix).c_str());           Pred_P->Reset();
             
-            //Kenji ///////////
+            //MVA code ///////////
             TH2D* Pred_MVA[6];
             string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"}; //might be a redifinition, if so then don't redifine it, its already in PlotStructure.h
             for( int ihist = 0; ihist < 6; ihist++){
@@ -266,28 +265,19 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
             printf("Making prediction for %s\n",directory->GetName());
             //////////////////////////////////////////////////      MAKING THE PREDICTION
             for(unsigned int CutIndex=0;CutIndex<(unsigned int)HCuts_Pt->GetXaxis()->GetNbins();CutIndex++){
-                //cout << CutIndex << endl; //KENJI
-                //KENJI, can cause I continue statement if the CutIndex > 100 for TypeMode==6
-                
+
+	      // The following is used to speed up the background prediction step
+	      // by not running over all the CutIndices
+	      ////////////
                 if(TypeMode == 6){
                     //if(CutIndex != 29 && CutIndex!=28)continue;
                     if(CutIndex > 5 && CutIndex < 20)continue;
                     if(CutIndex > 32)continue;
                 }
                 if(TypeMode == 7){
-                    //if(CutIndex > 50 && CutIndex < 200)continue;
-                    //if(CutIndex > 400)continue;
                     if(CutIndex != 0 && CutIndex != 16 && CutIndex != 286 && CutIndex != 288 && CutIndex != 290 && CutIndex!= 299 && CutIndex != 300 && CutIndex != 302 && CutIndex != 304 )continue;
-                    /*
-                    if(CutIndex != 0 && CutIndex!=16 && CutIndex!=299){ //16 is the loose cut for TK+TOF 299 is old tight
-                        if(HCuts_Pt->GetBinContent(CutIndex+1) < 60.0 || HCuts_Pt->GetBinContent(CutIndex+1) > 65.0){continue;}
-                        else if(HCuts_I->GetBinContent(CutIndex+1) < 0.100 || HCuts_I->GetBinContent(CutIndex+1) > 0.200){continue;}
-                        else if(HCuts_TOF->GetBinContent(CutIndex+1) < 1.10 || HCuts_TOF->GetBinContent(CutIndex+1) > 1.3){continue;}
-                    }*/
-                    //effort to speed up overall prediction without changing the cut indexing
                 }
                 
-                //if(CutIndex<86 || CutIndex>87)continue;
                 
                 double A=H_A->GetBinContent(CutIndex+1);  double AErr = sqrt(A);
                 double B=H_B->GetBinContent(CutIndex+1);  double BErr = sqrt(B);
@@ -439,7 +429,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                 if(P==0 || isnan((float)P)) {printf("P = 0 --> No Prediction possible \n"); continue;} //Skip this CutIndex --> No Prediction possible
                 
                 printf(" --> D=%6.2E vs Pred = %6.2E +- %6.2E (%6.2E%%)\n", D, P,  Perr, 100.0*Perr/P );
-                if(TypeMode>2 && TypeMode < 6)continue; //Need to compute mass predicted distribution ONLY for TkOnly and TkTOF and their MVA modes //KENJI
+                if(TypeMode>2 && TypeMode < 6)continue; //Need to compute mass predicted distribution ONLY for TkOnly and TkTOF and their MVA modes
                 TH1D* Pred_EtaB_Proj     = Pred_EtaB ->ProjectionY("ProjEtaB" ,CutIndex+1,CutIndex+1);
                 TH1D* Pred_EtaS_Proj     = Pred_EtaS ->ProjectionY("ProjEtaS" ,CutIndex+1,CutIndex+1);
                 TH1D* Pred_EtaS2_Proj    = Pred_EtaS2->ProjectionY("ProjEtaS2",CutIndex+1,CutIndex+1);
@@ -447,8 +437,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                 TH1D* Pred_EtaS_Proj_PE  = (TH1D*)Pred_EtaS_Proj ->Clone("Pred_EtaS_Proj_PE");  Pred_EtaS_Proj_PE ->Reset();
                 TH1D* Pred_EtaS2_Proj_PE = (TH1D*)Pred_EtaS2_Proj->Clone("Pred_EtaS2_Proj_PE"); Pred_EtaS2_Proj_PE->Reset();
                 
-                
-                /////KENJI ///////////
+                /// MVA code ///////////
                 Pred_EtaI->GetXaxis()->SetRange(CutIndex+1,CutIndex+1);
                 Pred_EtaTOF->GetXaxis()->SetRange(CutIndex+1,CutIndex+1);
                 
@@ -475,10 +464,10 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                 TH2D* Pred_Prof_MassTOF  =  new TH2D("Pred_Prof_MassTOF" ,"Pred_Prof_MassTOF" ,MassNBins,0,MassHistoUpperBound, NPseudoExp, 0, NPseudoExp);
                 TH2D* Pred_Prof_MassComb =  new TH2D("Pred_Prof_MassComb","Pred_Prof_MassComb",MassNBins,0,MassHistoUpperBound, NPseudoExp, 0, NPseudoExp);
                 
-                //KENJI ///////////////////
+                //MVA code ///////////////////
                 TH2D* Pred_Prof_MVA[6];
                 string MVAhistname2[6] = {"Pred_Prof_GluinoMVA","Pred_Prof_StopMVA","Pred_Prof_GMSBStauMVA","Pred_Prof_PPStauMVA","Pred_Prof_DYQ3MVA","Pred_Prof_DYQ6MVA"};
-                cout << "Number of MVA bins = " << MVANBins << endl;
+
                 for( int ihist = 0; ihist < 6; ihist++){
                     Pred_Prof_MVA[ihist] = new TH2D(MVAhistname2[ihist].c_str(),MVAhistname2[ihist].c_str(), MVANBins, 0, MVAHistoUpperBound, NPseudoExp, 0, NPseudoExp);
                 }
@@ -492,7 +481,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                 }
                 
                 for(int ihist = 0; ihist < 6; ihist++){
-                    //cout << "Pred_MVA_" << ihist << "contains " << Pred_MVA[ihist]->GetNbinsY()+1 << " Ybins" << endl;
                     for(int x = 0; x < Pred_MVA[ihist]->GetNbinsY()+1;x++){
                         for( unsigned int pe = 0; pe < NPseudoExp; pe++){
                             Pred_Prof_MVA[ihist] -> SetBinContent(x,pe,0);
@@ -500,20 +488,8 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     }
                 }
                 
-                /////////////////////////
+               
                 
-                
-                /////////////////////////
-                
-                /*
-                 for(int x=0;x<Pred_Mass->GetNbinsY()+1;x++){
-                 for(unsigned int pe=0;pe<NPseudoExp;pe++){
-                 Pred_Prof_Mass    ->SetBinContent(x, pe, 0);
-                 Pred_Prof_MassTOF ->SetBinContent(x, pe, 0);
-                 Pred_Prof_MassComb->SetBinContent(x, pe, 0);
-                 }
-                 }
-                 */
                 TRandom3* RNG = new TRandom3();
                 printf("Predicting (%4i / %4i)     :",CutIndex+1,HCuts_Pt->GetXaxis()->GetNbins());
                 
@@ -531,7 +507,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     TH1D* tmpH_MassTOF  =  new TH1D("tmpH_MassTOF" ,"tmpH_MassTOF" ,MassNBins,0,MassHistoUpperBound);
                     TH1D* tmpH_MassComb =  new TH1D("tmpH_MassComb","tmpH_MassComb",MassNBins,0,MassHistoUpperBound);
                     
-                    //KENJI //////////////
+                    //MVA code //////////////
                     TH1D* tmpH_MVA[6];
                     for( int ihist = 0; ihist < 6; ihist++){
                         tmpH_MVA[ihist] = new TH1D(("tmpH_"+MVAhistname[ihist]).c_str(),("tmpH_"+MVAhistname[ihist]).c_str(), MVANBins, 0, MVAHistoUpperBound );
@@ -560,42 +536,12 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     for(int i=0;i<Pred_EtaS2_Proj_PE->GetNbinsX()+1;i++){Pred_EtaS2_Proj_PE->SetBinContent(i,RNG->Poisson(Pred_EtaS2_Proj->GetBinContent(i)) );} Pred_EtaS2_Proj_PE->Scale(1.0/Pred_EtaS2_Proj_PE->Integral());
                     
                     
-                    /////////// KENJI/////////////////////////////////////
-                    
-                    //cout << "test" << endl;
-                    /*
-                     for(int i=0;i<Pred_EtaPWeighted_PE->GetNbinsX()+1;i++){
-                     for(int j=0;j<Pred_EtaPWeighted_PE->GetNbinsY()+1;j++){
-                     Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));
-                     //if(Pred_EtaPWeighted->GetBinContent(i,j) < 5){Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j));}//KENJI
-                     //else{Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));}//KENJI
-                     //Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j)); //KENJI
-                     }
-                     }
-                     
-                     double WeightP = 0.0;
-                     for(int x=0;x<=Pred_EtaPWeighted_PE->GetXaxis()->GetNbins();x++){
-                     WeightP = 0.0;
-                     if(Pred_EtaB_Proj_PE->GetBinContent(x)>0){
-                     WeightP = Pred_EtaS_Proj_PE ->GetBinContent(x)/Pred_EtaB_Proj_PE->GetBinContent(x);
-                     
-                     if(TypeMode==2 || TypeMode ==7)WeightP*= Pred_EtaS2_Proj_PE->GetBinContent(x)/Pred_EtaB_Proj_PE->GetBinContent(x); //KENJI
-                     }
-                     for(int y=0;y<=Pred_EtaPWeighted_PE->GetYaxis()->GetNbins();y++){
-                     Pred_EtaPWeighted_PE->SetBinContent(x,y,Pred_EtaPWeighted_PE->GetBinContent(x,y)*WeightP);
-                     }
-                     }
-                     */
-                    // Get the pred eta distribution
-                    // eta and P have already been Poissoned at this point
+                    /////////// MVA code/////////////////////////////////////
                     
                     //Ih
                     for(int i=0;i<Pred_EtaIWeighted_PE->GetNbinsX()+1;i++){
                         for(int j=0;j<Pred_EtaIWeighted_PE->GetNbinsY()+1;j++){
                             Pred_EtaIWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaIWeighted->GetBinContent(i,j)));
-                            //if(Pred_EtaPWeighted->GetBinContent(i,j) < 5){Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j));}//KENJI
-                            //else{Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));}//KENJI
-                            //Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j)); //KENJI
                         }
                     }
                     // eta distribution from I
@@ -603,27 +549,11 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     Pred_EtaI_Proj_PE->Scale(1.0/Pred_EtaI_Proj_PE->Integral());
                     
                     
-                    /*
-                     double WeightI = 0.0;
-                     for(int x=0;x<=Pred_EtaIWeighted_PE->GetXaxis()->GetNbins();x++){
-                     WeightI = 0.0;
-                     if(Pred_EtaB_Proj_PE->GetBinContent(x)>0){
-                     WeightI = Pred_EtaS_Proj_PE ->GetBinContent(x)/Pred_EtaB_Proj_PE->GetBinContent(x);
-                     if(TypeMode==2 || TypeMode ==7)WeightI*= Pred_EtaS2_Proj_PE->GetBinContent(x)/Pred_EtaB_Proj_PE->GetBinContent(x); //KENJI
-                     }
-                     
-                     for(int y=0;y<=Pred_EtaPWeighted_PE->GetYaxis()->GetNbins();y++){
-                     Pred_EtaIWeighted_PE->SetBinContent(x,y,Pred_EtaIWeighted_PE->GetBinContent(x,y)*WeightI);
-                     }
-                     }*/
                     
                     //P /////////
                     for(int i=0;i<Pred_EtaPWeighted_PE->GetNbinsX()+1;i++){
                         for(int j=0;j<Pred_EtaPWeighted_PE->GetNbinsY()+1;j++){
                             Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));
-                            //if(Pred_EtaPWeighted->GetBinContent(i,j) < 5){Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j));}//KENJI
-                            //else{Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));}//KENJI
-                            //Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j)); //KENJI
                         }
                     }
                     
@@ -634,14 +564,11 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     for(int x=0;x<=Pred_EtaPWeighted_PE->GetXaxis()->GetNbins()+1;x++){
                         WeightP = 0.0;
                         if(tmpPeta->GetBinContent(x)>0){
-                            WeightP = Pred_EtaI_Proj_PE ->GetBinContent(x)/tmpPeta->GetBinContent(x); //I think its better to replace EtaB with the Eta dist from P after its been poissoned.
-                            //cout << "x bin = " << x << " IdistEta = " << Pred_EtaI_Proj_PE ->GetBinContent(x) << " PdistEta = " <<Pred_EtaB_Proj_PE->GetBinContent(x) << " ratio = " << WeightP << endl;
-                            if(TypeMode==2 || TypeMode ==7)WeightP*= Pred_EtaS2_Proj_PE->GetBinContent(x)/tmpPeta->GetBinContent(x); //KENJI
+                            WeightP = Pred_EtaI_Proj_PE ->GetBinContent(x)/tmpPeta->GetBinContent(x);
+                            if(TypeMode==2 || TypeMode ==7)WeightP*= Pred_EtaS2_Proj_PE->GetBinContent(x)/tmpPeta->GetBinContent(x); 
                         }
                         for(int y=0;y<=Pred_EtaPWeighted_PE->GetYaxis()->GetNbins()+1;y++){
-                            //if(Pred_EtaPWeighted_PE->GetBinContent(x,y)>0){cout << " ybin " << y << " before = " <<Pred_EtaPWeighted_PE->GetBinContent(x,y) << endl;}
                             Pred_EtaPWeighted_PE->SetBinContent(x,y,Pred_EtaPWeighted_PE->GetBinContent(x,y)*WeightP);
-                            //if(Pred_EtaPWeighted_PE->GetBinContent(x,y)>0){ cout << " ybin " << y << " after = " << Pred_EtaPWeighted_PE->GetBinContent(x,y) << endl;}
                         }
                     }
                     
@@ -650,10 +577,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     for(int i=0;i<Pred_EtaTOFWeighted_PE->GetNbinsX()+1;i++){
                         for(int j=0;j<Pred_EtaTOFWeighted_PE->GetNbinsY()+1;j++){
                             Pred_EtaTOFWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaTOFWeighted->GetBinContent(i,j)));
-                            
-                            //if(Pred_EtaPWeighted->GetBinContent(i,j) < 5){Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j));}//KENJI
-                            //else{Pred_EtaPWeighted_PE->SetBinContent(i,j,RNG->Poisson(Pred_EtaPWeighted->GetBinContent(i,j)));}//KENJI
-                            //Pred_EtaPWeighted_PE->SetBinContent(i,j,Pred_EtaPWeighted->GetBinContent(i,j)); //KENJI
                         }
                     }
                     
@@ -666,9 +589,8 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                         
                         
                         if(tmpTOFeta->GetBinContent(x)>0){
-                            //cout << "Found EtaB > 0 " << endl;
                             WeightTOF = Pred_EtaI_Proj_PE ->GetBinContent(x)/tmpTOFeta->GetBinContent(x);
-                            if(TypeMode==2 || TypeMode ==7)WeightTOF*= Pred_EtaS2_Proj_PE->GetBinContent(x)/tmpTOFeta->GetBinContent(x); //KENJI
+                            if(TypeMode==2 || TypeMode ==7)WeightTOF*= Pred_EtaS2_Proj_PE->GetBinContent(x)/tmpTOFeta->GetBinContent(x);
                         }
                         for(int y=0;y<=Pred_EtaPWeighted_PE->GetYaxis()->GetNbins()+1;y++){
                             
@@ -686,47 +608,11 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                         Pred_I_ProjPE = (TH1D*) Pred_I_Proj->Clone("Pred_I_ProjPE"); Pred_I_ProjPE->Reset();
                         Pred_T_ProjPE = (TH1D*) Pred_T_Proj->Clone("Pred_T_ProjPE"); Pred_T_ProjPE->Reset();
                     }
-                    /*
-                     if( TypeMode > 5){
-                     Pred_I_ProjPE = (TH1D*)Pred_EtaPWeighted_PE->ProjectionY("Pred_I_ProjPE");
-                     Pred_T_ProjPE = (TH1D*)Pred_EtaIWeighted_PE->ProjectionY("Pred_T_ProjPE");
-                     Pred_I_ProjPE->Scale(1.0/Pred_I_ProjPE->Integral());
-                     Pred_T_ProjPE->Scale(1.0/Pred_T_ProjPE->Integral());
-                     
-                     
-                     }*/
-                    /*
-                     TH1D* Pred_I_ProjPE = (TH1D*) Pred_I_Proj->Clone("Pred_I_ProjPE");
-                     Pred_I_ProjPE->Reset();
-                     TH1D* Pred_T_ProjPE = (TH1D*) Pred_T_Proj->Clone("Pred_T_ProjPE");
-                     Pred_T_ProjPE->Reset();
-                     */
-                    
-                    /*
-                     TH1D* Pred_Eta_ProjPE = (TH1D*) Pred_Eta_Proj->Clone("Pred_Eta_ProjPE");
-                     Pred_Eta_ProjPE->Reset();
-                     
-                     for(int i=0;i<Pred_Eta_ProjPE->GetNbinsX()+1;i++){
-                     Pred_Eta_ProjPE->SetBinContent(i,RNG->Poisson(Pred_Eta_Proj->GetBinContent(i)) );
-                     }
-                     Pred_Eta_ProjPE->Scale(1.0/Pred_Eta_ProjPE->Integral());
-                     Pred_Eta_Proj->Print("all");
-                     Pred_Eta_ProjPE->Print("all");
-                     */
-                    
-                    
+		    
                     //P eta dist
                     
                     TH1D* Pred_Eta_ProjPE = Pred_EtaPWeighted_PE->ProjectionX("Pred_Eta_ProjPE"); //this is the eta dist that is used
                     Pred_Eta_ProjPE->Scale(1.0/Pred_Eta_ProjPE->Integral());
-                    //Pred_Eta_ProjPE->Print("All");
-                    
-                    //cout << "done with eta dist" << endl;
-                    
-                    //Ih eta dist
-                    //TH1D* Pred_Eta2_ProjPE = Pred_EtaIWeighted_PE->ProjectionX("Pred_Eta2_ProjPE");
-                    //Pred_Eta2_ProjPE->Scale(1.0/Pred_Eta2_ProjPE->Integral());
-                    //Pred_Eta2_ProjPE->Print("All");
                     
                     /////////////////////////////////////
                     
@@ -741,22 +627,12 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                         
                         for(int i=0;i<Pred_I_ProjPE->GetNbinsX()+1;i++){
                             Pred_I_ProjPE->SetBinContent(i,RNG->Poisson(Pred_I_Proj->GetBinContent(i)) );
-                            
-                            //if(Pred_I_Proj->GetBinContent(i) < 5){Pred_I_ProjPE->SetBinContent(i,Pred_I_Proj->GetBinContent(i));} //KENJI
-                            
-                            //else{Pred_I_ProjPE->SetBinContent(i,RNG->Poisson(Pred_I_Proj->GetBinContent(i)) );} //KENJI
-                            
-                            //Pred_I_ProjPE->SetBinContent(i,Pred_I_Proj->GetBinContent(i)); //KENJI
-                            
-                        }
+                             }
                         Pred_I_ProjPE->Scale(1.0/Pred_I_ProjPE->Integral());
                         
                         for(int i=0;i<Pred_T_ProjPE->GetNbinsX()+1;i++){
                             Pred_T_ProjPE->SetBinContent(i,RNG->Poisson(Pred_T_Proj->GetBinContent(i)) );
-                            //if(Pred_T_Proj->GetBinContent(i) < 5){Pred_T_ProjPE->SetBinContent(i,Pred_T_Proj->GetBinContent(i));} //KENJI
-                            //else{Pred_T_ProjPE->SetBinContent(i,RNG->Poisson(Pred_T_Proj->GetBinContent(i)) );} //KENJI
-                            //Pred_T_ProjPE->SetBinContent(i,Pred_T_Proj->GetBinContent(i));//KENJI
-                        }
+                            }
                         Pred_T_ProjPE->Scale(1.0/Pred_T_ProjPE->Integral());
                         
                         for(int x=0;x<Pred_P_ProjPE->GetNbinsX()+1;x++){Pred_P->SetBinContent(CutIndex+1, x, Pred_P->GetBinContent(CutIndex+1, x) + Pred_P_ProjPE->GetBinContent(x) * PE_P);};
@@ -764,9 +640,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     
                     
                     double Proba, MI, MComb;//, MT=0, ProbaT=0;
-                    
-                    
-                    
+		    
                     Proba = 0.0;
                     
                     if( TypeMode < 6){
@@ -796,25 +670,19 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                             double ProbaEta =0.0;
                             double Totalprob = 0.0;
                             for( int z=0; z<Pred_Eta_ProjPE->GetNbinsX();z++){
-                                //Pred_Eta_ProjPE->Print("all");
+                                
                                 if(Pred_Eta_ProjPE->GetBinContent(z)<=0.0){continue;}
                                 
                                 double eta = Pred_Eta_ProjPE->GetBinCenter(z);
                                 
-                                //ProbaEta+=Pred_Eta_ProjPE->GetBinContent(z);
-                                //if(nMVA == 0)cout << z << " bin center = " << Pred_Eta_ProjPE->GetBinCenter(z) << " bin content = " << Pred_Eta_ProjPE->GetBinContent(z) <<" proba Eta = " << ProbaEta << endl;
-                                //if(nMVA == 0)cout << " Ihetadist bin content = " << Pred_Eta2_ProjPE->GetBinContent(z) << endl;
                                 TH1D* Pred_P_ProjPEmva = Pred_EtaPWeighted_PE->ProjectionY("Pred_P_ProjPEmva",z,z);
                                 TH1D* Pred_I_ProjPEmva = Pred_EtaIWeighted_PE->ProjectionY("Pred_I_ProjPEmva",z,z);
                                 TH1D* Pred_T_ProjPEmva = Pred_EtaTOFWeighted_PE->ProjectionY("Pred_T_ProjPEmva",z,z);
-                                //Pred_P_ProjPEmva->Print();
-                                //Pred_I_ProjPEmva->Print();
+                                
                                 Pred_P_ProjPEmva->Scale(1.0/Pred_P_ProjPEmva->Integral());
                                 Pred_I_ProjPEmva->Scale(1.0/Pred_I_ProjPEmva->Integral());
                                 Pred_T_ProjPEmva->Scale(1.0/Pred_T_ProjPEmva->Integral());
-                                //cout << z << endl;
-                                //Pred_P_ProjPEmva->Print("All");
-                                //cout << "max combinations = " << (Pred_Eta_ProjPE->GetNbinsX()+1)*(Pred_P_ProjPEmva->GetNbinsX()+1)*(Pred_I_ProjPEmva->GetNbinsX()+1) << endl;
+                                
                                 double ProbaP = 0.0;
                                 
                                 for(int x=0;x<Pred_P_ProjPEmva->GetNbinsX()+1;x++){    if(Pred_P_ProjPEmva->GetBinContent(x)<=0.0){continue;}  const double& p = Pred_P_ProjPEmva->GetBinCenter(x);
@@ -878,15 +746,12 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                                             Totalprob += Proba;
                                             
                                             if(nMVA == 0 && CutIndex == 29){
-                                                //if(Proba > 1.0){cout << "Proba Too high" << endl; cout << "proba P = " << Pred_P_ProjPEmva->GetBinContent(x) << "proba I =" << Pred_I_ProjPEmva->GetBinContent(y) << "proba eta = " << Pred_Eta_ProjPE->GetBinContent(z) << endl;}
-                                                
-                                                //cout << combo << " eta = " << eta << " P = " << p << " Ih = " << i << " proba P = " << Pred_P_ProjPEmva->GetBinContent(x) << " proba I =" << Pred_I_ProjPEmva->GetBinContent(y) << " proba eta = " << Pred_Eta_ProjPE->GetBinContent(z) << " Proba = " << Proba << " TotalProba = " << Totalprob << endl;
-                                            }
+                                
+					    }
                                             
-                                        } //TypeMode == 6
+                                        } 
                                         if(TypeMode ==7){
                                             for( int w = 0; w<Pred_T_ProjPEmva->GetNbinsX()+1;w++){
-                                                //if(isnan((float)Pred_T_ProjPEmva->GetBinContent(w))){cout << w << " bin has nan issue" << endl;exit(0);}
                                                 if(Pred_T_ProjPEmva->GetBinContent(w) <= 0.0){continue;}
                                                 double tof = Pred_T_ProjPEmva->GetBinCenter(w);
                                                 
@@ -927,7 +792,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                                                 if(mvavalues[nMVA] < 0){mvavalues[nMVA] = 0;}
                                                 tmpH_MVA[nMVA]->Fill(mvavalues[nMVA],Proba);
                                                 
-                                                //cout << combo << " MVA = " << mvavalues[nMVA] << " eta = " << eta << " P = " << p << " Ih = " << i << " TOF = " << tof << " proba P = " << Pred_P_ProjPEmva->GetBinContent(x) << " proba I =" << Pred_I_ProjPEmva->GetBinContent(y) << " proba eta = " << Pred_Eta_ProjPE->GetBinContent(z) << " proba TOF =" << Pred_T_ProjPE->GetBinContent(w) << " Proba = " << Proba << endl;
                                             } //TOF loop
                                             
                                         } //TypeMode 7 loop
@@ -938,10 +802,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                                 delete Pred_P_ProjPEmva;
                                 delete Pred_I_ProjPEmva;
                             } //eta loop
-                            //cout << "Total Eta proba = " << ProbaEta << endl;
-                            //if(ProbaEta < 1)exit(0);
-                            //cout << "true combinations = " << combo << endl;
-                            //cout << "Total Prob = " << Totalprob << endl;
                         } //MVA loop
                         //cout << "Done with MVA loop" << endl;
                     } //TypeMode > 5 loop
@@ -957,7 +817,7 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                         if(isnan((float)(tmpH_Mass    ->GetBinContent(x) * PE_P))){printf("%f x %f\n",tmpH_Mass    ->GetBinContent(x),PE_P); fflush(stdout);exit(0);}
                     }
                     
-                    //KENJI/////////////////
+                    //MVA code/////////////////
                     if(TypeMode > 5 ){
                         for(int ihist = 0; ihist<6; ihist++){
                             for(int x=0; x<tmpH_MVA[ihist]->GetNbinsX()+1;x++){
@@ -967,7 +827,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                             
                             TH1D *test = Pred_Prof_MVA[ihist]->ProjectionX("test", pe,pe);
                             
-                            //cout << "Pred# = " << PE_P << " tmpMVA " << ihist << " " << tmpH_MVA[ihist]->Integral() << " Pred_Prof = " << test->Integral() << endl;
                             delete test;
                             
                             delete tmpH_MVA[ihist];
@@ -975,9 +834,8 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                         }
                     }//end TypeMode > 5
                     
-                    //delete Pred_Eta_ProjPE;
                     ///////////////////////
-                    //delete Pred_P_ProjPE;
+                    
                     delete tmpH_Mass;
                     delete tmpH_MassTOF;
                     delete tmpH_MassComb;
@@ -1009,12 +867,10 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                     Pred_MassComb  ->SetBinError(CutIndex+1,x,ErrComb);
                 }
                 
-                //KENJI adding the MVA equivalents ///////////////////
+                //adding the MVA equivalents ///////////////////
                 if(TypeMode > 5){
                     //cout << "Begin TypeMode5 " << endl;
                     for( int ihist = 0; ihist<6; ihist++){
-                        
-                        //if(ihist==0)Pred_Prof_MVA[ihist]->Print();
                         
                         for( int x=0; x<Pred_MVA[ihist]->GetNbinsY()+1;x++){
                             double Mean = 0, MeanTOF=0, MeanComb=0;
@@ -1028,19 +884,15 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
                                 Err     += pow( Mean - Pred_Prof_MVA[ihist]->GetBinContent(x, pe),2);
                             }
                             
-                            //if(ihist==0)cout << "histo bin" << x << " " << Mean << endl;
-                            
                             Err = sqrt(Err/(NPseudoExp-1));
                             Pred_MVA[ihist] ->SetBinContent(CutIndex+1,x,Mean);
                             Pred_MVA[ihist] ->SetBinError(CutIndex+1,x,Err);
                             
-                            //if(CutIndex == 16 && ihist == 0){cout << "x bin = " << x << " Mean = " << Mean << endl;}
                         }
                         delete Pred_Prof_MVA[ihist];
                     }
                 } //end Typemode > 5
-                
-                //cout << "end of TypeMode 5 " << endl;
+
                 if( TypeMode < 6){
                     for( int ihist = 0; ihist<6; ihist++){
                         delete Pred_Prof_MVA[ihist];
@@ -1073,7 +925,6 @@ void Analysis_Step2_BackgroundPrediction(std::string InputPattern="COMPILE")
             
             cout << "Writing to File" << endl;
             //save histogram to file
-            //KENJI Write MVA ////////
             for( int ihist = 0; ihist<6; ihist++){
                 Pred_MVA[ihist]->Write();
             }

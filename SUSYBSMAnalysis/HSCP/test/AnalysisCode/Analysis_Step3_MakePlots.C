@@ -285,13 +285,13 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
     else if(DataName.find("13TeV")!=string::npos){SQRTS=1315.0;}
     
     bool IsTkOnly = (InputPattern.find("Type0",0)<std::string::npos);
-    IsTkOnly = (InputPattern.find("Type6",0) < std::string::npos); //KENJI
-    bool IsMVA = (InputPattern.find("Type6",0) < std::string::npos || InputPattern.find("Type7",0) < std::string::npos); //KENJI
+    IsTkOnly = (InputPattern.find("Type6",0) < std::string::npos); //MVA code
+    bool IsMVA = (InputPattern.find("Type6",0) < std::string::npos || InputPattern.find("Type7",0) < std::string::npos); //MVA code
     
     double SystError     = 0.20;
     
     TH1D  *Pred13TeV15=NULL, *Data13TeV15=NULL, *Pred13TeV16=NULL, *Data13TeV16=NULL, *Pred8TeV=NULL, *Data8TeV=NULL, *Pred7TeV=NULL, *Data7TeV=NULL, *MCPred=NULL, *MC=NULL, *Signal=NULL;
-    //KENJI ADD MVA ///////////////////////////////
+    //MVA code ADD MVA ///////////////////////////////
     
     TH1D *PredMVA[6];
     TH1D *DataMVA[6];
@@ -323,7 +323,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
         if(showMC)MCPred    = GetProjectionFromPath(InputFile, string("MCTr_13TeV16/Pred_"  ) + HistoSuffix,  CutIndex, "TmpMCPred");
         if(showMC)MC        = GetProjectionFromPath(InputFile, string("MCTr_13TeV16/"       ) + HistoSuffix,  CutIndex, "TmpMCMass");
         Signal    = GetProjectionFromPath(InputFile, string(SName+"/"     ) + HistoSuffix, CutIndex, "TmpSignalMass");
-        /////KENJI////////////////////////
+        /////MVA code////////////////////////
         is2016 = true;
         if(IsMVA){
             for( int ihist = 0; ihist < 6; ihist++){
@@ -352,7 +352,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
         if(showMC)MCPred    = GetProjectionFromPath(InputFile, string("MCTr_13TeV/Pred_"  ) + HistoSuffix,  CutIndex, "TmpMCPred");
         if(showMC)MC        = GetProjectionFromPath(InputFile, string("MCTr_13TeV/"       ) + HistoSuffix,  CutIndex, "TmpMCMass");
         Signal    = GetProjectionFromPath(InputFile, string(SName+"/"     ) + HistoSuffix, CutIndex, "TmpSignalMass");
-        /////KENJI////////////////////////
+        /////MVA code////////////////////////
         if(IsMVA && !is2016){
             cout << "IsMVA and is NOT 2016" << endl;
             for( int ihist = 0; ihist < 6; ihist++){
@@ -437,7 +437,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
             printf("%4.0f<M<2000 --> Obs=%9.3f Data-Pred = %9.3f +- %8.3f(syst+stat) %9.3f (syst) %9.3f (stat)\n", M, D, P, sqrt(Perr*Perr + pow(P*SystError,2)), P*SystError, Perr);
         }
         
-        /////KENJI////////////////////////
+        /////MVA code////////////////////////
         
         if(IsMVA){
             
@@ -488,7 +488,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
             printf("%4.0f<M<2000 --> Obs=%9.3f Data-Pred = %9.3f +- %8.3f(syst+stat) %9.3f (syst) %9.3f (stat)\n", M, D, P, sqrt(Perr*Perr + pow(P*SystError,2)), P*SystError, Perr);
         }
         
-        /////KENJI////////////////////////
+        /////MVA code////////////////////////
         
         if(IsMVA){
             
@@ -554,7 +554,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
     Max*=50.0;
     
     
-    ////KENJI///////////////////////
+    ////MVA code///////////////////////
     double MAX[6], MIN[6];
     if(IsMVA){
         for(int ihist = 0; ihist < 6; ihist++){
@@ -615,7 +615,7 @@ void MassPrediction(string InputPattern, unsigned int CutIndex, string HistoSuff
         if(PredMCErr->GetBinContent(i)<Min && i>5){for(unsigned int j=i+1;j<(unsigned int)PredMCErr->GetNbinsX();j++)PredMCErr->SetBinContent(j,0);}
     }}
     
-    ///KENJI//////////////////////////
+    ///MVA code//////////////////////////
     //loop over mvas
     TH1D *PredMVAErr[6];
     if(IsMVA){

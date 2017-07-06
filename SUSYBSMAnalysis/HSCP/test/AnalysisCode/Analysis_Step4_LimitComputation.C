@@ -12,10 +12,8 @@ using namespace std;
 
 class stAllInfo{
 public:
-    
-    //KENJI --> Go through file. Add MVA cuts and if TypeMode < 6 statements to use mass cuts or not.
-    //Will also have to edit the Analysis_Cuts file. Either make a new one or add a new column for MVA.
-    
+
+  //// MVA code /////////////
     vector<string> mvanames = {"MVAGluino", "MVAStop", "MVAGMStau", "MVAPPStau", "MVADYQ3", "MVADYQ6"};
     double MVAMean[6] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
     double MVASigma[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
@@ -24,8 +22,8 @@ public:
     //////////////
     double Mass, MassMean, MassSigma, MassCut;
     double XSec_Th, XSec_Err, XSec_Exp, XSec_ExpUp, XSec_ExpDown, XSec_Exp2Up, XSec_Exp2Down, XSec_Obs;
-    double  Eff, Eff_SYSTP, Eff_SYSTI, Eff_SYSTM, Eff_SYSTHUp, Eff_SYSTHDown, Eff_SYSTT, Eff_SYSTPU, Eff_SYSTComb, TotalUnc; //KENJI
-    double  EffE, EffE_SYSTP, EffE_SYSTI, EffE_SYSTM, EffE_SYSTHUp, EffE_SYSTHDown, EffE_SYSTT, EffE_SYSTPU, EffE_SYSTComb; //KENJI
+    double  Eff, Eff_SYSTP, Eff_SYSTI, Eff_SYSTM, Eff_SYSTHUp, Eff_SYSTHDown, Eff_SYSTT, Eff_SYSTPU, Eff_SYSTComb, TotalUnc;
+    double  EffE, EffE_SYSTP, EffE_SYSTI, EffE_SYSTM, EffE_SYSTHUp, EffE_SYSTHDown, EffE_SYSTT, EffE_SYSTPU, EffE_SYSTComb;
     double Significance; double XSec_5Sigma;
     double Index, WP_Pt, WP_I, WP_TOF;
     float  NData, NPred, NPredErr, NSign;
@@ -75,7 +73,7 @@ public:
         fscanf(pFile,"NSign        : %E\n" ,&NSign);
         fscanf(pFile,"LInt         : %lf\n",&LInt);
         fscanf(pFile,"XSec_5Sigma  : %lf\n",&XSec_5Sigma);
-        //KENJI/////////////////////
+        //MVA code/////////////////////
         for( int ihist = 0; ihist < 6; ihist++){
             fscanf(pFile,(mvanames[ihist]+"Mean  :%lf\n").c_str(),&MVAMean[ihist]);
             fscanf(pFile,(mvanames[ihist]+"Sigma  :%lf\n").c_str(),&MVASigma[ihist]);
@@ -120,7 +118,7 @@ public:
         fprintf(pFile,"NSign        : %+6.2E\n",NSign);
         fprintf(pFile,"LInt         : %f\n",LInt);
         fprintf(pFile,"XSec_5Sigma  : %f\n",XSec_5Sigma);
-        /////KENJI ////////////////
+        /////MVA code////////////////
         for( int ihist = 0; ihist < 6; ihist++){
             fprintf(pFile,(mvanames[ihist]+"Mean  :%f\n").c_str(),MVAMean[ihist]);
             fprintf(pFile,(mvanames[ihist]+"Sigma  :%f\n").c_str(),MVASigma[ihist]);
@@ -164,15 +162,15 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
 bool Combine(string InputPattern, string signal7, string signal8);
 bool useSample(int TypeMode, string sample);
 
-//KENJI //made some MVA functions///////////
-
+//MVA functions///////////
 bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance, string& InputPattern, string& signal, unsigned int CutIndex, bool Shape, bool Temporary, stAllInfo& result, TH1* MVAData, TH1* MVAPred, TH1* MVASign, TH1* MVASignP, TH1* MVASignI, TH1* MVASignComb, TH1* MVASignT, TH1* MVASignPU, TH1* MVASignHUp, TH1* MVASignHDown,  double MVAmin);
+///////////////////////////
 
 double GetSignalMeanHSCPPerEvent(string InputPattern, unsigned int CutIndex, double MinRange, double MaxRange, string nameMVA);
 
+///MVA code////////////////
 double MVAMinRange[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 double MVAmax = 2.0;
-
 //////////////////////
 
 double MinRange = 0;
@@ -190,7 +188,6 @@ string SHAPESTRING="";
 //}
 
 void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern="", string signal=""){
-    cout << MODE << endl; //KENJI
     setTDRStyle();
     gStyle->SetPadTopMargin   (0.05);
     gStyle->SetPadBottomMargin(0.11);
@@ -298,7 +295,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     //   string HQPattern  = "Results/Type4/";  //Disabling this analyis
     //   string LQPattern  = "Results/Type5/";  //Disabling this analyis
     
-    // add MVA analyses //KENJI//////////////
+    // add MVA analyses ////////////////
     string TkMVAPattern = "Results/Type6/";
     string MuMVAPattern = "Results/Type7/";
     ///////////////////////////////////////
@@ -366,7 +363,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     //DrawModelLimitWithBand(HQPattern);
     //DrawModelLimitWithBand(LQPattern);
     
-    //Add MVA KENJI//////////////////
+    //Add MVA//////////////////
     DrawModelLimitWithBand(TkMVAPattern);
     DrawModelLimitWithBand(MuMVAPattern);
     ///////////////////////////////////
@@ -418,7 +415,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     fprintf(pFile   ,"      \\end{tabular}\n\\end{table}\n\n");
     fprintf(talkFile,"      \\end{tabular}\n\\end{sidewaystable}\n\n");
     
-    //KENJI ////////////////////////////
+    //MVA code ////////////////////////////
     fprintf(pFile   , "%% %50s\n", "TkOnlyMVA");
     fprintf(pFile   , "\\begin{table}\n   \\centering\n      \\begin{tabular}{|l|cccccc|}\n      \\hline\n");
     fprintf(pFile   , "%-20s & %-4s & %-6s & %-5s & %-5s & %-4s & %-15s & %-2s & %-4s & %-6s & %-6s & %-6s & %-3s \\\\\n", "Model", "Mass", "pT>", "I>", "TOF>", "MVA>", "Bckg. Pred", "Obs", "Seff", "ThXsec", "ExpXsec", "ObsXsec", "Signif");
@@ -433,7 +430,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     fprintf(pFile   ,"      \\end{tabular}\n\\end{table}\n\n");
     fprintf(talkFile,"      \\end{tabular}\n\\end{sidewaystable}\n\n");
     
-    //KENJI
+    //MVA code //////////////////////
     fprintf(pFile   , "%% %50s\n", "TkMuonMVA");
     fprintf(pFile   , "\\begin{table}\n   \\centering\n      \\begin{tabular}{|l|cccccc|}\n      \\hline\n");
     fprintf(talkFile, "\\begin{sidewaystable}\n   \\centering\n      \\begin{tabular}{|l|cccccc|}\n      \\hline\n");
@@ -578,8 +575,8 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     LEG->SetBorderSize(0);
     
     fprintf(pFile   ,"\n\n %20s \n\n", LegendFromType(TkPattern).c_str());
-    fprintf(pFile,             "%20s   Eff   --> PScale |  DeDxScale | MassScale | HIP | PUScale | TotalUncertainty     \n","Model"); //KENJI
-    fprintf(talkFile, "\\hline\n%20s &  Eff    & PScale &  DeDxScale & MassScale & HIP & PUScale & TotalUncertainty \\\\\n","Model"); //KENJI
+    fprintf(pFile,             "%20s   Eff   --> PScale |  DeDxScale | MassScale | HIP | PUScale | TotalUncertainty     \n","Model");
+    fprintf(talkFile, "\\hline\n%20s &  Eff    & PScale &  DeDxScale & MassScale & HIP & PUScale & TotalUncertainty \\\\\n","Model");
     int Graphs=0;
     
     for(unsigned int k=0; k<modelVector.size(); k++){
@@ -657,7 +654,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         delete LEG;
     }
     
-    //KENJI ///////
+    //MVA code ///////
     c1 = new TCanvas("c1", "c1",600,600);
     c1->SetLeftMargin(0.15);
     
@@ -705,7 +702,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     }
     
     
-    //KENJI Tracker+TOF w/MVA
+    // MVA code //////////////
     
     c1 = new TCanvas("c1", "c1",600,600);
     c1->SetLeftMargin(0.15);
@@ -751,7 +748,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         delete MuSystGraphs;
         delete LEG;
     }
-    ///end KENJI
+    //////////////////////
     
     /*
      fprintf(pFile   ,"\n\n %20s \n\n", LegendFromType(MOPattern).c_str());
@@ -1027,7 +1024,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         //fprintf(pFile,"%20s --> Excluded mass below %8.3fGeV\n", modelVector[k].c_str(), FindIntersectionBetweenTwoGraphs(MuGraphs[k],  ThXSec[k], MuGraphs[k]->GetX()[0], MuGraphs[k]->GetX()[MuGraphs[k]->GetN()-1], 1, 0.00));
     }
     
-    //KENJI //////
+    //MVA code //////
     //Print the excluded mass range
     fprintf(pFile,"\n\n\n-----------------------\n Mass range excluded   \n-------------------------\n");
     fprintf(pFile,"-----------------------\n0%% TK-ONLY MVA       \n-------------------------\n");
@@ -1036,8 +1033,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         if(TkMVAGraphs[k]->GetX()[TkMVAGraphs[k]->GetN()-1]<0) continue;
         fprintf(pFile,"%20s --> Excluded mass below %8.3fGeV\n", modelVector[k].c_str(), FindIntersectionBetweenTwoGraphs(TkMVAGraphs[k],  ThXSec[k], TkMVAGraphs[k]->GetX()[0], TkMVAGraphs[k]->GetX()[TkMVAGraphs[k]->GetN()-1], 1, 0.00));
     }
-    ///////////////////
-    //KENJI///////////////////
+    
     fprintf(pFile,"-----------------------\n0%% MU+TOF MVA        \n-------------------------\n");
     for(unsigned int k=0; k<modelVector.size(); k++){
         bool isNeutral = false;if(modelVector[k].find("GluinoN")!=string::npos || modelVector[k].find("StopN")!=string::npos)isNeutral = true;
@@ -1099,8 +1095,8 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     std::map<string, TGraph*> MOGraphMap;
     std::map<string, TGraph*> ThGraphMap;
     std::map<string, TCutG* > ThErrorMap;
-    std::map<string, TGraph*> TkMVAGraphMap; //KENJI
-    std::map<string, TGraph*> MuMVAGraphMap; //KENJI
+    std::map<string, TGraph*> TkMVAGraphMap; //MVA code
+    std::map<string, TGraph*> MuMVAGraphMap; //MVA code
     
     for(unsigned int k=0; k<modelVector.size(); k++){
         TkGraphMap[modelVector[k]] = TkGraphs [k];
@@ -1110,8 +1106,8 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         //MOGraphMap[modelVector[k]] = MOGraphs [k];
         ThGraphMap[modelVector[k]] = ThXSec   [k];
         ThErrorMap[modelVector[k]] = ThXSecErr[k];
-        TkMVAGraphMap[modelVector[k]] = TkMVAGraphs[k]; //KENJI
-        MuMVAGraphMap[modelVector[k]] = MuMVAGraphs[k]; //KENJI
+        TkMVAGraphMap[modelVector[k]] = TkMVAGraphs[k]; //MVA code
+        MuMVAGraphMap[modelVector[k]] = MuMVAGraphs[k]; //MVA code
         
     }
     
@@ -1120,7 +1116,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     MuGraphMap["Gluino_f50"   ]->SetLineColor(4);  MuGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   MuGraphMap["Gluino_f50"   ]->SetLineWidth(2);   MuGraphMap["Gluino_f50"   ]->SetLineStyle(1);  MuGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
     TkGraphMap["Gluino_f10"   ]->SetLineColor(4);  TkGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   TkGraphMap["Gluino_f10"   ]->SetLineWidth(2);   TkGraphMap["Gluino_f10"   ]->SetLineStyle(1);  TkGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
     TkGraphMap["Gluino_f50"   ]->SetLineColor(4);  TkGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   TkGraphMap["Gluino_f50"   ]->SetLineWidth(2);   TkGraphMap["Gluino_f50"   ]->SetLineStyle(1);  TkGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
-    ///KENJI ////////////
+    ///MVA code ////////////
     MuMVAGraphMap["Gluino_f10"   ]->SetLineColor(4);  MuMVAGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   MuMVAGraphMap["Gluino_f10"   ]->SetLineWidth(2);   MuMVAGraphMap["Gluino_f10"   ]->SetLineStyle(1);  MuMVAGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
     MuMVAGraphMap["Gluino_f50"   ]->SetLineColor(4);  MuMVAGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   MuMVAGraphMap["Gluino_f50"   ]->SetLineWidth(2);   MuMVAGraphMap["Gluino_f50"   ]->SetLineStyle(1);  MuMVAGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
     TkMVAGraphMap["Gluino_f10"   ]->SetLineColor(4);  TkMVAGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   TkMVAGraphMap["Gluino_f10"   ]->SetLineWidth(2);   TkMVAGraphMap["Gluino_f10"   ]->SetLineStyle(1);  TkMVAGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
@@ -1135,9 +1131,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkGraphMap["Gluino16_f50"   ]->SetLineColor(4);  TkGraphMap["Gluino16_f50"   ]->SetMarkerColor(4);   TkGraphMap["Gluino16_f50"   ]->SetLineWidth(2);   TkGraphMap["Gluino16_f50"   ]->SetLineStyle(1);  TkGraphMap["Gluino16_f50"   ]->SetMarkerStyle(23);
     TkGraphMap["Gluino16N_f10"  ]->SetLineColor(4);  TkGraphMap["Gluino16N_f10"  ]->SetMarkerColor(4);   TkGraphMap["Gluino16N_f10"  ]->SetLineWidth(2);   TkGraphMap["Gluino16N_f10"  ]->SetLineStyle(1);  TkGraphMap["Gluino16N_f10"  ]->SetMarkerStyle(26);
 
-    ///KENJI/////////////////////
-    
-    
+    ///MVA code/////////////////////
     TkMVAGraphMap["Gluino16N_f10"  ]->SetLineColor(4);  TkMVAGraphMap["GluinoN_f10"  ]->SetMarkerColor(4);   TkMVAGraphMap["Gluino16N_f10"  ]->SetLineWidth(2);   TkMVAGraphMap["GluinoN_f10"  ]->SetLineStyle(1);  TkMVAGraphMap["Gluino16N_f10"  ]->SetMarkerStyle(26);
     MuMVAGraphMap["Gluino16_f10"   ]->SetLineColor(4);  MuMVAGraphMap["Gluino16_f10"   ]->SetMarkerColor(4);   MuMVAGraphMap["Gluino16_f10"   ]->SetLineWidth(2);   MuMVAGraphMap["Gluino16_f10"   ]->SetLineStyle(1);  MuMVAGraphMap["Gluino16_f10"   ]->SetMarkerStyle(22);
     MuMVAGraphMap["Gluino16_f50"   ]->SetLineColor(4);  MuMVAGraphMap["Gluino16_f50"   ]->SetMarkerColor(4);   MuMVAGraphMap["Gluino16_f50"   ]->SetLineWidth(2);   MuMVAGraphMap["Gluino16_f50"   ]->SetLineStyle(1);  MuMVAGraphMap["Gluino16_f50"   ]->SetMarkerStyle(23);
@@ -1145,7 +1139,6 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkMVAGraphMap["Gluino16_f50"   ]->SetLineColor(4);  TkMVAGraphMap["Gluino16_f50"   ]->SetMarkerColor(4);   TkMVAGraphMap["Gluino16_f50"   ]->SetLineWidth(2);   TkMVAGraphMap["Gluino16_f50"   ]->SetLineStyle(1);  TkMVAGraphMap["Gluino16_f50"   ]->SetMarkerStyle(23);
     TkMVAGraphMap["Gluino16N_f10"  ]->SetLineColor(4);  TkMVAGraphMap["Gluino16N_f10"  ]->SetMarkerColor(4);   TkMVAGraphMap["Gluino16N_f10"  ]->SetLineWidth(2);   TkMVAGraphMap["Gluino16N_f10"  ]->SetLineStyle(1);  TkMVAGraphMap["Gluino16N_f10"  ]->SetMarkerStyle(26);
     
-    cout << "ok gluino" << endl;
     ///////////////////////////////
     //MOGraphMap["Gluino_f10"   ]->SetLineColor(4);  MOGraphMap["Gluino_f10"   ]->SetMarkerColor(4);   MOGraphMap["Gluino_f10"   ]->SetLineWidth(2);   MOGraphMap["Gluino_f10"   ]->SetLineStyle(1);  MOGraphMap["Gluino_f10"   ]->SetMarkerStyle(22);
     //MOGraphMap["Gluino_f50"   ]->SetLineColor(4);  MOGraphMap["Gluino_f50"   ]->SetMarkerColor(4);   MOGraphMap["Gluino_f50"   ]->SetLineWidth(2);   MOGraphMap["Gluino_f50"   ]->SetLineStyle(1);  MOGraphMap["Gluino_f50"   ]->SetMarkerStyle(23);
@@ -1158,7 +1151,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkGraphMap["Stop16"         ]->SetLineColor(2);  TkGraphMap["Stop16"         ]->SetMarkerColor(2);   TkGraphMap["Stop16"         ]->SetLineWidth(2);   TkGraphMap["Stop16"         ]->SetLineStyle(1);  TkGraphMap["Stop16"         ]->SetMarkerStyle(21);
     TkGraphMap["Stop16N"        ]->SetLineColor(2);  TkGraphMap["Stop16N"        ]->SetMarkerColor(2);   TkGraphMap["Stop16N"        ]->SetLineWidth(2);   TkGraphMap["Stop16N"        ]->SetLineStyle(1);  TkGraphMap["Stop16N"        ]->SetMarkerStyle(25);
     
-    ///KENJI ////////////////
+    ///MVA code ////////////////
     MuMVAGraphMap["Stop"         ]->SetLineColor(2);  MuMVAGraphMap["Stop"         ]->SetMarkerColor(2);   MuMVAGraphMap["Stop"         ]->SetLineWidth(2);   MuMVAGraphMap["Stop"         ]->SetLineStyle(1);  MuMVAGraphMap["Stop"         ]->SetMarkerStyle(21);
     TkMVAGraphMap["Stop"         ]->SetLineColor(2);  TkMVAGraphMap["Stop"         ]->SetMarkerColor(2);   TkMVAGraphMap["Stop"         ]->SetLineWidth(2);   TkMVAGraphMap["Stop"         ]->SetLineStyle(1);  TkMVAGraphMap["Stop"         ]->SetMarkerStyle(21);
     TkMVAGraphMap["StopN"        ]->SetLineColor(2);  TkMVAGraphMap["StopN"        ]->SetMarkerColor(2);   TkMVAGraphMap["StopN"        ]->SetLineWidth(2);   TkMVAGraphMap["StopN"        ]->SetLineStyle(1);  TkMVAGraphMap["StopN"        ]->SetMarkerStyle(25);
@@ -1166,7 +1159,6 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkMVAGraphMap["Stop16"         ]->SetLineColor(2);  TkMVAGraphMap["Stop16"         ]->SetMarkerColor(2);   TkMVAGraphMap["Stop16"         ]->SetLineWidth(2);   TkMVAGraphMap["Stop16"         ]->SetLineStyle(1);  TkMVAGraphMap["Stop16"         ]->SetMarkerStyle(21);
     TkMVAGraphMap["Stop16N"        ]->SetLineColor(2);  TkMVAGraphMap["Stop16N"        ]->SetMarkerColor(2);   TkMVAGraphMap["Stop16N"        ]->SetLineWidth(2);   TkMVAGraphMap["Stop16N"        ]->SetLineStyle(1);  TkMVAGraphMap["Stop16N"        ]->SetMarkerStyle(25);
     
-    cout << "ok stop" << endl;
     ////////////////////////
     
     
@@ -1182,7 +1174,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkGraphMap["GMStau16"       ]->SetLineColor(1);  TkGraphMap["GMStau16"       ]->SetMarkerColor(1);   TkGraphMap["GMStau16"       ]->SetLineWidth(2);   TkGraphMap["GMStau16"       ]->SetLineStyle(1);  TkGraphMap["GMStau16"       ]->SetMarkerStyle(20);
     TkGraphMap["PPStau16"       ]->SetLineColor(6);  TkGraphMap["PPStau16"       ]->SetMarkerColor(6);   TkGraphMap["PPStau16"       ]->SetLineWidth(2);   TkGraphMap["PPStau16"       ]->SetLineStyle(1);  TkGraphMap["PPStau16"       ]->SetMarkerStyle(20);
     
-    /////KENJI//////////////////
+    /////MVA code//////////////////
     
     MuMVAGraphMap["GMStau"       ]->SetLineColor(1);  MuMVAGraphMap["GMStau"       ]->SetMarkerColor(1);   MuMVAGraphMap["GMStau"       ]->SetLineWidth(2);   MuMVAGraphMap["GMStau"       ]->SetLineStyle(1);  MuMVAGraphMap["GMStau"       ]->SetMarkerStyle(20);
     MuMVAGraphMap["PPStau"       ]->SetLineColor(6);  MuMVAGraphMap["PPStau"       ]->SetMarkerColor(6);   MuMVAGraphMap["PPStau"       ]->SetLineWidth(2);   MuMVAGraphMap["PPStau"       ]->SetLineStyle(1);  MuMVAGraphMap["PPStau"       ]->SetMarkerStyle(20);
@@ -1192,9 +1184,6 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     MuMVAGraphMap["PPStau16"       ]->SetLineColor(6);  MuMVAGraphMap["PPStau16"       ]->SetMarkerColor(6);   MuMVAGraphMap["PPStau16"       ]->SetLineWidth(2);   MuMVAGraphMap["PPStau16"       ]->SetLineStyle(1);  MuMVAGraphMap["PPStau16"       ]->SetMarkerStyle(20);
     TkMVAGraphMap["GMStau16"       ]->SetLineColor(1);  TkMVAGraphMap["GMStau16"       ]->SetMarkerColor(1);   TkMVAGraphMap["GMStau16"       ]->SetLineWidth(2);   TkMVAGraphMap["GMStau16"       ]->SetLineStyle(1);  TkMVAGraphMap["GMStau16"       ]->SetMarkerStyle(20);
     TkMVAGraphMap["PPStau16"       ]->SetLineColor(6);  TkMVAGraphMap["PPStau16"       ]->SetMarkerColor(6);   TkMVAGraphMap["PPStau16"       ]->SetLineWidth(2);   TkMVAGraphMap["PPStau16"       ]->SetLineStyle(1);  TkMVAGraphMap["PPStau16"       ]->SetMarkerStyle(20);
-    
-    cout << "Ok stau" << endl;
-    
     
     /////////////////////////////
     
@@ -1216,8 +1205,8 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     MuGraphMap["DY16_Q1"        ]->SetLineColor(46); MuGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  MuGraphMap["DY16_Q1"        ]->SetLineWidth(2);   MuGraphMap["DY16_Q1"        ]->SetLineStyle(1);  MuGraphMap["DY16_Q1"      ]->SetMarkerStyle(20);
     TkGraphMap["DY16_Q1"        ]->SetLineColor(46); TkGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  TkGraphMap["DY16_Q1"        ]->SetLineWidth(2);   TkGraphMap["DY16_Q1"        ]->SetLineStyle(1);  TkGraphMap["DY16_Q1"      ]->SetMarkerStyle(20);
     //HQGraphMap["DY_Q1"        ]->SetLineColor(46); HQGraphMap["DY_Q1"        ]->SetMarkerColor(46);  HQGraphMap["DY_Q1"        ]->SetLineWidth(2);   HQGraphMap["DY_Q1"        ]->SetLineStyle(1);  HQGraphMap["DY_Q1"        ]->SetMarkerStyle(20);
-    cout << "ok Q1" << endl;
-    //KENJI ///////////////////
+    
+    //MVA code ///////////////////
     MuMVAGraphMap["DY_Q1"        ]->SetLineColor(46); MuMVAGraphMap["DY_Q1"        ]->SetMarkerColor(46);  MuMVAGraphMap["DY_Q1"        ]->SetLineWidth(2);   MuMVAGraphMap["DY_Q1"        ]->SetLineStyle(1);  MuMVAGraphMap["DY_Q1"      ]->SetMarkerStyle(20);
     TkMVAGraphMap["DY_Q1"        ]->SetLineColor(46); TkMVAGraphMap["DY_Q1"        ]->SetMarkerColor(46);  TkMVAGraphMap["DY_Q1"        ]->SetLineWidth(2);   TkMVAGraphMap["DY_Q1"        ]->SetLineStyle(1);  TkMVAGraphMap["DY_Q1"      ]->SetMarkerStyle(20);
     MuMVAGraphMap["DY16_Q1"        ]->SetLineColor(46); MuMVAGraphMap["DY16_Q1"        ]->SetMarkerColor(46);  MuMVAGraphMap["DY16_Q1"        ]->SetLineWidth(2);   MuMVAGraphMap["DY16_Q1"        ]->SetLineStyle(1);  MuMVAGraphMap["DY16_Q1"      ]->SetMarkerStyle(20);
@@ -1228,7 +1217,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     MuGraphMap["DY16_Q2"        ]->SetLineColor(43); MuGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  MuGraphMap["DY16_Q2"        ]->SetLineWidth(2);   MuGraphMap["DY16_Q2"        ]->SetLineStyle(1);  MuGraphMap["DY16_Q2"      ]->SetMarkerStyle(34);
     TkGraphMap["DY16_Q2"        ]->SetLineColor(43); TkGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  TkGraphMap["DY16_Q2"        ]->SetLineWidth(2);   TkGraphMap["DY16_Q2"        ]->SetLineStyle(1);  TkGraphMap["DY16_Q2"      ]->SetMarkerStyle(34);
     
-    //KENJI ///////////////////
+    //MVA code ///////////////////
     MuMVAGraphMap["DY_Q2"        ]->SetLineColor(43); MuMVAGraphMap["DY_Q2"        ]->SetMarkerColor(43);  MuMVAGraphMap["DY_Q2"        ]->SetLineWidth(2);   MuMVAGraphMap["DY_Q2"        ]->SetLineStyle(1);  MuMVAGraphMap["DY_Q2"      ]->SetMarkerStyle(34);
     TkMVAGraphMap["DY_Q2"        ]->SetLineColor(43); TkMVAGraphMap["DY_Q2"        ]->SetMarkerColor(43);  TkMVAGraphMap["DY_Q2"        ]->SetLineWidth(2);   TkMVAGraphMap["DY_Q2"        ]->SetLineStyle(1);  TkMVAGraphMap["DY_Q2"      ]->SetMarkerStyle(34);
     MuMVAGraphMap["DY16_Q2"        ]->SetLineColor(43); MuMVAGraphMap["DY16_Q2"        ]->SetMarkerColor(43);  MuMVAGraphMap["DY16_Q2"        ]->SetLineWidth(2);   MuMVAGraphMap["DY16_Q2"        ]->SetLineStyle(1);  MuMVAGraphMap["DY16_Q2"      ]->SetMarkerStyle(34);
@@ -1464,8 +1453,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     SaveCanvas(c1, outpath, string("TkExclusionLog"));
     delete c1;
     
-    /// KENJI ////////
-    
+    ///MVA code ////////
     c1 = new TCanvas("c1", "c1",600,600);
     c1->SetLogy(true);
     
@@ -1573,7 +1561,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     SaveCanvas(c1, outpath, string("MuMVAExclusionLog"));
     delete c1;
     
-    /////  KENJI
+    //MVA code //////////////
     c1 = new TCanvas("c1", "c1",600,600);
     c1->SetLogy(true);
     frame = new TH1D("frame", "frame", 1,50, 2650);
@@ -1613,7 +1601,6 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     }
     
     TkMVAGraphMap["Gluino16_f10" ]->Draw("LP");
-    //TkGraphMap["Gluino_f50" ]->Draw("LP");
     TkMVAGraphMap["Gluino16N_f10"]->Draw("LP");
     TkMVAGraphMap["Stop16"       ]->Draw("LP");
     TkMVAGraphMap["Stop16N"      ]->Draw("LP");
@@ -1621,7 +1608,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     TkMVAGraphMap["PPStau16"     ]->Draw("LP");
     TkMVAGraphMap["DY16_Q1"    ]->Draw("LP");
     TkMVAGraphMap["DY16_Q2"    ]->Draw("LP");
-    //TkGraphMap["DY_Q2o3"    ]->Draw("LP");
+
     
     DrawPreliminary(LegendFromType(TkMVAPattern).c_str(), SQRTS, IntegratedLuminosityFromE(SQRTS));
     
@@ -1631,14 +1618,13 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     LEGTkMVA->SetFillColor(0);
     LEGTkMVA->SetFillStyle(0);
     LEGTkMVA->SetBorderSize(0);
-    //LEGTk->AddEntry(TkGraphMap["Gluino_f50" ], "gluino; 50% #tilde{g}g"            ,"LP");
+    
     LEGTkMVA->AddEntry(TkMVAGraphMap["Gluino_f10" ], "gluino; 10% #tilde{g}g"            ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["GluinoN_f10"], "gluino; 10% #tilde{g}g; CS"        ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["Stop"       ], "stop"                              ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["StopN"      ], "stop; CS"                          ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["PPStau"     ], "stau; dir. prod."                ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["GMStau"     ], "stau"                              ,"LP");
-    //LEGTk->AddEntry(TkGraphMap["DY_Q2o3"    ], "|Q| = 2e/3"                            ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["DY16_Q1"    ], "|Q| = 1e"                            ,"LP");
     LEGTkMVA->AddEntry(TkMVAGraphMap["DY16_Q2"    ], "|Q| = 2e"                            ,"LP");
     
@@ -1663,9 +1649,6 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
         TGraph* StauThLeg = (TGraph*) ThGraphMap["GMStau"        ]->Clone("StauThLeg");
         StauThLeg->SetFillColor(ThErrorMap["Gluino_f10"]->GetFillColor());
         LEGThTkMVA->AddEntry(StauThLeg   ,"stau (NLO)" ,"LF");
-        //TGraph* DYQ2o3ThLeg = (TGraph*) ThGraphMap["DY_Q2o3"        ]->Clone("DYQ2o3ThLeg");
-        //DYQ2o3ThLeg->SetFillColor(ThErrorMap["DY_Q2o3"]->GetFillColor());
-        //LEGThTkMVA->AddEntry(DYQ2o3ThLeg   ,"|Q| = 2e/3 (LO)" ,"LF");
         TGraph* DYQ1ThLeg = (TGraph*) ThGraphMap["DY16_Q1"        ]->Clone("DYQ1ThLeg");
         DYQ1ThLeg->SetFillColor(ThErrorMap["DY16_Q1"]->GetFillColor());
         LEGThTkMVA->AddEntry(DYQ1ThLeg   ,"|Q| = 1e (LO)" ,"LF");
@@ -1681,6 +1664,7 @@ void Analysis_Step4_LimitComputation(string MODE="COMPILE", string InputPattern=
     c1->SetLogy(true);
     SaveCanvas(c1, outpath, string("TkMVAExclusionLog"));
     delete c1;
+    ////////////////////////////////
     
     std::cout<<"F\n";
     
@@ -2034,8 +2018,8 @@ TGraph* CheckSignalUncertainty(FILE* pFile, FILE* talkFile, string InputPattern,
         case 3: prefix   = "Mo"; break;
         case 4: prefix   = "HQ"; break;
         case 5: prefix   = "LQ"; break;
-        case 6: prefix   = "TkMVA"; break; //KENJI
-        case 7: prefix   = "MuMVA"; break; //KENJI
+        case 6: prefix   = "TkMVA"; break; //MVA code
+        case 7: prefix   = "MuMVA"; break; //MVA code
             
     }
     
@@ -2073,7 +2057,7 @@ TGraph* CheckSignalUncertainty(FILE* pFile, FILE* talkFile, string InputPattern,
         SystH[N]       = (tmp.Eff_SYSTHUp - tmp.Eff)/tmp.Eff;  SystErrH[N]       = (tmp.EffE_SYSTHUp)/tmp.Eff;
         SystPU[N]      = (tmp.Eff_SYSTPU - tmp.Eff)/tmp.Eff;  SystErrPU[N]      = (tmp.EffE_SYSTPU)/tmp.Eff;
         SystT[N]       = (tmp.Eff_SYSTT  - tmp.Eff)/tmp.Eff;  SystErrT[N]       = (tmp.EffE_SYSTT )/tmp.Eff;
-        //KENJI//////////////////
+        //MVA code//////////////////
         if(TypeMode > 5){
             if(TypeMode == 6){SystT[N]       = 0;  SystErrT[N]       = 0;}
             SystM[N] = (tmp.Eff_SYSTComb  - tmp.Eff)/tmp.Eff;  SystErrM[N]       = (tmp.EffE_SYSTComb)/tmp.Eff;
@@ -2112,7 +2096,7 @@ TGraph* CheckSignalUncertainty(FILE* pFile, FILE* talkFile, string InputPattern,
         SystErrTotal[N] = (tmp.EffE)/tmp.Eff;
         SystTotal2[N] = -1*SystTotal[N];
         
-        //KENJI
+        //MVA code ////////////
         if(TypeMode==0 || TypeMode==5 || TypeMode == 6)fprintf(pFile, "%30s   %7.3f --> %7.3f  |  %7.3f  | %7.3f  | %7.3f | %7.3f  | %7.3f"        ,modelSample[N].Name.c_str(), tmp.Eff, SystP[N], SystI[N], SystM[N], SystH[N], SystPU[N]          , SystTotal[N]);
         else                          fprintf(pFile, "%30s   %7.3f --> %7.3f  |  %7.3f  | %7.3f  | %7.3f | %7.3f  | %7.3f | %7.3f",modelSample[N].Name.c_str(), tmp.Eff, SystP[N], SystI[N], SystM[N], SystH[N], SystPU[N], SystT[N], SystTotal[N]);
         
@@ -2209,7 +2193,8 @@ TGraph* CheckSignalUncertainty(FILE* pFile, FILE* talkFile, string InputPattern,
         LEG->AddEntry(graphSystRe,  "Reconstruction" ,"LP");
         if(TypeMode==4)LEG->AddEntry(graphSystMB,  "MB" ,"LP");
         LEG->AddEntry(graphSystP,  "P" ,"LP");
-        //KENJI//////////////////////
+
+	//MVA code //////////////////////
         if(TypeMode < 6 ){
             if(TypeMode!=3)LEG->AddEntry(graphSystI,  "dE/dx Ias" ,"LP");
             if(TypeMode!=3)LEG->AddEntry(graphSystM,  "dE/dx Mass" ,"LP");
@@ -2296,10 +2281,8 @@ TGraph* MakePlot(FILE* pFile, FILE* talkFile, string InputPattern, string ModelN
         }
     }
     
-    ///KENJI ///////////
+    ///MVA code ///////////
     if( XSectionType>0 && FileFound && TypeMode > 5){
-        //KENJI need to change the printouts
-        //cout << ModelName << endl;
         int number;
         if(ModelName.find("Gluino")!=std::string::npos){
             number = 0; //cout << number << endl;
@@ -2486,8 +2469,8 @@ void DrawModelLimitWithBand(string InputPattern){
         case 3: prefix   = "Mo"; break;
         case 4: prefix   = "HQ"; break;
         case 5: prefix   = "LQ"; break;
-        case 6: prefix   = "TkMVA"; break; //KENJI
-        case 7: prefix   = "MuMVA"; break; //KENJI
+        case 6: prefix   = "TkMVA"; break; //MVA code
+        case 7: prefix   = "MuMVA"; break; //MVA code
     }
     
     
@@ -2581,8 +2564,8 @@ void DrawRatioBands(string InputPattern)
         case 3: prefix   = "Mo"; break;
         case 4: prefix   = "HQ"; break;
         case 5: prefix   = "LQ"; break;
-        case 6: prefix   = "TkMVA"; break; //KENJI
-        case 7: prefix   = "MuMVA"; break; //KENJI
+        case 6: prefix   = "TkMVA"; break; //MVA code
+        case 7: prefix   = "MuMVA"; break; //MVA code
     }
     
     TCanvas* c2            = new TCanvas("c2", "c2",600,800);
@@ -2804,7 +2787,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
     TH1D* TotalE        = (TH1D*)GetObjectFromPath(InputFile, samples[CurrentSampleIndex].Name + "/TotalE" );
     TH1D* TotalEPU      = (TH1D*)GetObjectFromPath(InputFile, samples[CurrentSampleIndex].Name + "/TotalEPU" );
     
-    /////KENJI//////////////////
+    /////MVA code//////////////////
     string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"};
     string MVAhistname_systP[6] = {"GlunioMVA_SystP","StopMVA_SystP","GMSBStauMVA_SystP","PPStauMVA_SystP","DYQ3MVA_SystP","DYQ6MVA_SystP"};
     string MVAhistname_systI[6] = {"GlunioMVA_SystI","StopMVA_SystI","GMSBStauMVA_SystI","PPStauMVA_SystI","DYQ3MVA_SystI","DYQ6MVA_SystI"};
@@ -2919,7 +2902,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
     MassSignT     ->Scale(norm);
     MassSignPU    ->Scale(normPU);
     
-    //KENJI////////////
+    //MVA code////////////
     if( TypeMode > 5){
         for( int ihist = 0; ihist < 6; ihist++){
             MVASign[ihist] ->Scale(norm);
@@ -2932,9 +2915,6 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
             MVASignHDown[ihist]->Scale(norm);
         }
     }
-    //Compute mass range for the cut&count search
-    //KENJI you need to replace the mass cut with an MVA cut
-    // replace the mean with MVA means??
     
     double MVA_mean[6] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
     double MVA_width[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
@@ -2943,9 +2923,9 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
     
     //Compute mass range for the cut&count search
     double Mean=-1,Width=-1;
-    if(!shape && (TypeMode<=2||TypeMode>5)){ //KENJI
+    if(!shape && (TypeMode<=2||TypeMode>5)){
         TH1D* tmpMassSignProj = MassSign->ProjectionY("MassSignProj0",1,1);
-        /////KENJI////////////////////////
+        /////MVA code////////////////////////
         char StrOptimCutIndex[3]; sprintf(StrOptimCutIndex,"%i",OptimCutIndex);
         char type_mode[5]; sprintf(type_mode,"%i",TypeMode);
         
@@ -2984,7 +2964,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
         MinRange = tmpMassSignProj->GetXaxis()->GetBinLowEdge(tmpMassSignProj->GetXaxis()->FindBin(MinRange)); //Round to a bin value to avoid counting prpoblem due to the binning.
         delete tmpMassSignProj;
         
-        //KENJI////////////////////
+        //MVA code////////////////////
         if(TypeMode>5){
             
             int ihistbegin;
@@ -3135,7 +3115,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
         if(OptimCutIndex<0 && H_G->GetBinContent(CutIndex+1) >0 && H_F->GetBinContent(CutIndex+1)==0 && (H_C->GetBinContent(CutIndex+1)<25 || H_H->GetBinContent(CutIndex+1)<25)){printf("Skip cut=%i because of unreliable ABCD prediction\n", CutIndex); continue;}  //Skip events where Prediction (CH/G) is not reliable
         
         //make sure we have a reliable prediction of the shape
-        if(TypeMode<=2||TypeMode>5){//KENJI
+        if(TypeMode<=2||TypeMode>5){
             double N_P = H_P->GetBinContent(CutIndex+1);
             if(H_E->GetBinContent(CutIndex+1) >0 && (H_A->GetBinContent(CutIndex+1)<0.25*N_P || H_F->GetBinContent(CutIndex+1)<0.25*N_P || H_G->GetBinContent(CutIndex+1)<0.25*N_P)){printf("Skip cut=%i because of unreliable mass prediction\n", CutIndex); continue;}  //Skip events where Mass Prediction is not reliable
             if(H_E->GetBinContent(CutIndex+1)==0 && (H_C->GetBinContent(CutIndex+1)<0.25*N_P || H_B->GetBinContent(CutIndex+1)<0.25*N_P)){printf("Skip cut=%i because of unreliable mass prediction\n", CutIndex); continue;}  //Skip events where Mass Prediction is not reliable
@@ -3162,16 +3142,12 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
         result.WP_TOF    = HCuts_TOF->GetBinContent(CutIndex+1);
         result.LInt      = LInt;
         
-        //////KENJI////////
+        //MVA code////////
         for( int ihist = 0; ihist < 6; ihist++){
             result.MVAMean[ihist] = MVA_mean[ihist];
             result.MVASigma[ihist] = MVA_width[ihist];
             result.MVACut[ihist] = (TypeMode > 5)?MVAMinRange[ihist]:0;
-            
-            //KENJI might want to add result.MVAPredMean ... and save those to the output txt file.
-            
-            //result.MVACut[ihist] = 0.90; //KENJI
-            //cout << "result.MVACut[" << ihist <<"] = " << result.MVACut[ihist] << endl;
+
         }
         //cout << "ok 1" << endl;
         /////////////////////
@@ -3180,7 +3156,7 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
         if(TypeMode<=2){if(!runCombine(true, false, true, InputPattern, signal, CutIndex, shape, true, result, MassData, MassPred, MassSign, MassSignP, MassSignI, MassSignM, MassSignHUp, MassSignHDown, MassSignT, MassSignPU)){printf("runCombine did not converge\n"); continue;}
         }
         
-        //KENJI ///////////////
+        //MVA code ///////////////
         else if( TypeMode > 5 ){
             if( signal.find("Gluino")!=std::string::npos){
                 if(!runCombineMVA(true, false, true, InputPattern, signal, CutIndex, shape, true, result, MVAData[0], MVAPred[0], MVASign[0], MVASignP[0], MVASignI[0], MVASignComb[0], MVASignT[0], MVASignPU[0], MVASignHUp[0], MVASignHDown[0], result.MVACut[0])){
@@ -3241,7 +3217,8 @@ void Optimize(string InputPattern, string Data, string signal, bool shape, bool 
     if(TypeMode<=2){runCombine(false, true, true, InputPattern, signal, toReturn.Index, shape, false, toReturn, MassData, MassPred, MassSign, MassSignP, MassSignI, MassSignM, MassSignHUp, MassSignHDown, MassSignT, MassSignPU);
     }
     ///////////////
-    //KENJI
+
+    //MVA code/////
     else if(TypeMode > 5){
         cout << "TypeMode > 5 for " << signal << endl;
         if( signal.find("Gluino")!=std::string::npos){
@@ -3704,7 +3681,7 @@ bool runCombine(bool fastOptimization, bool getXsection, bool getSignificance, s
     if(getXsection){
         //prepare and run the script that will run the external "combine" tool from the Higgs group
         //If very low background range too small, set limit at 0.001.  Only affects scanning range not final limit
-        //Kenji This is where the higgs combined tool is being called. It is using the HybridNew asymptotic CLs method and using the ProfieLikelihood first to get a "hint" at the limit.
+        
         if(NPred<0.001) NPred=0.001;
         string CodeToExecute = "cd /tmp/;";
         CodeToExecute += "combine -M HybridNew  -H ProfileLikelihood -n " + JobName + " -m " + massStr + " shape_" + JobName+".dat > shape_" + JobName + ".log;";
@@ -4063,21 +4040,16 @@ string toLatex(double value) {
     return stringReturn;
 }
 
-//KENJI this is the MVA version of the runCombine tool in order to get the limits
-//KENJI GO THROUGH THIS CAREFULLY///// THIS IS WHERE THE XSEC IS GOTTEN FROM
-//May need to modify. Missing HIP and combined uncertainties. These correspond to MassM and MassH histos.
-//These are created during step1 which will require rerunning all over again.
+//MVA version of the runCombine tool in order to get the limits
 bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance, string& InputPattern, string& signal, unsigned int CutIndex, bool Shape, bool Temporary, stAllInfo& result, TH1* MVAData, TH1* MVAPred, TH1* MVASign, TH1* MVASignP, TH1* MVASignI, TH1* MVASignComb, TH1* MVASignT, TH1* MVASignPU, TH1* MVASignHUp, TH1* MVASignHDown, double MVAmin){
-    //KENJI ADD A BOOL TO USE MVA OR NOT
     
-    cout << "shape = " << Shape << endl;
     
     TH1D *MVADataProj=NULL, *MVAPredProj=NULL, *MVASignProj=NULL, *MVASignProjP=NULL, *MVASignProjI=NULL, *MVASignProjT=NULL, *MVASignProjPU=NULL, *MVASignProjHUp=NULL,*MVASignProjHDown=NULL, *MVASignProjComb;
     double NData, NPredErr, NPred, NSign, NSignP, NSignI, NSignT, NSignPU, NSignHUp, NSignHDown, NSignComb;
     double NSignErr, NSignPErr, NSignIErr, NSignMErr, NSignTErr, NSignPUErr, NSignHUpErr, NSignHDownErr, NSignCombErr;
     double signalsMeanHSCPPerEvent = GetSignalMeanHSCPPerEventMVA(InputPattern,CutIndex, MVAmin, MVAmax,MVASign->GetName());
     
-    int TypeMode = TypeFromPattern(InputPattern);  //might not be needed //KENJI
+    int TypeMode = TypeFromPattern(InputPattern);
     
     //IF 2D histograms --> we get all the information from there (and we can do shape based analysis AND/OR cut on mass)
     if(MVAData->InheritsFrom("TH2")){
@@ -4093,16 +4065,9 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
         MVASignProjHDown  = ((TH2D*)MVASignHDown)->ProjectionY("MVASignProHDown",CutIndex+1,CutIndex+1);
         MVASignProjComb   = ((TH2D*)MVASignComb)->ProjectionY("MVASignProComb",CutIndex+1,CutIndex+1);
         
-        cout << "got projections from file in runCombineMVA" << endl;
-        cout << "Printing MVASign" << endl;
-        MVASign->Print();
+        //MVASign->Print();
         //MVASignProj->Print("all");
         
-        
-        cout << "MVAmax = " << MVAmax << " MVAmin = " << MVAmin << endl;
-        //cout << "NSign Integral = " << MVASignProj ->IntegralAndError(MVASignProjP ->GetXaxis()->FindBin(MVAmin), MVASignProjP ->GetXaxis()->FindBin(MVAmax), NSignErr ) << endl;
-        cout << "signalsMeanHSCPPerEvent = " << signalsMeanHSCPPerEvent << endl;
-        cout << "NSignErr = " << NSignErr << endl;
         //count events in the allowed range (infinite for shape based and restricted for cut&count)
         NData       = MVADataProj->Integral(MVADataProj->GetXaxis()->FindBin(MVAmin), MVADataProj->GetXaxis()->FindBin(MVAmax));
         NPred       = MVAPredProj->Integral(MVAPredProj->GetXaxis()->FindBin(MVAmin), MVAPredProj->GetXaxis()->FindBin(MVAmax));
@@ -4117,18 +4082,10 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
         NSignHDown  = (MVASignProjHDown->IntegralAndError(MVASignProjHDown->GetXaxis()->FindBin(MVAmin), MVASignProjHDown ->GetXaxis()->FindBin(MVAmax), NSignHDownErr)) / signalsMeanHSCPPerEvent;  NSignHDownErr /= signalsMeanHSCPPerEvent;
         NSignComb      = (MVASignProjComb ->IntegralAndError(MVASignProjComb ->GetXaxis()->FindBin(MVAmin), MVASignProjComb ->GetXaxis()->FindBin(MVAmax), NSignCombErr )) / signalsMeanHSCPPerEvent;  NSignCombErr /= signalsMeanHSCPPerEvent;
         
-        cout << "Testing NSign" << endl;
-        
         double NSignTotal = MVASignProj->Integral();
         double minbin = MVASignProj->GetXaxis()->FindBin(MVAmin);
         double maxbin = MVASignProj->GetXaxis()->FindBin(MVAmax);
         double NSignTest = MVASignProj->Integral(minbin,maxbin);
-        
-        cout << "min bin = " << minbin << endl;
-        cout << "max bin = " << maxbin << endl;
-        cout << "NSign Total = " << NSignTotal << endl;
-        cout << "NSign Test = " << NSignTest << endl;
-        
         
         //IF 1D histograms --> we get all the information from the ABCD method output
     }else{
@@ -4167,11 +4124,9 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
     
     //compute all efficiencies (not really needed anymore, but it's nice to look at these numbers afterward)
     
-    //KENJI MIGHT HAVE TO EDIT THIS // result is of type stAllInfo and is input to this function
-    
     if(NPred<0.001) {NPred=0.001; NPredErr=NPred;}
+    /*
     cout << "NData = " << NData << endl;
-    if(NData == 1){NData = 0;}
     cout << "NSign = " << NSign << endl;
     cout << "NSignErr = " << NSignErr << endl;
     cout << "NPred = " << NPred << endl;
@@ -4184,6 +4139,7 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
     cout << "NSignHDown = " << NSignHDown << endl;
     
     cout << "scale factor for Eff = " << result.XSec_Th << " * " << 1.0*result.LInt << " = " << result.XSec_Th*result.LInt << endl;
+    */
     
     double Eff         = NSign   / (result.XSec_Th*result.LInt);
     double EffP        = NSignP  / (result.XSec_Th*result.LInt);
@@ -4351,15 +4307,15 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
     result.TotalUnc = SignalUnc-1;
     
     printf("SIGNAL UNCERTAINTY = %f\n",SignalUnc);
-    cout << "NData = " << NData << endl;
+    //cout << "NData = " << NData << endl;
+    
     //build the combine datacard, the same code is used both for cut&count and shape base
-    // KENJI I think this is ok.
     char TypeStr[255]; sprintf(TypeStr,"Type%i", TypeMode);
     string JobName = TypeStr+signal;
     string datacardPath = "/tmp/shape_"+JobName+".dat";
     makeDataCard(datacardPath,string("shape_")+JobName+".root", TypeStr,signal, NData, NPred, 1.0+(Shape?RescaleError:NPredErr/NPred), NSign, 1.0+fabs(EffErr/Eff), SignalUnc, Shape);
     
-    char massStr[255]; sprintf(massStr,"%.0f",result.Mass);  //KENJI change this to MVA...?? --> No should be ok.
+    char massStr[255]; sprintf(massStr,"%.0f",result.Mass);  
     string test = massStr + signal;
     if(getSignificance && Temporary){
         if(NPred<0.001) NPred=0.001;
@@ -4425,7 +4381,7 @@ bool runCombineMVA(bool fastOptimization, bool getXsection, bool getSignificance
         tree->GetBranch("limit"           )->SetAddress(&Tlimit   );
         tree->GetBranch("limitErr"        )->SetAddress(&TlimitErr);
         tree->GetBranch("quantileExpected")->SetAddress(&TquantExp);
-        for(int ientry=0;ientry<tree->GetEntriesFast();ientry++){  //KENJI Setting the exp xsec saving it to result
+        for(int ientry=0;ientry<tree->GetEntriesFast();ientry++){  //Setting the exp xsec saving it to result
             tree->GetEntry(ientry);
             printf("Quantile=%f --> Limit = %f\n", TquantExp, Tlimit*(SignalScaleFactor/result.LInt));
             if(TquantExp==0.025f){ result.XSec_Exp2Down = Tlimit*(SignalScaleFactor/result.LInt);

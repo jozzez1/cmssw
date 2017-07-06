@@ -22,7 +22,7 @@ struct stPlots {
    float        Tree_dR;
    float        Tree_eta;
    float        Tree_phi;
-    ///KENJI /////////////////
+    ///MVA code /////////////////
     float        Tree_etaErr;
     float        Tree_Ih;
     float        Tree_P;
@@ -34,7 +34,7 @@ struct stPlots {
     float        Tree_DYQ3MVA;
     float        Tree_DYQ6MVA;
     //////////////////////////
-    //KENJI
+    //MVA code
     TH2F* MVA[6];
     TH2F* MVA_SystP[6];
     TH2F* MVA_SystI[6];
@@ -280,7 +280,7 @@ struct stPlots {
   TH1D*  Hist_Is  ;
   TH1D*  Hist_TOF;
 
-    //KENJI/////////////
+    //MVA code/////////////
     TH3D* Pred_MVAP;
     
     TH3D* Pred_EtaI;
@@ -420,7 +420,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    Name = "HSCPE_SystHUp";    st.HSCPE_SystHUp  = new TH1F(Name.c_str(), Name.c_str(),  NCuts, 0,  NCuts);    st.HSCPE_SystHUp    ->Sumw2();
    Name = "HSCPE_SystHDown";    st.HSCPE_SystHDown  = new TH1F(Name.c_str(), Name.c_str(),  NCuts, 0,  NCuts);    st.HSCPE_SystHDown    ->Sumw2();
 
-    //KENJI ////////////////
+    //MVA code ////////////////
     string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"};
     string MVAhistname_systP[6] = {"GlunioMVA_SystP","StopMVA_SystP","GMSBStauMVA_SystP","PPStauMVA_SystP","DYQ3MVA_SystP","DYQ6MVA_SystP"};
     string MVAhistname_systI[6] = {"GlunioMVA_SystI","StopMVA_SystI","GMSBStauMVA_SystI","PPStauMVA_SystI","DYQ3MVA_SystI","DYQ6MVA_SystI"};
@@ -695,7 +695,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    Name = "Hist_Pt"; st.Hist_Pt = new TH1D(Name.c_str(), Name.c_str() ,200,0,PtHistoUpperBound); st.Hist_Pt->Sumw2();
    Name = "Hist_TOF"; st.Hist_TOF = new TH1D(Name.c_str(), Name.c_str() ,200,-10,20); st.Hist_TOF->Sumw2();
    //The following are only used to create the predicted mass spectrum.  Memory intensive so don't initialize for analyses not doing mass fits
-   if(TypeMode<3||TypeMode > 5) { //KENJI
+   if(TypeMode<3||TypeMode > 5) { //MVA code
      Name = "Pred_I"; st.Pred_I = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 400,0,dEdxM_UpLim); st.Pred_I->Sumw2();
      Name = "Pred_EtaB"; st.Pred_EtaB = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60,-3,3); st.Pred_EtaB->Sumw2();
      Name = "Pred_EtaS"; st.Pred_EtaS = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60,-3,3); st.Pred_EtaS->Sumw2();
@@ -703,7 +703,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
      Name = "Pred_EtaP"; st.Pred_EtaP = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 200,GlobalMinPt,PtHistoUpperBound); st.Pred_EtaP->Sumw2();
      Name = "Pred_TOF"; st.Pred_TOF = new TH2D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts,   200,GlobalMinTOF,5); st.Pred_TOF->Sumw2();
        
-       ////KENJI ////////////////
+       ////MVA code ////////////////
        
        Name = "Pred_EtaI"; st.Pred_EtaI = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 400,0,dEdxM_UpLim); st.Pred_EtaI->Sumw2();
        Name = "Pred_EtaTOF"; st.Pred_EtaTOF = new TH3D(Name.c_str(), Name.c_str() ,NCuts,0,NCuts, 60, -3, 3, 200,GlobalMinTOF,5); st.Pred_EtaTOF->Sumw2();
@@ -738,7 +738,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    }
 
    //The following are only used to create the predicted mass spectrum.  Memory intensive so don't initialize for analyses not doing mass fits
-    if(TypeMode<3||TypeMode > 5) { //KENJI
+    if(TypeMode<3||TypeMode > 5) { //MVA code
      Name = "Pred_I_Flip"; st.Pred_I_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 400,0,dEdxM_UpLim); st.Pred_I_Flip->Sumw2();
      Name = "Pred_EtaB_Flip"; st.Pred_EtaB_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 50,-3,3); st.Pred_EtaB_Flip->Sumw2();
      Name = "Pred_EtaS_Flip"; st.Pred_EtaS_Flip = new TH2D(Name.c_str(), Name.c_str() ,NCuts_Flip,0,NCuts_Flip, 50,-3,3); st.Pred_EtaS_Flip->Sumw2();
@@ -804,7 +804,7 @@ void stPlots_Init(TFile* HistoFile, stPlots& st, std::string BaseName, unsigned 
    st.Tree->Branch("eta"     ,&st.Tree_eta       ,"eta/F");
    st.Tree->Branch("phi"     ,&st.Tree_phi       ,"phi/F");
 
-    //KENJI //////////////////
+    //MVA code //////////////////
     st.Tree->Branch("etaErr"  ,&st.Tree_etaErr     ,"etaErr/F");
     st.Tree->Branch("Ih"      ,&st.Tree_Ih        ,"Ih/F");
     st.Tree->Branch("P"       ,&st.Tree_P         ,"P/F");
@@ -870,7 +870,7 @@ bool stPlots_InitFromFile(TFile* HistoFile, stPlots& st, std::string BaseName)
    st.HSCPE_SystHUp     = (TH1F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/HSCPE_SystHUp");
    st.HSCPE_SystHDown   = (TH1F*)GetObjectFromPath(st.Directory, HistoFile,  BaseName + "/HSCPE_SystHDown");
 
-    ////////////KENJI
+    ////////////MVA code
     string MVAhistname[6] = {"GluinoMVA","StopMVA","GMSBStauMVA","PPStauMVA","DYQ3MVA","DYQ6MVA"};
     string MVAhistname_systP[6] = {"GlunioMVA_SystP","StopMVA_SystP","GMSBStauMVA_SystP","PPStauMVA_SystP","DYQ3MVA_SystP","DYQ6MVA_SystP"};
     string MVAhistname_systI[6] = {"GlunioMVA_SystI","StopMVA_SystI","GMSBStauMVA_SystI","PPStauMVA_SystI","DYQ3MVA_SystI","DYQ6MVA_SystI"};
@@ -1086,7 +1086,7 @@ void stPlots_Clear(stPlots* st, bool WriteFirst=false)
 }
 
 // add one candidate to the bookeeping tree --> the event must be saved in the tree if you want to find it back with the DumpInfo.C code later on
-void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigned int Hscp, double Pt, double I, double TOF, double Mass, double dZ, double dXY, double dR, double eta, double phi, double dedx, double P, int charge, double etaErr, double Gluino_mva, double Stop_mva, double GMSBStau_mva, double PPStau_mva, double DYQ3_mva, double DYQ6_mva, int MaxEntry=20000){ //KENJI
+void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigned int Hscp, double Pt, double I, double TOF, double Mass, double dZ, double dXY, double dR, double eta, double phi, double dedx, double P, int charge, double etaErr, double Gluino_mva, double Stop_mva, double GMSBStau_mva, double PPStau_mva, double DYQ3_mva, double DYQ6_mva, int MaxEntry=20000){ //MVA code
    if(MaxEntry>0 && st->Tree->GetEntries()>=MaxEntry)return;
    st->Tree_Run   = Run;
    st->Tree_Event = Event;
@@ -1100,7 +1100,7 @@ void stPlots_FillTree(stPlots* st, unsigned int Run, unsigned int Event, unsigne
    st->Tree_dR    = dR;
    st->Tree_eta    = eta;
    st->Tree_phi    = phi;
-    //KENJI ////////////////////
+    //MVA code ////////////////////
     st->Tree_etaErr = etaErr;
     st->Tree_Ih     = dedx;
     st->Tree_P      = P;
@@ -1813,7 +1813,7 @@ void stPlots_DrawComparison(std::string SavePath, std::string LegendTitle, unsig
          Histos[3] = (TH1*)st[i]->Beta_PreselectedC;                                         legend.push_back("Preselected");
          Histos[4] = (TH1*)st[i]->Beta_SelectedP->ProjectionY("A",CutIndex_+1,CutIndex_+1);    legend.push_back("p_{T}>Cut");
          Histos[5] = (TH1*)st[i]->Beta_SelectedI->ProjectionY("B",CutIndex_+1,CutIndex_+1);    legend.push_back("I  >Cut");
-          //KENJI
+          //MVA code
          if(!(TypeMode==0 || TypeMode==5 || TypeMode==6)){Histos[6] = (TH1*)st[i]->Beta_SelectedT->ProjectionY("C",CutIndex_+1,CutIndex_+1);    legend.push_back("ToF>Cut");}
          DrawSuperposedHistos((TH1**)Histos, legend,"HIST E1",  "#beta", "# HSCP", 0,0, -10, -10);
          DrawLegend((TObject**)Histos,legend,"","P", 0.65, 0.88, 0.20, 0.025);

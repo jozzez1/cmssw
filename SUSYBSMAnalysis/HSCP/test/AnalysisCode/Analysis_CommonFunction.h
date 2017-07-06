@@ -18,7 +18,7 @@ std::string ReplacePartOfString (std::string s, std::string a, std::string b){
    return toReturn;
 }
 
-//KENJI
+
 int TypeFromPattern(const std::string& InputPattern){
   if(InputPattern.find("Type0",0)<std::string::npos){       return 0;
   }else if(InputPattern.find("Type1",0)<std::string::npos){ return 1;
@@ -1451,7 +1451,6 @@ void printClusterCleaningMessage (uint8_t exitCode){
    }
 }
 
-//KENJI
 bool MVAWeightexists(const std::string& name) {
   struct stat buffer;
   return (stat (name.c_str(), &buffer) == 0);
