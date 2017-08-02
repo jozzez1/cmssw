@@ -1,5 +1,0 @@
-<use   name="tbb"/>
-<use   name="xerces-c"/>
-<export>
-  <lib   name="1"/>
-</export>
