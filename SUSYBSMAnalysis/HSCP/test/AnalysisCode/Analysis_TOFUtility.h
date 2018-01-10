@@ -721,7 +721,7 @@ class muonTimingCalculator{
                     }
 
                     // a segment must have at least one left and one right hit
-                    if ((!hitxl.size()) || (!hityl.size())) continue;
+                    if ((!hitxl.size()) || (!hitxr.size())) continue;
 
                     int segidx=0;
                     for (std::vector<muonTimingCalculator::TimeMeasurementDT>::const_iterator tm=seg.begin(); tm!=seg.end(); ++tm) {
